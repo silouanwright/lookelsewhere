@@ -37,6 +37,7 @@ Item {
       Item {
         id: fullScreenHitArea
         anchors.fill: parent
+        visible: root.breaking
         enabled: root.breaking && window.authoritative
 
         ColumnLayout {
