@@ -147,6 +147,8 @@ function defaultSnapshot(nowMs) {
     warningEndsAtMs: 0,
     breakEndsAtMs: 0,
     activeBreakDurationMs: 0,
+    activeBreakIsLong: false,
+    breaksSinceLong: 0,
     protectedCategory: "",
     pauseReason: "",
     snoozesUsed: 0,
@@ -200,6 +202,8 @@ function copySnapshot(snapshot) {
     warningEndsAtMs: Number(value.warningEndsAtMs || 0),
     breakEndsAtMs: Number(value.breakEndsAtMs || 0),
     activeBreakDurationMs: Number(value.activeBreakDurationMs || 0),
+    activeBreakIsLong: value.activeBreakIsLong === true,
+    breaksSinceLong: Math.max(0, Number(value.breaksSinceLong || 0)),
     protectedCategory: String(value.protectedCategory || ""),
     pauseReason: String(value.pauseReason || ""),
     snoozesUsed: Number(value.snoozesUsed || 0),
@@ -313,19 +317,20 @@ function startWarning(snapshot, nowMs, config, durationMs) {
 
 function startBreak(snapshot, nowMs, config) {
   var next = copySnapshot(snapshot)
-  var completedCycles = next.totals.completed + next.totals.skipped
-  var ordinal = completedCycles + 1
-  var longBreak = config.longBreakEvery > 0 && ordinal % config.longBreakEvery === 0
+  var ordinal = next.breaksSinceLong + 1
+  var longBreak = config.longBreakEvery > 0 && ordinal >= config.longBreakEvery
   var duration = longBreak ? config.longBreakMs : config.breakMs
   next.state = State.Breaking
   next.stateEnteredAtMs = nowMs
   next.activeBreakDurationMs = duration
+  next.activeBreakIsLong = longBreak
   next.breakEndsAtMs = nowMs + duration
   return next
 }
 
 function completeBreak(snapshot, nowMs) {
   var next = copySnapshot(snapshot)
+  next.breaksSinceLong = next.activeBreakIsLong ? 0 : next.breaksSinceLong + 1
   next.state = State.Working
   next.stateEnteredAtMs = nowMs
   next.accumulatedActiveMs = 0
@@ -335,6 +340,7 @@ function completeBreak(snapshot, nowMs) {
   next.warningEndsAtMs = 0
   next.breakEndsAtMs = 0
   next.activeBreakDurationMs = 0
+  next.activeBreakIsLong = false
   next.protectedCategory = ""
   next.snoozesUsed = 0
   next.totals.completed++

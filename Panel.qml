@@ -527,7 +527,7 @@ Panel {
 
         Text {
           Layout.fillWidth: true
-          Layout.topMargin: -Style.space(2)
+          Layout.topMargin: Style.space(3)
           visible: root.page === "now" && root.delayActionsVisible
           text: root.snoozeAvailabilitySummary
           color: root.muted

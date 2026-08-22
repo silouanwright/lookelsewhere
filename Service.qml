@@ -249,6 +249,10 @@ Item {
       next.accumulatedActiveMs = config.focusMs
     }
     else if (name === "due") next.accumulatedActiveMs = config.focusMs - 30000
+    else if (name === "long-break") {
+      next.breaksSinceLong = Math.max(0, config.longBreakEvery - 1)
+      next = Model.startBreak(next, now, config)
+    }
     else if (name === "paused") {
       next.state = Model.State.Waiting
       next.pauseReason = "manual"

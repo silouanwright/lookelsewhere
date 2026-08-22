@@ -224,20 +224,25 @@ TestCase {
   function test_periodicLongBreak() {
     var c = config({ breakMs: 5000, longBreakEvery: 4, longBreakMs: 180000 })
     var s = Model.defaultSnapshot(1000)
-    s.totals.completed = 2
-    s.totals.skipped = 1
+    s.breaksSinceLong = 3
     s = Model.startBreak(s, 1000, c)
     compare(s.activeBreakDurationMs, 180000)
+    verify(s.activeBreakIsLong)
     compare(s.breakEndsAtMs, 181000)
+    s = Model.completeBreak(s, 181000)
+    compare(s.breaksSinceLong, 0)
 
     s = Model.defaultSnapshot(1000)
-    s.totals.completed = 1
+    s.breaksSinceLong = 1
     s = Model.startBreak(s, 1000, c)
     compare(s.activeBreakDurationMs, 5000)
+    verify(!s.activeBreakIsLong)
     compare(s.breakEndsAtMs, 6000)
+    s = Model.completeBreak(s, 6000)
+    compare(s.breaksSinceLong, 2)
 
     c.longBreakEvery = 0
-    s.totals.completed = 3
+    s.breaksSinceLong = 3
     s = Model.startBreak(s, 1000, c)
     compare(s.activeBreakDurationMs, 5000)
   }
@@ -369,8 +374,10 @@ TestCase {
     var s = Model.defaultSnapshot(1000)
     s.accumulatedActiveMs = 5000
     s.totals = { prompted: 2, completed: 1, postponed: 3, skipped: 4, delayed: 5 }
+    s.breaksSinceLong = 2
     var reset = Model.resetTotals(s)
     compare(reset.accumulatedActiveMs, 5000)
+    compare(reset.breaksSinceLong, 2)
     compare(reset.totals.completed, 0)
     compare(reset.totals.delayed, 0)
   }

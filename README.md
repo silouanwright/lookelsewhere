@@ -48,6 +48,7 @@ With the plugin installed and enabled:
 omarchy-shell look-elsewhere demo protected
 omarchy-shell look-elsewhere demo idle
 omarchy-shell look-elsewhere demo flow
+omarchy-shell look-elsewhere demo long-break
 omarchy-shell look-elsewhere demo warning
 omarchy-shell look-elsewhere demo final
 omarchy-shell look-elsewhere demo break
