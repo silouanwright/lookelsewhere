@@ -82,7 +82,8 @@ BarWidget {
       Text {
         id: countdown
         visible: root.showTime
-        width: timeMetrics.stableWidth
+        // Reserve a stable field so final-minute updates do not shift the bar.
+        width: Style.space(28)
         text: root.compactTime
         color: button.active && button.useActiveColor ? button.activeColor : button.foreground
         font.family: button.fontFamily
@@ -91,15 +92,6 @@ BarWidget {
         horizontalAlignment: Text.AlignRight
         renderType: Text.NativeRendering
         anchors.verticalCenter: parent.verticalCenter
-
-        FontMetrics {
-          id: timeMetrics
-          font.family: countdown.font.family
-          font.pixelSize: countdown.font.pixelSize
-          font.weight: countdown.font.weight
-          // Stable width prevents final-minute updates from shifting the bar.
-          readonly property real stableWidth: Math.max(advanceWidth("00s"), advanceWidth("00m"))
-        }
       }
     }
 
