@@ -227,6 +227,12 @@ function observe(snapshot, input, config) {
 
   if (input.active === true && input.idle !== true) next.accumulatedActiveMs += elapsed
   var remaining = Math.max(0, cfg.focusMs - next.accumulatedActiveMs)
+  // The pre-break warning is part of the focus interval, not an additional
+  // countdown after it. Enter it as soon as the configured warning window is
+  // reached and end it at the original due moment.
+  if (remaining > 0 && remaining <= cfg.warningMs) {
+    return startWarning(next, now, cfg, remaining)
+  }
   if (remaining > cfg.dueSoonMs) {
     next.state = State.Working
     return next
@@ -263,11 +269,11 @@ function observe(snapshot, input, config) {
   return startWarning(next, now, cfg)
 }
 
-function startWarning(snapshot, nowMs, config) {
+function startWarning(snapshot, nowMs, config, durationMs) {
   var next = copySnapshot(snapshot)
   next.state = State.Warning
   next.stateEnteredAtMs = nowMs
-  next.warningEndsAtMs = nowMs + config.warningMs
+  next.warningEndsAtMs = nowMs + Math.max(0, Number(durationMs === undefined ? config.warningMs : durationMs))
   next.totals.prompted++
   return next
 }

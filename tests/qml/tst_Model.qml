@@ -92,6 +92,29 @@ TestCase {
     compare(s.state, Model.State.Warning)
   }
 
+  function test_warningOccupiesFinalFocusSeconds() {
+    var c = config({ focusMs: 60000, warningMs: 25000, finalMs: 3000 })
+    var s = Model.defaultSnapshot(1000)
+
+    s = Model.observe(s, {
+      nowMs: 36000, active: true, idle: false, naturalPause: false, evidence: []
+    }, c)
+    compare(s.state, Model.State.Warning)
+    compare(s.warningEndsAtMs, 61000)
+    compare(s.totals.prompted, 1)
+
+    s = Model.observe(s, {
+      nowMs: 58000, active: true, idle: false, naturalPause: false, evidence: []
+    }, c)
+    compare(s.state, Model.State.Final)
+
+    s = Model.observe(s, {
+      nowMs: 61000, active: true, idle: false, naturalPause: false, evidence: []
+    }, c)
+    compare(s.state, Model.State.Breaking)
+    compare(s.totals.prompted, 1)
+  }
+
   function test_dueBreakWaitsForNaturalPause() {
     var c = config({ maximumDelayMs: 10000 })
     var s = Model.defaultSnapshot(0)
