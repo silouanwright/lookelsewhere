@@ -162,7 +162,10 @@ Panel {
           Item {
             Layout.alignment: Qt.AlignHCenter
             Layout.preferredWidth: Math.max(clockRow.implicitWidth, idleClock.implicitWidth)
-            Layout.preferredHeight: Math.max(clockRow.implicitHeight, idleClock.implicitHeight)
+            // Display fonts reserve substantial invisible descent below the
+            // visible glyphs. Trim that optical whitespace so the related
+            // action rail sits with the clock rather than its line box.
+            Layout.preferredHeight: Math.max(clockRow.implicitHeight, idleClock.implicitHeight) - Style.space(8)
             Accessible.role: Accessible.StaticText
             Accessible.name: root.idlePaused
               ? qsTr("Idle; focus timer paused")
@@ -399,7 +402,6 @@ Panel {
             id: postpone1Button
             visible: root.delayActionsVisible
             label: qsTr("+1m")
-            tooltipText: qsTr("Snooze for 1 minute")
             bordered: true
             focusable: true
             foreground: root.foreground
@@ -420,7 +422,6 @@ Panel {
             id: postpone5Button
             visible: root.delayActionsVisible
             label: qsTr("+5m")
-            tooltipText: qsTr("Snooze for 5 minutes")
             bordered: true
             focusable: true
             foreground: root.foreground
@@ -441,7 +442,6 @@ Panel {
             id: postpone15Button
             visible: root.delayActionsVisible
             label: qsTr("+15m")
-            tooltipText: qsTr("Snooze for 15 minutes")
             bordered: true
             focusable: true
             foreground: root.foreground
