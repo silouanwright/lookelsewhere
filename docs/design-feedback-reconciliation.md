@@ -13,7 +13,7 @@ installed-runtime check are required.
 | Offer icon, time, or icon-and-time without hover | Manifest `displayMode`; `BarWidget.showIcon/showTime` | Exercised horizontally; vertical bars intentionally use the icon |
 | Keep icon/time spacing stable as digits change | Natural-width `barContent` centered inside a content-derived `fixedWidth` | Live captures at one- and two-digit minute values |
 | Center the active underline under icon and time together | The host `WidgetButton` owns the full content-derived width | Live-verified after width correction |
-| Show away/idle suspension in the bar | `BarWidget.compactTime` renders `Paused`; idle uses the pause glyph | Deterministic idle fixture and real resume verified |
+| Show away/idle suspension compactly in the bar | `BarWidget.compactTime` renders `Idle`; idle uses the pause glyph | Deterministic idle fixture and real resume verified |
 | Round minutes down, then show seconds below one minute | `Model.formatBarDuration` floors minutes and uses second precision below 60 seconds | Boundary regression tests |
 | Keep bar and interrupting-surface seconds synchronized | Sub-minute bar and overlay both use ceiling-rounded seconds | Boundary regression tests and live warning comparison |
 
@@ -64,4 +64,3 @@ installed-runtime check are required.
   authority during an already-active break. The delegate lifecycle defect is
   fixed in source, but one connected output cannot prove the physical path.
 - Large accessibility text scaling still needs a dedicated capture matrix.
-

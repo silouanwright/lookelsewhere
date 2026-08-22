@@ -138,6 +138,7 @@ Panel {
             Layout.alignment: Qt.AlignHCenter
             Layout.preferredWidth: Style.space(34)
             Layout.preferredHeight: Layout.preferredWidth
+            Layout.bottomMargin: Style.space(3)
             Accessible.ignored: true
 
             BreakIcon {
@@ -148,7 +149,7 @@ Panel {
 
           Text {
             Layout.fillWidth: true
-            Layout.bottomMargin: -Style.space(5)
+            Layout.bottomMargin: -Style.space(7)
             text: root.idlePaused ? qsTr("Look Elsewhere is paused") : qsTr("Break starts in")
             color: root.foreground
             font.family: root.fontFamily
