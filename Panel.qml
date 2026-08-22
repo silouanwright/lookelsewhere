@@ -1,6 +1,5 @@
 import QtQuick
 import QtQuick.Controls
-import QtQuick.Effects
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
@@ -28,6 +27,16 @@ Panel {
   readonly property int remainingSeconds: service ? Math.max(0, Math.ceil(service.remainingMs / 1000)) : 0
   readonly property int remainingMinutesPart: Math.floor(remainingSeconds / 60)
   readonly property int remainingSecondsPart: remainingSeconds % 60
+  readonly property real clockSeparatorOverlap: Math.max(0,
+    (clockColonMetrics.advanceWidth - clockColonMetrics.tightBoundingRect.width) / 2)
+
+  TextMetrics {
+    id: clockColonMetrics
+    text: ":"
+    font.family: root.fontFamily
+    font.pixelSize: Style.font.display * 1.55
+    font.weight: Font.DemiBold
+  }
 
   function syncSettings() { if (service) service.configure(settings) }
   onSettingsChanged: syncSettings()
@@ -134,17 +143,9 @@ Panel {
             Layout.preferredHeight: Layout.preferredWidth
             Accessible.ignored: true
 
-            Image {
+            BreakIcon {
               anchors.fill: parent
-              source: Qt.resolvedUrl("assets/break.svg")
-              sourceSize: Qt.size(width, height)
-              fillMode: Image.PreserveAspectFit
-              smooth: true
-              layer.enabled: true
-              layer.effect: MultiEffect {
-                colorization: 1
-                colorizationColor: root.accent
-              }
+              color: root.accent
             }
           }
 
@@ -161,10 +162,10 @@ Panel {
 
           Row {
             Layout.alignment: Qt.AlignHCenter
-            // Monospace themes reserve a full character cell around the
-            // colon. Pull the number groups into that cell so the clock reads
-            // as one compact value instead of three separated tokens.
-            spacing: -Style.space(2)
+            // Remove only the active font's unused colon side-bearing. This
+            // preserves natural glyph metrics across Omarchy themes while
+            // keeping independently rolling digit columns visually unified.
+            spacing: -root.clockSeparatorOverlap
             Accessible.role: Accessible.StaticText
             Accessible.name: qsTr("Time remaining: %1").arg(root.service ? root.service.remainingText : qsTr("Starting"))
 
@@ -346,7 +347,7 @@ Panel {
           Layout.fillWidth: true
           Layout.alignment: Qt.AlignHCenter
           visible: root.page === "now"
-          spacing: Style.space(8)
+          spacing: Style.space(5)
 
           Button {
             id: breakNowButton
@@ -356,6 +357,8 @@ Panel {
             foreground: root.foreground
             accent: root.accent
             fontFamily: root.fontFamily
+            fontSize: Style.font.bodySmall
+            horizontalPadding: Style.space(7)
             KeyNavigation.tab: root.delayActionsVisible ? postpone1Button : statsButton
             KeyNavigation.backtab: settingsButton
             Keys.onEscapePressed: root.close()
@@ -365,16 +368,9 @@ Panel {
             onClicked: { if (root.service) root.service.takeBreak(); root.close() }
           }
 
-        }
-
-        RowLayout {
-          Layout.fillWidth: true
-          Layout.alignment: Qt.AlignHCenter
-          visible: root.page === "now" && root.delayActionsVisible
-          spacing: Style.space(6)
-
           Button {
             id: postpone1Button
+            visible: root.delayActionsVisible
             text: qsTr("+1m")
             tooltipText: qsTr("Snooze for 1 minute")
             bordered: true
@@ -382,6 +378,8 @@ Panel {
             foreground: root.foreground
             accent: root.accent
             fontFamily: root.fontFamily
+            fontSize: Style.font.bodySmall
+            horizontalPadding: Style.space(6)
             KeyNavigation.tab: postpone5Button
             KeyNavigation.backtab: breakNowButton
             Keys.onEscapePressed: root.close()
@@ -393,6 +391,7 @@ Panel {
 
           Button {
             id: postpone5Button
+            visible: root.delayActionsVisible
             text: qsTr("+5m")
             tooltipText: qsTr("Snooze for 5 minutes")
             bordered: true
@@ -400,6 +399,8 @@ Panel {
             foreground: root.foreground
             accent: root.accent
             fontFamily: root.fontFamily
+            fontSize: Style.font.bodySmall
+            horizontalPadding: Style.space(6)
             KeyNavigation.tab: postpone15Button
             KeyNavigation.backtab: postpone1Button
             Keys.onEscapePressed: root.close()
@@ -411,6 +412,7 @@ Panel {
 
           Button {
             id: postpone15Button
+            visible: root.delayActionsVisible
             text: qsTr("+15m")
             tooltipText: qsTr("Snooze for 15 minutes")
             bordered: true
@@ -418,6 +420,8 @@ Panel {
             foreground: root.foreground
             accent: root.accent
             fontFamily: root.fontFamily
+            fontSize: Style.font.bodySmall
+            horizontalPadding: Style.space(6)
             KeyNavigation.tab: statsButton
             KeyNavigation.backtab: postpone5Button
             Keys.onEscapePressed: root.close()
