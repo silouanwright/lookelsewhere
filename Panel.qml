@@ -28,7 +28,9 @@ Panel {
     owner: root.hostWidget || root
     bar: root.bar
     open: root.opened
-    centerOnBar: true
+    // The control surface belongs spatially to the eye button. Warning and
+    // break surfaces are separate and intentionally centered by Overlay.qml.
+    centerOnBar: false
     contentWidth: popup.fittedContentWidth(Style.space(390))
     contentHeight: popup.fittedContentHeight(content.implicitHeight)
 
