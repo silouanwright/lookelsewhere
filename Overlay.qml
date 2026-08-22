@@ -46,9 +46,9 @@ Item {
         contentMotionAnimation.stop()
         contentBlurAnimation.stop()
         backdropReveal = 0
-        contentOpacity = 0
-        contentOffset = Style.space(144)
-        contentBlur = 0.72
+        contentOffset = Style.space(96)
+        contentOpacity = 0.24
+        contentBlur = 0.2
         backdropAnimation.start()
         contentOpacityAnimation.start()
         contentMotionAnimation.start()
@@ -78,46 +78,46 @@ Item {
         property: "backdropReveal"
         from: 0
         to: 1
-        duration: 2000
-        easing.type: Easing.InOutCubic
+        duration: 1100
+        easing.type: Easing.InOutSine
       }
 
       SequentialAnimation {
         id: contentOpacityAnimation
-        PauseAnimation { duration: 80 }
+        PauseAnimation { duration: 40 }
         NumberAnimation {
           target: window
           property: "contentOpacity"
-          from: 0
+          from: 0.24
           to: 1
-          duration: 1600
-          easing.type: Easing.InOutCubic
+          duration: 850
+          easing.type: Easing.InOutSine
         }
       }
 
       SequentialAnimation {
         id: contentMotionAnimation
-        PauseAnimation { duration: 80 }
+        PauseAnimation { duration: 40 }
         NumberAnimation {
           target: window
           property: "contentOffset"
-          from: Style.space(144)
+          from: Style.space(96)
           to: 0
-          duration: 1800
-          easing.type: Easing.InOutCubic
+          duration: 1000
+          easing.type: Easing.InOutSine
         }
       }
 
       SequentialAnimation {
         id: contentBlurAnimation
-        PauseAnimation { duration: 60 }
+        PauseAnimation { duration: 40 }
         NumberAnimation {
           target: window
           property: "contentBlur"
-          from: 0.72
+          from: 0.2
           to: 0
-          duration: 1800
-          easing.type: Easing.InOutCubic
+          duration: 900
+          easing.type: Easing.InOutSine
         }
       }
 
@@ -142,12 +142,12 @@ Item {
         focus: enabled
 
         ColumnLayout {
-          anchors.centerIn: parent
-          anchors.verticalCenterOffset: window.contentOffset
+          x: Math.round((parent.width - width) / 2)
+          y: Math.round((parent.height - implicitHeight) / 2 + window.contentOffset)
           width: Math.min(parent.width - Style.space(48), Style.space(520))
           spacing: Style.space(18)
           opacity: Math.max(0, Math.min(1, window.contentOpacity))
-          scale: 1 - 0.035 * Math.min(1, Math.max(0, window.contentOffset / Style.space(144)))
+          scale: 1 - 0.015 * Math.min(1, Math.max(0, window.contentOffset / Style.space(96)))
           layer.enabled: window.contentBlur > 0.001
           layer.smooth: true
           layer.effect: MultiEffect {
