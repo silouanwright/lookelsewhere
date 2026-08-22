@@ -1,14 +1,56 @@
 # Look Elsewhere
 
-Look Elsewhere is a context-aware break coach built for Omarchy. It counts active screen use, waits through protected moments such as meetings, media, fullscreen work, and dictation, then delivers a calm native warning and break experience at a better moment.
+Look Elsewhere is a private, context-aware break coach built natively for Omarchy. It counts active screen use, waits through protected moments such as meetings, media, fullscreen work, and dictation, then delivers a calm warning and break at a better moment.
 
-The project is currently in its documented pre-implementation phase. Product contracts and architecture decisions live under [`docs/`](docs/README.md).
+The repository currently contains a runnable competition prototype: a resident scheduling service, bar widget, anchored quick panel, progressive warning, final countdown, and theme-aware multi-monitor break overlay. The remaining release work is tracked in the [completion matrix](docs/completion-matrix.md).
 
 ## Product promise
 
 > Look Elsewhere finds the right moment to pull your attention away from the screen.
 
-The competition MVP is a self-contained Omarchy Shell plugin written with Quickshell/QML. It will provide a bar widget, quick panel, context service, top-centered warning, final countdown chip, and multi-monitor break overlay.
+The competition MVP is a self-contained Omarchy Shell plugin written with Quickshell/QML. It observes only coarse local state. It does not record audio, capture the screen, retain window or media titles, require an account, or send telemetry.
+
+## Current capabilities
+
+- Active-use scheduling with timestamp persistence and recovery
+- Idle, Hyprland fullscreen, MPRIS playback, PipeWire microphone, and Omarchy dictation evidence
+- Confidence-based protected-context delay and cooldown
+- Gentle, Balanced, and Focused enforcement policies
+- Omarchy-native bar, popup, warning, countdown, and break surfaces
+- One interactive authority across multiple outputs
+- Deterministic IPC demo states that do not persist synthetic data
+- Theme-role integration for contrasting Omarchy themes
+
+## Development preview
+
+With the plugin installed and enabled:
+
+```bash
+omarchy-shell look-elsewhere demo protected
+omarchy-shell look-elsewhere demo warning
+omarchy-shell look-elsewhere demo final
+omarchy-shell look-elsewhere demo break
+omarchy-shell look-elsewhere demoOff
+```
+
+These fixtures are development tools. They restore the pre-demo snapshot and never write synthetic state.
+
+## Install
+
+The public repository is not published yet. Once available:
+
+```bash
+omarchy plugin add https://github.com/silouanwright/look-elsewhere.git --enable
+```
+
+Disable or remove it safely with:
+
+```bash
+omarchy plugin disable io.github.silouanwright.look-elsewhere
+omarchy plugin remove io.github.silouanwright.look-elsewhere
+```
+
+Look Elsewhere has no installer hook, privileged operation, external daemon, account, or network dependency.
 
 ## Project identity
 
@@ -18,6 +60,6 @@ The competition MVP is a self-contained Omarchy Shell plugin written with Quicks
 - Runtime target: Omarchy Quattro / Omarchy Shell
 - Source repository: `silouanwright/look-elsewhere`
 
-## Current status
+## Documentation
 
-No production implementation has been accepted yet. The next milestone is a runnable Quickshell feasibility and interaction prototype governed by the accepted ADRs.
+Product behavior, architecture, privacy boundaries, research, ADRs, verification, and competition delivery live under [`docs/`](docs/README.md).

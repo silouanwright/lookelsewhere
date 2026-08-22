@@ -14,10 +14,8 @@ Omarchy Shell / Quickshell process
     │   └── bar presentation + quick-panel loader
     ├── Panel.qml
     │   └── status, immediate actions, summary, settings entry
-    ├── WarningOverlay.qml
-    │   └── top-center warning + final countdown chip
-    ├── BreakOverlay.qml
-    │   └── per-output break presentation
+    ├── Overlay.qml
+    │   └── top-center warning, final chip, and per-output break presentation
     ├── Model.js
     │   └── pure transitions, policies, formatting
     └── state/config JSON under XDG state/config locations
@@ -41,10 +39,10 @@ The prototype must validate whether the overlay is best owned by the resident se
 
 ## Data paths
 
-- Configuration: `${XDG_CONFIG_HOME:-~/.config}/look-elsewhere/config.json`
-- Runtime state: `${XDG_STATE_HOME:-~/.local/state}/look-elsewhere/state.json`
+- Manifest-backed user settings: Omarchy Shell configuration
+- Normalized runtime configuration and state: `${XDG_STATE_HOME:-~/.local/state}/look-elsewhere/state.json`
 
-Exact schemas will be versioned before implementation. Writes must be atomic. Corrupt or unsupported data must fall back safely with an explanation and without overwriting the original before recovery is possible.
+The persisted document is versioned and written atomically. Before release, corrupt/unsupported-state recovery must retain diagnostic evidence rather than silently replacing the original.
 
 ## External integrations
 

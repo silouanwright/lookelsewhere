@@ -12,6 +12,7 @@ This directory is the product and engineering source of truth. Earlier competiti
 - [Privacy and trust](privacy.md)
 - [Competition delivery plan](competition.md)
 - [Verification strategy](verification.md)
+- [Completion matrix](completion-matrix.md)
 - [Research archive and synthesis](research/README.md)
 - [Architecture decision records](adr/README.md)
 
