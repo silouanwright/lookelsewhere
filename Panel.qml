@@ -16,7 +16,7 @@ Panel {
   property var anchorItem: null
   property var hostWidget: null
   property string page: "now"
-  property bool keyboardHintsVisible: false
+  property var keyboardHintsOverride: null
 
   // Popup roles are independent from bar roles in an Omarchy theme.
   readonly property color foreground: Color.popups.text
@@ -28,6 +28,9 @@ Panel {
   readonly property bool delayActionsVisible: !manuallyPaused && service
   readonly property bool delayActionsEnabled: delayActionsVisible && service.canPostpone
   readonly property bool shortcutsActive: opened && popup.activeFocusItem !== null
+  readonly property bool keyboardHintsVisible: keyboardHintsOverride === null
+    ? !!(settings && settings.showKeyboardHints === true)
+    : keyboardHintsOverride === true
   readonly property int snoozesRemaining: service
     ? Math.max(0, Number(service.config.snoozeBudget || 0) - Number(service.snapshot.snoozesUsed || 0))
     : 0
@@ -69,15 +72,12 @@ Panel {
     if (service && !service.interrupting) service.togglePause()
   }
   function togglePage(name) { page = page === name ? "now" : name }
-  function dismissHintsOrClose() {
-    if (keyboardHintsVisible) keyboardHintsVisible = false
-    else close()
-  }
+  function toggleKeyboardHints() { keyboardHintsOverride = !keyboardHintsVisible }
+  function dismissHintsOrClose() { close() }
   onSettingsChanged: syncSettings()
   onServiceChanged: syncSettings()
   onOpenedChanged: if (!opened) {
     page = "now"
-    keyboardHintsVisible = false
   }
 
   // Window-local mnemonics complement native Tab/Backtab traversal. They are
@@ -92,7 +92,7 @@ Panel {
   Shortcut { sequence: "E"; context: Qt.ApplicationShortcut; enabled: root.shortcutsActive && root.page === "options"; onActivated: { root.close(); settingsEditor.running = true } }
   Shortcut { sequence: "Shift+D"; context: Qt.ApplicationShortcut; enabled: root.shortcutsActive && root.page === "options"; onActivated: { root.close(); stopPlugin.running = true } }
   Shortcut { sequence: "Q"; context: Qt.ApplicationShortcut; enabled: root.shortcutsActive; onActivated: root.close() }
-  Shortcut { sequence: "?"; context: Qt.ApplicationShortcut; enabled: root.shortcutsActive; onActivated: root.keyboardHintsVisible = !root.keyboardHintsVisible }
+  Shortcut { sequence: "?"; context: Qt.ApplicationShortcut; enabled: root.shortcutsActive; onActivated: root.toggleKeyboardHints() }
 
   KeyboardPanel {
     id: popup
@@ -155,7 +155,7 @@ Panel {
           Accessible.role: Accessible.Button
           Accessible.name: qsTr("Toggle keyboard shortcut hints")
           Accessible.onPressAction: clicked()
-          onClicked: root.keyboardHintsVisible = !root.keyboardHintsVisible
+          onClicked: root.toggleKeyboardHints()
 
           KeyHintBadge {
             visible: root.keyboardHintsVisible

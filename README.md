@@ -82,6 +82,7 @@ omarchy bar set io.github.silouanwright.look-elsewhere startSoundPath '"/absolut
 omarchy bar set io.github.silouanwright.look-elsewhere completionSoundPath '"~/Sounds/complete.ogg"' --json
 omarchy bar set io.github.silouanwright.look-elsewhere outputMode '"all"' --json
 omarchy bar set io.github.silouanwright.look-elsewhere displayMode '"icon-and-time"' --json
+omarchy bar set io.github.silouanwright.look-elsewhere showKeyboardHints true --json
 ```
 
 `displayMode` accepts `icon`, `time`, or `icon-and-time`. The compact countdown shows minutes, then switches to seconds during the final minute. Vertical bars use the icon so the widget remains legible.
@@ -126,8 +127,8 @@ closes the panel. Direct panel keys keep common actions immediate:
 | `o` | Toggle options |
 | `e` | Edit settings while Options is open |
 | `Shift+d` | Stop and disable Look Elsewhere while Options is open |
-| `?` | Toggle visible key hints for every action |
-| `q` or `Esc` | Close the panel |
+| `?` | Toggle visible key hints for every action; the choice persists for the shell session |
+| `q` or `Esc` | Close the panel without changing key-hint visibility |
 
 Look Elsewhere does not silently claim global keys. On a stock Omarchy install,
 these optional bindings can be added to `~/.config/hypr/bindings.lua`:

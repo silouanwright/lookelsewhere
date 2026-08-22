@@ -47,7 +47,8 @@
       "startSoundPath": "",
       "completionSoundPath": "",
       "outputMode": "all",
-      "displayMode": "icon-and-time"
+      "displayMode": "icon-and-time",
+      "showKeyboardHints": false
     },
     "schema": [
       { "key": "focusMinutes", "type": "integer", "label": "Focus interval (minutes)", "min": 1, "max": 180, "step": 1, "defaultValue": 20 },
@@ -75,7 +76,8 @@
       { "key": "startSoundPath", "type": "string", "label": "Custom break-start sound", "defaultValue": "", "description": "Absolute path or ~/ path to an audio file. Leave empty to use the bundled piano cue." },
       { "key": "completionSoundPath", "type": "string", "label": "Custom break-completion sound", "defaultValue": "", "description": "Absolute path or ~/ path to an audio file. Leave empty to use the bundled piano cue." },
       { "key": "outputMode", "type": "enum", "label": "Break outputs", "options": ["all", "focused"], "defaultValue": "all", "description": "Show interruptions on every output or only the currently focused output." },
-      { "key": "displayMode", "type": "enum", "label": "Bar display", "options": ["icon", "time", "icon-and-time"], "defaultValue": "icon-and-time", "description": "Show the eye, the compact countdown, or both. Vertical bars use the icon." }
+      { "key": "displayMode", "type": "enum", "label": "Bar display", "options": ["icon", "time", "icon-and-time"], "defaultValue": "icon-and-time", "description": "Show the eye, the compact countdown, or both. Vertical bars use the icon." },
+      { "key": "showKeyboardHints", "type": "boolean", "label": "Show keyboard hints by default", "defaultValue": false, "description": "Show shortcut badges whenever the panel opens. Toggle them temporarily with ?." }
     ]
   }
 }
