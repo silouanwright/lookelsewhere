@@ -368,11 +368,16 @@ Panel {
           wrapMode: Text.WordWrap
         }
 
-        RowLayout {
+        Item {
           Layout.fillWidth: true
-          Layout.alignment: Qt.AlignHCenter
+          Layout.preferredHeight: Math.max(0, actionRow.implicitHeight - Style.space(6))
           visible: root.page === "now"
-          spacing: Style.space(5)
+
+          RowLayout {
+            id: actionRow
+            anchors.horizontalCenter: parent.horizontalCenter
+            y: -Style.space(6)
+            spacing: Style.space(5)
 
           WeightedButton {
             id: breakNowButton
@@ -434,24 +439,25 @@ Panel {
             onClicked: { if (root.service) root.service.postponeMinutes(5); root.close() }
           }
 
-          WeightedButton {
-            id: postpone15Button
-            visible: root.delayActionsVisible
-            label: qsTr("+15m")
-            bordered: true
-            focusable: true
-            foreground: root.foreground
-            accent: root.accent
-            fontFamily: root.fontFamily
-            fontSize: Style.font.bodySmall
-            horizontalPadding: Style.space(6)
-            KeyNavigation.tab: statsButton
-            KeyNavigation.backtab: postpone5Button
-            Keys.onEscapePressed: root.close()
-            Accessible.role: Accessible.Button
-            Accessible.name: qsTr("Snooze next break for 15 minutes")
-            Accessible.onPressAction: clicked()
-            onClicked: { if (root.service) root.service.postponeMinutes(15); root.close() }
+            WeightedButton {
+              id: postpone15Button
+              visible: root.delayActionsVisible
+              label: qsTr("+15m")
+              bordered: true
+              focusable: true
+              foreground: root.foreground
+              accent: root.accent
+              fontFamily: root.fontFamily
+              fontSize: Style.font.bodySmall
+              horizontalPadding: Style.space(6)
+              KeyNavigation.tab: statsButton
+              KeyNavigation.backtab: postpone5Button
+              Keys.onEscapePressed: root.close()
+              Accessible.role: Accessible.Button
+              Accessible.name: qsTr("Snooze next break for 15 minutes")
+              Accessible.onPressAction: clicked()
+              onClicked: { if (root.service) root.service.postponeMinutes(15); root.close() }
+            }
           }
         }
 
