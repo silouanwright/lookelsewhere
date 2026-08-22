@@ -445,6 +445,7 @@ Panel {
             id: postpone1Button
             visible: root.delayActionsVisible
             actionEnabled: root.delayActionsEnabled
+            tooltipText: root.delayActionsEnabled ? root.snoozeBudgetSummary : ""
             disabledTooltipText: root.delayActionsEnabled ? "" : root.snoozeBudgetSummary
             label: qsTr("+1m")
             bordered: true
@@ -469,6 +470,7 @@ Panel {
             id: postpone5Button
             visible: root.delayActionsVisible
             actionEnabled: root.delayActionsEnabled
+            tooltipText: root.delayActionsEnabled ? root.snoozeBudgetSummary : ""
             disabledTooltipText: root.delayActionsEnabled ? "" : root.snoozeBudgetSummary
             label: qsTr("+5m")
             bordered: true
@@ -493,6 +495,7 @@ Panel {
               id: postpone15Button
               visible: root.delayActionsVisible
               actionEnabled: root.delayActionsEnabled
+              tooltipText: root.delayActionsEnabled ? root.snoozeBudgetSummary : ""
               disabledTooltipText: root.delayActionsEnabled ? "" : root.snoozeBudgetSummary
               label: qsTr("+15m")
               bordered: true
