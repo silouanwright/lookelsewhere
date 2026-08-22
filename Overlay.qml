@@ -23,6 +23,7 @@ Item {
   readonly property int remainingSeconds: service ? Math.max(0, Math.ceil(service.remainingMs / 1000)) : 0
   readonly property int remainingMinutesPart: Math.floor(remainingSeconds / 60)
   readonly property int remainingSecondsPart: remainingSeconds % 60
+  readonly property real breakClockFontSize: Style.font.display * 1.35
   readonly property real clockSeparatorOverlap: Math.max(0,
     (clockColonMetrics.advanceWidth - clockColonMetrics.tightBoundingRect.width) / 2)
 
@@ -30,7 +31,7 @@ Item {
     id: clockColonMetrics
     text: ":"
     font.family: Style.font.family
-    font.pixelSize: Style.font.display
+    font.pixelSize: root.breakClockFontSize
     font.weight: Font.DemiBold
   }
 
@@ -225,7 +226,7 @@ Item {
               minimumDigits: 2
               color: Color.lock.text
               fontFamily: Style.font.family
-              fontSize: Style.font.display
+              fontSize: root.breakClockFontSize
               fontWeight: Font.DemiBold
               reducedMotion: root.service && root.service.config.reducedMotion
               animationActive: window.visible && root.breaking
@@ -234,7 +235,7 @@ Item {
               text: ":"
               color: Color.lock.text
               font.family: Style.font.family
-              font.pixelSize: Style.font.display
+              font.pixelSize: root.breakClockFontSize
               font.weight: Font.DemiBold
               Accessible.ignored: true
             }
@@ -243,7 +244,7 @@ Item {
               minimumDigits: 2
               color: Color.lock.text
               fontFamily: Style.font.family
-              fontSize: Style.font.display
+              fontSize: root.breakClockFontSize
               fontWeight: Font.DemiBold
               reducedMotion: root.service && root.service.config.reducedMotion
               animationActive: window.visible && root.breaking
