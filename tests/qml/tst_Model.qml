@@ -38,6 +38,9 @@ TestCase {
       officeStart: "22:30",
       mediaDetection: false,
       soundEnabled: true,
+      soundVolume: 35,
+      startSoundEnabled: false,
+      completionSoundPath: "~/Sounds/done.ogg",
       outputMode: "focused"
     })
     compare(customized.focusMs, 25 * 60000)
@@ -45,6 +48,9 @@ TestCase {
     compare(customized.officeHours.startMinute, 22 * 60 + 30)
     verify(!customized.detectors.media)
     verify(customized.soundEnabled)
+    compare(customized.soundVolume, 35)
+    verify(!customized.startSoundEnabled)
+    compare(customized.completionSoundPath, "~/Sounds/done.ogg")
     compare(customized.outputMode, "focused")
 
     // Omarchy supplies no key after an override is removed. A fresh
@@ -54,7 +60,12 @@ TestCase {
     verify(!restored.officeHours.enabled)
     compare(restored.officeHours.startMinute, 8 * 60)
     verify(restored.detectors.media)
-    verify(!restored.soundEnabled)
+    verify(restored.soundEnabled)
+    compare(restored.soundVolume, 65)
+    verify(restored.startSoundEnabled)
+    verify(restored.completionSoundEnabled)
+    compare(restored.startSoundPath, "")
+    compare(restored.completionSoundPath, "")
     compare(restored.outputMode, "all")
   }
 

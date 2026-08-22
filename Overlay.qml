@@ -56,6 +56,8 @@ Item {
       property real contentOpacity: 0
       property real contentOffset: 0
       property real contentBlur: 0
+      readonly property int backdropDuration: 495
+      readonly property int contentRevealDelay: backdropDuration + 650
 
       function beginBreakReveal() {
         backdropAnimation.stop()
@@ -64,7 +66,7 @@ Item {
         contentBlurAnimation.stop()
         backdropReveal = 0
         contentOffset = Style.space(24)
-        contentOpacity = 0.28
+        contentOpacity = 0
         contentBlur = 0.08
         if (root.service && root.service.config.reducedMotion) {
           backdropReveal = 1
@@ -106,17 +108,17 @@ Item {
         property: "backdropReveal"
         from: 0
         to: 1
-        duration: 495
+        duration: window.backdropDuration
         easing.type: Easing.InOutSine
       }
 
       SequentialAnimation {
         id: contentOpacityAnimation
-        PauseAnimation { duration: 66 }
+        PauseAnimation { duration: window.contentRevealDelay }
         NumberAnimation {
           target: window
           property: "contentOpacity"
-          from: 0.28
+          from: 0
           to: 1
           duration: 495
           easing.type: Easing.InOutSine
@@ -125,7 +127,7 @@ Item {
 
       SequentialAnimation {
         id: contentMotionAnimation
-        PauseAnimation { duration: 0 }
+        PauseAnimation { duration: window.contentRevealDelay }
         NumberAnimation {
           target: window
           property: "contentOffset"
@@ -138,7 +140,7 @@ Item {
 
       SequentialAnimation {
         id: contentBlurAnimation
-        PauseAnimation { duration: 121 }
+        PauseAnimation { duration: window.contentRevealDelay + 55 }
         NumberAnimation {
           target: window
           property: "contentBlur"

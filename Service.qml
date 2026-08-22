@@ -74,6 +74,13 @@ Item {
   readonly property bool canPostpone: Model.canPostpone(snapshot, config)
   readonly property bool canSkipBreak: phase === Model.State.Breaking && Model.canSkipBreak(config)
   readonly property bool soundAvailable: startSoundAvailable && completionSoundAvailable
+  readonly property string soundVolumeDb: {
+    var level = Math.max(0, Math.min(100, Number(config.soundVolume || 0)))
+    if (level <= 0) return "-10000.0"
+    return (20 * Math.log(level / 100) / Math.LN10).toFixed(1)
+  }
+  readonly property string startSoundPath: resolvedSoundPath(config.startSoundPath, Qt.resolvedUrl("assets/sounds/break-start.ogg"))
+  readonly property string completionSoundPath: resolvedSoundPath(config.completionSoundPath, Qt.resolvedUrl("assets/sounds/break-complete.ogg"))
   readonly property int remainingMs: {
     var now = Date.now()
     if (phase === Model.State.Breaking) return Math.max(0, Number(snapshot.breakEndsAtMs || 0) - now)
@@ -187,8 +194,16 @@ Item {
   function playTransitionSound(beforeState, afterState) {
     if (demoMode || !config.soundEnabled) return
     var cue = Model.soundCueForTransition(beforeState, afterState)
-    if (cue === "start" && !breakStartSound.running) breakStartSound.running = true
-    else if (cue === "complete" && !breakCompletionSound.running) breakCompletionSound.running = true
+    if (cue === "start" && config.startSoundEnabled && !breakStartSound.running) breakStartSound.running = true
+    else if (cue === "complete" && config.completionSoundEnabled && !breakCompletionSound.running) breakCompletionSound.running = true
+  }
+
+  function resolvedSoundPath(configuredPath, bundledUrl) {
+    var value = String(configuredPath || "").trim()
+    if (!value) value = String(bundledUrl)
+    if (value.indexOf("~/") === 0) value = Quickshell.env("HOME") + value.substring(1)
+    if (value.indexOf("file://") === 0) value = decodeURIComponent(value.substring(7))
+    return value
   }
 
   function setDemo(name) {
@@ -398,13 +413,13 @@ Item {
 
   Process {
     id: breakStartSound
-    command: ["canberra-gtk-play", "-i", "dialog-information", "-d", "Look Elsewhere break started"]
+    command: ["canberra-gtk-play", "-f", service.startSoundPath, "-V", service.soundVolumeDb, "-d", "Look Elsewhere break started"]
     onExited: function(exitCode) { service.startSoundAvailable = exitCode === 0 }
   }
 
   Process {
     id: breakCompletionSound
-    command: ["canberra-gtk-play", "-i", "complete", "-d", "Look Elsewhere break complete"]
+    command: ["canberra-gtk-play", "-f", service.completionSoundPath, "-V", service.soundVolumeDb, "-d", "Look Elsewhere break complete"]
     onExited: function(exitCode) { service.completionSoundAvailable = exitCode === 0 }
   }
 

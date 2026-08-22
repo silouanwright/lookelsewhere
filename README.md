@@ -69,15 +69,25 @@ omarchy bar set io.github.silouanwright.look-elsewhere enforcement '"balanced"' 
 omarchy bar set io.github.silouanwright.look-elsewhere officeHoursEnabled true --json
 omarchy bar set io.github.silouanwright.look-elsewhere reducedMotion false --json
 omarchy bar set io.github.silouanwright.look-elsewhere soundEnabled true --json
+omarchy bar set io.github.silouanwright.look-elsewhere soundVolume 65 --json
+omarchy bar set io.github.silouanwright.look-elsewhere startSoundEnabled true --json
+omarchy bar set io.github.silouanwright.look-elsewhere completionSoundEnabled true --json
+omarchy bar set io.github.silouanwright.look-elsewhere startSoundPath '"/absolute/path/to/start.ogg"' --json
+omarchy bar set io.github.silouanwright.look-elsewhere completionSoundPath '"~/Sounds/complete.ogg"' --json
 omarchy bar set io.github.silouanwright.look-elsewhere outputMode '"all"' --json
 omarchy bar set io.github.silouanwright.look-elsewhere displayMode '"icon-and-time"' --json
 ```
 
 `displayMode` accepts `icon`, `time`, or `icon-and-time`. The compact countdown shows minutes, then switches to seconds during the final minute. Vertical bars use the icon so the widget remains legible.
 
-When `soundEnabled` is true, Look Elsewhere plays a quiet freedesktop theme cue
-when a break begins and a distinct completion cue when it is time to return.
-Demo fixtures and state restoration never replay either cue.
+Look Elsewhere enables two bundled piano cues by default: an ascending phrase
+when a break begins and a resolving phrase when it is time to return.
+`soundEnabled` is the master switch; the two per-cue switches can disable only
+one transition. `soundVolume` controls both cues from 0–100 independently of
+other applications, while system output volume remains the final ceiling.
+Set either custom path to an absolute or `~/` audio-file path; an empty path
+restores the bundled cue. Demo fixtures and state restoration never replay
+either sound.
 
 The complete typed contract, defaults, ranges, and descriptions are declared in [`manifest.json`](manifest.json). A dedicated graphical settings client is intentionally deferred until after the competition MVP.
 

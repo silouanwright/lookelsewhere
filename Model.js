@@ -30,7 +30,12 @@ function defaultConfig() {
     enforcement: "balanced",
     snoozeBudget: 3,
     reducedMotion: false,
-    soundEnabled: false,
+    soundEnabled: true,
+    soundVolume: 65,
+    startSoundEnabled: true,
+    completionSoundEnabled: true,
+    startSoundPath: "",
+    completionSoundPath: "",
     outputMode: "all",
     officeHours: { enabled: false, startMinute: 8 * 60, endMinute: 18 * 60 },
     detectors: { idle: true, fullscreen: true, media: true, microphone: true, dictation: true }
@@ -52,6 +57,11 @@ function normalizeConfig(input) {
   base.snoozeBudget = Math.round(clamp(value.snoozeBudget === undefined ? base.snoozeBudget : value.snoozeBudget, 0, 20))
   base.reducedMotion = value.reducedMotion === true
   base.soundEnabled = value.soundEnabled === true
+  base.soundVolume = Math.round(clamp(value.soundVolume === undefined ? base.soundVolume : value.soundVolume, 0, 100))
+  base.startSoundEnabled = value.startSoundEnabled === undefined ? base.startSoundEnabled : value.startSoundEnabled === true
+  base.completionSoundEnabled = value.completionSoundEnabled === undefined ? base.completionSoundEnabled : value.completionSoundEnabled === true
+  base.startSoundPath = String(value.startSoundPath || "").trim()
+  base.completionSoundPath = String(value.completionSoundPath || "").trim()
   base.outputMode = ["all", "focused"].indexOf(value.outputMode) >= 0 ? value.outputMode : base.outputMode
   if (value.officeHours) {
     base.officeHours.enabled = value.officeHours.enabled === true
@@ -91,6 +101,11 @@ function configFromSettings(settings) {
   if (incoming.snoozeBudget !== undefined) next.snoozeBudget = finiteNumber(incoming.snoozeBudget, next.snoozeBudget)
   if (incoming.reducedMotion !== undefined) next.reducedMotion = incoming.reducedMotion === true
   if (incoming.soundEnabled !== undefined) next.soundEnabled = incoming.soundEnabled === true
+  if (incoming.soundVolume !== undefined) next.soundVolume = finiteNumber(incoming.soundVolume, next.soundVolume)
+  if (incoming.startSoundEnabled !== undefined) next.startSoundEnabled = incoming.startSoundEnabled === true
+  if (incoming.completionSoundEnabled !== undefined) next.completionSoundEnabled = incoming.completionSoundEnabled === true
+  if (incoming.startSoundPath !== undefined) next.startSoundPath = String(incoming.startSoundPath)
+  if (incoming.completionSoundPath !== undefined) next.completionSoundPath = String(incoming.completionSoundPath)
   if (incoming.outputMode !== undefined) next.outputMode = String(incoming.outputMode)
   if (incoming.officeHoursEnabled !== undefined) next.officeHours.enabled = incoming.officeHoursEnabled === true
   if (incoming.officeStart !== undefined) next.officeHours.startMinute = parseClockMinute(incoming.officeStart, next.officeHours.startMinute)

@@ -36,7 +36,12 @@
       "microphoneDetection": true,
       "dictationDetection": true,
       "reducedMotion": false,
-      "soundEnabled": false,
+      "soundEnabled": true,
+      "soundVolume": 65,
+      "startSoundEnabled": true,
+      "completionSoundEnabled": true,
+      "startSoundPath": "",
+      "completionSoundPath": "",
       "outputMode": "all",
       "displayMode": "icon-and-time"
     },
@@ -55,7 +60,12 @@
       { "key": "microphoneDetection", "type": "boolean", "label": "Delay while the microphone is active", "defaultValue": true, "description": "Uses PipeWire stream state. Look Elsewhere never records audio." },
       { "key": "dictationDetection", "type": "boolean", "label": "Delay during Omarchy dictation", "defaultValue": true },
       { "key": "reducedMotion", "type": "boolean", "label": "Reduce motion", "defaultValue": false, "description": "Show the break surface without animated movement or soft focus." },
-      { "key": "soundEnabled", "type": "boolean", "label": "Play break sounds", "defaultValue": false, "description": "Play a quiet cue when a break starts and a completion cue when it ends." },
+      { "key": "soundEnabled", "type": "boolean", "label": "Play break sounds", "defaultValue": true, "description": "Play a quiet cue when a break starts and a completion cue when it ends." },
+      { "key": "soundVolume", "type": "integer", "label": "Break sound volume", "min": 0, "max": 100, "step": 5, "defaultValue": 65, "description": "Set Look Elsewhere break-cue volume independently of other applications." },
+      { "key": "startSoundEnabled", "type": "boolean", "label": "Play break-start sound", "defaultValue": true },
+      { "key": "completionSoundEnabled", "type": "boolean", "label": "Play break-completion sound", "defaultValue": true },
+      { "key": "startSoundPath", "type": "string", "label": "Custom break-start sound", "defaultValue": "", "description": "Absolute path or ~/ path to an audio file. Leave empty to use the bundled piano cue." },
+      { "key": "completionSoundPath", "type": "string", "label": "Custom break-completion sound", "defaultValue": "", "description": "Absolute path or ~/ path to an audio file. Leave empty to use the bundled piano cue." },
       { "key": "outputMode", "type": "enum", "label": "Break outputs", "options": ["all", "focused"], "defaultValue": "all", "description": "Show interruptions on every output or only the currently focused output." },
       { "key": "displayMode", "type": "enum", "label": "Bar display", "options": ["icon", "time", "icon-and-time"], "defaultValue": "icon-and-time", "description": "Show the eye, the compact countdown, or both. Vertical bars use the icon." }
     ]
