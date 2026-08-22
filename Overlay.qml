@@ -57,7 +57,7 @@ Item {
       property real contentOffset: 0
       property real contentBlur: 0
       readonly property int backdropDuration: 495
-      readonly property int contentRevealDelay: backdropDuration + 200
+      readonly property int contentRevealDelay: 200
 
       function beginBreakReveal() {
         backdropAnimation.stop()
@@ -358,7 +358,7 @@ Item {
         anchors.topMargin: Style.space(56)
         anchors.horizontalCenter: parent.horizontalCenter
         width: Math.min(parent.width - Style.space(32), finalRow.implicitWidth + Style.space(28))
-        height: Style.space(48)
+        height: finalRow.implicitHeight + Style.space(16)
         radius: height / 2
         color: Color.popups.background
         borderSpec: Border.surfaceSpec("popups", "border", Color.popups.border, Math.max(1, Style.space(2)))
@@ -366,7 +366,8 @@ Item {
         RowLayout {
           id: finalRow
           anchors.fill: parent
-          anchors.margins: Style.space(14)
+          anchors.leftMargin: Style.space(14)
+          anchors.rightMargin: Style.space(14)
           spacing: Style.space(10)
           Text {
             text: "󰈉"
