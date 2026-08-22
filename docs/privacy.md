@@ -22,7 +22,7 @@ Look Elsewhere observes the minimum local signals needed to time interruptions. 
 - Raw PipeWire or process snapshots
 - Analytics identifiers or remote event logs
 
-Persist only configuration, semantic state, timestamps needed for recovery, aggregate break outcomes, and optional coarse detector diagnostics that contain no content metadata.
+Persist user configuration only through Omarchy's `shell.json`. The plugin state file contains semantic state, timestamps needed for recovery, aggregate break outcomes, and optional coarse detector diagnostics that contain no content metadata.
 
 ## Process execution
 

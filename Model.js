@@ -61,6 +61,43 @@ function normalizeConfig(input) {
   return base
 }
 
+function parseClockMinute(value, fallback) {
+  var match = /^(\d{1,2}):(\d{2})$/.exec(String(value || "").trim())
+  if (!match) return fallback
+  var hour = Number(match[1])
+  var minute = Number(match[2])
+  return hour >= 0 && hour <= 23 && minute >= 0 && minute <= 59 ? hour * 60 + minute : fallback
+}
+
+function finiteNumber(value, fallback) {
+  var number = Number(value)
+  return isFinite(number) ? number : fallback
+}
+
+// Omarchy injects only the values present on the widget's shell.json entry;
+// it does not merge manifest defaults. Rebuild from defaults every time so
+// deleting an override reliably restores the documented default.
+function configFromSettings(settings) {
+  var incoming = settings || {}
+  var next = defaultConfig()
+  if (incoming.focusMinutes !== undefined) next.focusMs = finiteNumber(incoming.focusMinutes, next.focusMs / 60000) * 60000
+  if (incoming.breakSeconds !== undefined) next.breakMs = finiteNumber(incoming.breakSeconds, next.breakMs / 1000) * 1000
+  if (incoming.enforcement !== undefined) next.enforcement = String(incoming.enforcement)
+  if (incoming.maximumDelayMinutes !== undefined) next.maximumDelayMs = finiteNumber(incoming.maximumDelayMinutes, next.maximumDelayMs / 60000) * 60000
+  if (incoming.snoozeBudget !== undefined) next.snoozeBudget = finiteNumber(incoming.snoozeBudget, next.snoozeBudget)
+  if (incoming.reducedMotion !== undefined) next.reducedMotion = incoming.reducedMotion === true
+  if (incoming.officeHoursEnabled !== undefined) next.officeHours.enabled = incoming.officeHoursEnabled === true
+  if (incoming.officeStart !== undefined) next.officeHours.startMinute = parseClockMinute(incoming.officeStart, next.officeHours.startMinute)
+  if (incoming.officeEnd !== undefined) next.officeHours.endMinute = parseClockMinute(incoming.officeEnd, next.officeHours.endMinute)
+  var detectorKeys = ["idle", "fullscreen", "media", "microphone", "dictation"]
+  for (var i = 0; i < detectorKeys.length; i++) {
+    var detector = detectorKeys[i]
+    var settingKey = detector + "Detection"
+    if (incoming[settingKey] !== undefined) next.detectors[detector] = incoming[settingKey] === true
+  }
+  return normalizeConfig(next)
+}
+
 function defaultSnapshot(nowMs) {
   return {
     version: 1,

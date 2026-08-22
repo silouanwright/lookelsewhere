@@ -90,33 +90,7 @@ Item {
   }
 
   function configure(values) {
-    var incoming = values || {}
-    var next = JSON.parse(JSON.stringify(config))
-    if (incoming.focusMinutes !== undefined) next.focusMs = Number(incoming.focusMinutes) * 60000
-    if (incoming.breakSeconds !== undefined) next.breakMs = Number(incoming.breakSeconds) * 1000
-    if (incoming.enforcement !== undefined) next.enforcement = String(incoming.enforcement)
-    if (incoming.maximumDelayMinutes !== undefined) next.maximumDelayMs = Number(incoming.maximumDelayMinutes) * 60000
-    if (incoming.snoozeBudget !== undefined) next.snoozeBudget = Number(incoming.snoozeBudget)
-    if (incoming.reducedMotion !== undefined) next.reducedMotion = incoming.reducedMotion === true
-    if (incoming.officeHoursEnabled !== undefined) next.officeHours.enabled = incoming.officeHoursEnabled === true
-    if (incoming.officeStart !== undefined) next.officeHours.startMinute = parseClockMinute(incoming.officeStart, next.officeHours.startMinute)
-    if (incoming.officeEnd !== undefined) next.officeHours.endMinute = parseClockMinute(incoming.officeEnd, next.officeHours.endMinute)
-    var detectorKeys = ["idle", "fullscreen", "media", "microphone", "dictation"]
-    for (var i = 0; i < detectorKeys.length; i++) {
-      var detector = detectorKeys[i]
-      var settingKey = detector + "Detection"
-      if (incoming[settingKey] !== undefined) next.detectors[detector] = incoming[settingKey] === true
-    }
-    config = Model.normalizeConfig(next)
-    scheduleSave()
-  }
-
-  function parseClockMinute(value, fallback) {
-    var match = /^(\d{1,2}):(\d{2})$/.exec(String(value || "").trim())
-    if (!match) return fallback
-    var hour = Number(match[1])
-    var minute = Number(match[2])
-    return hour >= 0 && hour <= 23 && minute >= 0 && minute <= 59 ? hour * 60 + minute : fallback
+    config = Model.configFromSettings(values)
   }
 
   function takeBreak() {
@@ -215,7 +189,8 @@ Item {
       if (parsed && Number(parsed.version || 0) !== 1) throw new Error("unsupported state version")
       if (parsed && !parsed.snapshot) throw new Error("state snapshot is missing")
       if (parsed && parsed.snapshot) snapshot = parsed.snapshot
-      if (parsed && parsed.config) config = Model.normalizeConfig(parsed.config)
+      // State files written before 0.1 may contain `config`. Ignore it:
+      // Omarchy's shell.json entry is the sole configuration authority.
     } catch (error) {
       console.warn("look-elsewhere: state parse failed:", error)
       recoveryWarning = "Saved state could not be read. The original file has been preserved."
@@ -228,7 +203,7 @@ Item {
 
   function flushState() {
     if (persistenceBlocked || demoMode) return
-    stateFile.setText(JSON.stringify({ version: 1, config: config, snapshot: snapshot }, null, 2) + "\n")
+    stateFile.setText(JSON.stringify({ version: 1, snapshot: snapshot }, null, 2) + "\n")
   }
 
   function resetLocalData() {

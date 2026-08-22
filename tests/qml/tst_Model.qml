@@ -18,6 +18,40 @@ TestCase {
     verify(!Model.inOfficeHours(new Date(2026, 7, 22, 12, 0), hours))
   }
 
+  function test_settingsRebuildFromDefaults() {
+    var customized = Model.configFromSettings({
+      focusMinutes: 25,
+      officeHoursEnabled: true,
+      officeStart: "22:30",
+      mediaDetection: false
+    })
+    compare(customized.focusMs, 25 * 60000)
+    verify(customized.officeHours.enabled)
+    compare(customized.officeHours.startMinute, 22 * 60 + 30)
+    verify(!customized.detectors.media)
+
+    // Omarchy supplies no key after an override is removed. A fresh
+    // reconciliation must restore defaults rather than retain old config.
+    var restored = Model.configFromSettings({})
+    compare(restored.focusMs, 20 * 60000)
+    verify(!restored.officeHours.enabled)
+    compare(restored.officeHours.startMinute, 8 * 60)
+    verify(restored.detectors.media)
+  }
+
+  function test_settingsNormalizeInvalidValues() {
+    var value = Model.configFromSettings({
+      focusMinutes: "not-a-number",
+      breakSeconds: 99999,
+      enforcement: "unknown",
+      officeStart: "25:90"
+    })
+    compare(value.focusMs, 20 * 60000)
+    compare(value.breakMs, 60 * 60 * 1000)
+    compare(value.enforcement, "balanced")
+    compare(value.officeHours.startMinute, 8 * 60)
+  }
+
   function test_activeUseDoesNotCountIdle() {
     var c = config()
     var s = Model.defaultSnapshot(1000)

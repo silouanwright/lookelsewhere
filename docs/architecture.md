@@ -18,7 +18,7 @@ Omarchy Shell / Quickshell process
     │   └── top-center warning, final chip, and per-output break presentation
     ├── Model.js
     │   └── pure transitions, policies, formatting
-    └── state/config JSON under XDG state/config locations
+    └── scheduler/history JSON under XDG state
 ```
 
 The competition release is self-contained to preserve one-command installation. Durable state is timestamp-based so the plugin can rehydrate after Quickshell reloads instead of trusting in-memory countdown values.
@@ -39,10 +39,10 @@ The prototype must validate whether the overlay is best owned by the resident se
 
 ## Data paths
 
-- Manifest-backed user settings: Omarchy Shell configuration
-- Normalized runtime configuration and state: `${XDG_STATE_HOME:-~/.local/state}/look-elsewhere/state.json`
+- Manifest-backed user settings and sole configuration authority: Omarchy Shell `shell.json`
+- Scheduler state, timestamps, and aggregate history: `${XDG_STATE_HOME:-~/.local/state}/look-elsewhere/state.json`
 
-The persisted document is versioned and written atomically. Before release, corrupt/unsupported-state recovery must retain diagnostic evidence rather than silently replacing the original.
+The state document contains no configuration, is versioned, and is written atomically. Legacy documents containing a `config` field remain readable, but that field is ignored. Before release, corrupt/unsupported-state recovery must retain diagnostic evidence rather than silently replacing the original.
 
 ## External integrations
 

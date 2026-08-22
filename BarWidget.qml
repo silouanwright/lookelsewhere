@@ -89,7 +89,9 @@ BarWidget {
         font.family: button.fontFamily
         font.pixelSize: Style.font.body
         font.weight: Font.Medium
-        horizontalAlignment: Text.AlignRight
+        // Keep the icon-to-label gap constant as 10m becomes 9m; the stable
+        // field's unused space belongs on the outside edge of the widget.
+        horizontalAlignment: Text.AlignLeft
         renderType: Text.NativeRendering
         anchors.verticalCenter: parent.verticalCenter
       }
