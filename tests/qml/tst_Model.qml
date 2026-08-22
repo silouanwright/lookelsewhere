@@ -39,6 +39,23 @@ TestCase {
     compare(s.state, Model.State.Warning)
   }
 
+  function test_maximumDelayOverridesProtection() {
+    var c = config({ maximumDelayMs: 5000 })
+    var s = Model.defaultSnapshot(0)
+    s.accumulatedActiveMs = c.focusMs
+    s.dueAtMs = 1000
+    s = Model.observe(s, { nowMs: 7000, active: true, idle: false, evidence: [{ category: "meeting", active: true, confidence: 1 }] }, c)
+    compare(s.state, Model.State.Warning)
+  }
+
+  function test_clockRollbackDoesNotSubtractActiveUse() {
+    var c = config()
+    var s = Model.defaultSnapshot(10000)
+    s.accumulatedActiveMs = 5000
+    s = Model.observe(s, { nowMs: 5000, active: true, idle: false, evidence: [] }, c)
+    compare(s.accumulatedActiveMs, 5000)
+  }
+
   function test_warningFinalBreakCompletion() {
     var c = config()
     var s = Model.defaultSnapshot(0)
@@ -95,5 +112,10 @@ TestCase {
     compare(Model.formatDuration(23000), "23s")
     compare(Model.formatDuration(61000), "1m 1s")
     compare(Model.formatDuration(3600000), "1h")
+  }
+
+  function test_protectedExplanationAvoidsInternalLabels() {
+    compare(Model.protectedExplanation("meeting"), "Held quietly while your meeting is active.")
+    compare(Model.protectedExplanation("dictation"), "Held quietly while dictation is active.")
   }
 }

@@ -265,3 +265,14 @@ function stateLabel(snapshot) {
   if (state === State.DueSoon) return "Break due soon"
   return "Next eye break"
 }
+
+function protectedExplanation(category) {
+  var labels = {
+    meeting: "your meeting is active",
+    microphone: "your microphone is active",
+    media: "media is playing",
+    fullscreen: "fullscreen work is active",
+    dictation: "dictation is active"
+  }
+  return "Held quietly while " + (labels[String(category || "")] || "protected work is active") + "."
+}

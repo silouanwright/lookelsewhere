@@ -22,10 +22,15 @@ Item {
   property var snapshot: Model.defaultSnapshot(Date.now())
   property bool stateLoaded: false
   property bool fullscreenActive: false
+  property bool fullscreenAvailable: false
   property bool dictationActive: false
+  property bool dictationAvailable: false
+  property string recoveryWarning: ""
+  property bool persistenceBlocked: false
   property bool demoMode: false
   property var demoEvidence: []
   property var preDemoSnapshot: null
+  property var preDemoConfig: null
 
   readonly property var players: Mpris.players ? Mpris.players.values : []
   readonly property var pipewireNodes: Pipewire.nodes ? Pipewire.nodes.values : []
@@ -52,7 +57,7 @@ Item {
     return config.focusMs > 0 ? Math.max(0, Math.min(1, Number(snapshot.accumulatedActiveMs || 0) / config.focusMs)) : 0
   }
   readonly property string protectedSummary: state === Model.State.Protected
-    ? "Held quietly while " + (snapshot.protectedCategory || "protected work") + " is active."
+    ? Model.protectedExplanation(snapshot.protectedCategory)
     : ""
   readonly property bool interrupting: state === Model.State.Warning || state === Model.State.Final || state === Model.State.Breaking
   readonly property bool canPostpone: Model.canPostpone(snapshot, config)
@@ -158,12 +163,25 @@ Item {
   }
 
   function setDemo(name) {
-    if (!demoMode) preDemoSnapshot = JSON.parse(JSON.stringify(snapshot))
+    if (!demoMode) {
+      preDemoSnapshot = JSON.parse(JSON.stringify(snapshot))
+      preDemoConfig = JSON.parse(JSON.stringify(config))
+    }
     demoMode = true
     demoEvidence = []
     var now = Date.now()
     var next = Model.defaultSnapshot(now)
-    if (name === "due") next.accumulatedActiveMs = config.focusMs - 30000
+    if (name === "working") next.accumulatedActiveMs = config.focusMs * 0.35
+    else if (name === "due") next.accumulatedActiveMs = config.focusMs - 30000
+    else if (name === "paused") {
+      next.state = Model.State.Waiting
+      next.pauseReason = "manual"
+      next.postponedUntilMs = now + 60 * 60000
+    } else if (name === "postponed") {
+      next.state = Model.State.Waiting
+      next.postponedUntilMs = now + 5 * 60000
+      next.snoozesUsed = 1
+    }
     else if (name === "protected") {
       next.accumulatedActiveMs = config.focusMs
       next.dueAtMs = now
@@ -180,8 +198,10 @@ Item {
     demoMode = false
     demoEvidence = []
     snapshot = preDemoSnapshot || Model.defaultSnapshot(Date.now())
+    config = preDemoConfig || config
     snapshot.lastObservedAtMs = Date.now()
     preDemoSnapshot = null
+    preDemoConfig = null
   }
 
   function scheduleSave() {
@@ -192,17 +212,30 @@ Item {
     if (stateLoaded) return
     try {
       var parsed = raw ? JSON.parse(raw) : null
+      if (parsed && Number(parsed.version || 0) !== 1) throw new Error("unsupported state version")
+      if (parsed && !parsed.snapshot) throw new Error("state snapshot is missing")
       if (parsed && parsed.snapshot) snapshot = parsed.snapshot
       if (parsed && parsed.config) config = Model.normalizeConfig(parsed.config)
     } catch (error) {
       console.warn("look-elsewhere: state parse failed:", error)
+      recoveryWarning = "Saved state could not be read. The original file has been preserved."
+      persistenceBlocked = true
+      snapshot = Model.defaultSnapshot(Date.now())
     }
     snapshot.lastObservedAtMs = Date.now()
     stateLoaded = true
   }
 
   function flushState() {
+    if (persistenceBlocked || demoMode) return
     stateFile.setText(JSON.stringify({ version: 1, config: config, snapshot: snapshot }, null, 2) + "\n")
+  }
+
+  function resetLocalData() {
+    snapshot = Model.defaultSnapshot(Date.now())
+    recoveryWarning = ""
+    persistenceBlocked = false
+    flushState()
   }
 
   PwObjectTracker {
@@ -273,9 +306,14 @@ Item {
         try {
           var value = JSON.parse(text)
           service.fullscreenActive = Number(value.fullscreen || value.fullscreenClient || 0) > 0
-        } catch (error) { service.fullscreenActive = false }
+          service.fullscreenAvailable = true
+        } catch (error) {
+          service.fullscreenActive = false
+          service.fullscreenAvailable = false
+        }
       }
     }
+    onExited: function(exitCode) { if (exitCode !== 0) service.fullscreenAvailable = false }
   }
 
   Process {
@@ -286,9 +324,15 @@ Item {
       onStreamFinished: {
         var value = String(text || "").toLowerCase()
         service.dictationActive = value.indexOf("record") >= 0 || value.indexOf("transcrib") >= 0
+        service.dictationAvailable = true
       }
     }
-    onExited: function(exitCode) { if (exitCode !== 0) service.dictationActive = false }
+    onExited: function(exitCode) {
+      if (exitCode !== 0) {
+        service.dictationActive = false
+        service.dictationAvailable = false
+      }
+    }
   }
 
   Component.onCompleted: {
@@ -299,13 +343,16 @@ Item {
   IpcHandler {
     target: "look-elsewhere"
 
-    function status(): string { return JSON.stringify({ state: service.state, remainingMs: service.remainingMs, evidence: service.evidence(), demo: service.demoMode }) }
+    function status(): string { return JSON.stringify({ state: service.state, remainingMs: service.remainingMs, evidence: service.evidence(), demo: service.demoMode, recoveryWarning: service.recoveryWarning }) }
+    function configuration(): string { return JSON.stringify(service.config) }
+    function diagnostics(): string { return JSON.stringify({ fullscreen: service.fullscreenAvailable, dictation: service.dictationAvailable, mpris: true, pipewire: true, idle: true, persistenceBlocked: service.persistenceBlocked }) }
     function takeBreak(): string { service.takeBreak(); return service.state }
     function postpone(minutes: int): string { service.postponeMinutes(minutes); return service.state }
     function pause(minutes: int): string { service.pauseMinutes(minutes); return service.state }
     function resume(): string { service.resume(); return service.state }
     function skip(): string { service.skipBreak(); return service.state }
     function resetHistory(): string { service.resetHistory(); return "ok" }
+    function resetLocalData(): string { service.resetLocalData(); return "ok" }
     function demo(state: string): string { service.setDemo(state); return service.state }
     function demoOff(): string { service.clearDemo(); return service.state }
   }
