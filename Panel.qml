@@ -203,7 +203,7 @@ Panel {
             idleForeground: root.muted
             accent: root.accent
             iconSize: Style.font.icon
-            KeyNavigation.tab: root.page === "stats" ? statsButton
+            KeyNavigation.tab: root.page === "stats" ? shortcutsButton
               : (root.page === "options" ? pauseBreaksButton : breakNowButton)
             KeyNavigation.backtab: statsButton
             Keys.onEscapePressed: root.dismissHintsOrClose()
@@ -444,7 +444,7 @@ Panel {
             foreground: root.foreground
             accent: root.accent
             fontFamily: root.fontFamily
-            KeyNavigation.tab: statsButton
+            KeyNavigation.tab: shortcutsButton
             KeyNavigation.backtab: stopButton
             Keys.onEscapePressed: root.dismissHintsOrClose()
             Accessible.role: Accessible.Button
@@ -510,7 +510,7 @@ Panel {
             fontFamily: root.fontFamily
             fontSize: Style.font.bodySmall
             horizontalPadding: Style.space(7)
-            KeyNavigation.tab: root.delayActionsEnabled ? postpone1Button : statsButton
+            KeyNavigation.tab: root.delayActionsEnabled ? postpone1Button : shortcutsButton
             KeyNavigation.backtab: settingsButton
             Keys.onEscapePressed: root.dismissHintsOrClose()
             Accessible.role: Accessible.Button
@@ -603,7 +603,7 @@ Panel {
               fontFamily: root.fontFamily
               fontSize: Style.font.bodySmall
               horizontalPadding: Style.space(6)
-              KeyNavigation.tab: statsButton
+              KeyNavigation.tab: shortcutsButton
               KeyNavigation.backtab: postpone5Button
               Keys.onEscapePressed: root.dismissHintsOrClose()
               Accessible.role: Accessible.Button
