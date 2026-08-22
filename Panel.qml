@@ -28,6 +28,7 @@ Panel {
   readonly property int remainingSeconds: service ? Math.max(0, Math.ceil(service.remainingMs / 1000)) : 0
   readonly property int remainingMinutesPart: Math.floor(remainingSeconds / 60)
   readonly property int remainingSecondsPart: remainingSeconds % 60
+  readonly property int topInsetTrim: Style.space(3)
   readonly property real clockSeparatorOverlap: Math.max(0,
     (clockColonMetrics.advanceWidth - clockColonMetrics.tightBoundingRect.width) / 2)
 
@@ -55,11 +56,12 @@ Panel {
     centerOnBar: false
     focusTarget: neutralFocus
     contentWidth: popup.fittedContentWidth(Style.space(260))
-    contentHeight: popup.fittedContentHeight(content.implicitHeight)
+    contentHeight: popup.fittedContentHeight(content.implicitHeight - root.topInsetTrim)
 
     Flickable {
       id: panelScroll
       anchors.fill: parent
+      anchors.topMargin: -root.topInsetTrim
       contentWidth: width
       contentHeight: content.implicitHeight
       clip: true
