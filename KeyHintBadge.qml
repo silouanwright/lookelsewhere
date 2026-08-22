@@ -7,12 +7,16 @@ Rectangle {
   required property string keyText
   property bool available: true
 
+  readonly property real badgeSize: Style.space(12)
+
   anchors.top: parent.top
   anchors.right: parent.right
-  anchors.topMargin: -Style.space(5)
-  anchors.rightMargin: -Style.space(4)
-  implicitWidth: label.implicitWidth + Style.space(6)
-  implicitHeight: label.implicitHeight + Style.space(2)
+  anchors.topMargin: 0
+  anchors.rightMargin: 0
+  implicitWidth: keyText.length === 1
+    ? badgeSize
+    : Math.max(badgeSize, label.implicitWidth + Style.space(5))
+  implicitHeight: badgeSize
   radius: height / 2
   color: Color.accent
   opacity: available ? 1 : 0.45
