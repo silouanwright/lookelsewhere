@@ -155,7 +155,10 @@ Panel {
 
           Row {
             Layout.alignment: Qt.AlignHCenter
-            spacing: Style.space(2)
+            // Monospace themes reserve a full character cell around the
+            // colon. Pull the number groups into that cell so the clock reads
+            // as one compact value instead of three separated tokens.
+            spacing: -Style.space(2)
             Accessible.role: Accessible.StaticText
             Accessible.name: qsTr("Time remaining: %1").arg(root.service ? root.service.remainingText : qsTr("Starting"))
 
