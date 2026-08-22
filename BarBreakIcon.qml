@@ -14,6 +14,7 @@ Item {
     height: 256
     anchors.centerIn: parent
     scale: Math.min(root.width, root.height) / 256
+    preferredRendererType: Shape.CurveRenderer
 
     ShapePath {
       strokeWidth: -1
