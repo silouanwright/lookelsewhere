@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Hyprland
@@ -36,18 +37,22 @@ Item {
       readonly property bool authoritative: Hyprland.focusedMonitor && Hyprland.focusedMonitor.name === modelData.name
       property real backdropReveal: 0
       property real contentOpacity: 0
-      property real contentMotion: 0
+      property real contentOffset: 0
+      property real contentBlur: 0
 
       function beginBreakReveal() {
         backdropAnimation.stop()
         contentOpacityAnimation.stop()
         contentMotionAnimation.stop()
+        contentBlurAnimation.stop()
         backdropReveal = 0
         contentOpacity = 0
-        contentMotion = 0
+        contentOffset = Style.space(64)
+        contentBlur = 0.72
         backdropAnimation.start()
         contentOpacityAnimation.start()
         contentMotionAnimation.start()
+        contentBlurAnimation.start()
       }
 
       Connections {
@@ -58,9 +63,11 @@ Item {
             backdropAnimation.stop()
             contentOpacityAnimation.stop()
             contentMotionAnimation.stop()
+            contentBlurAnimation.stop()
             window.backdropReveal = 0
             window.contentOpacity = 0
-            window.contentMotion = 0
+            window.contentOffset = 0
+            window.contentBlur = 0
           }
         }
       }
@@ -77,7 +84,7 @@ Item {
 
       SequentialAnimation {
         id: contentOpacityAnimation
-        PauseAnimation { duration: 180 }
+        PauseAnimation { duration: 80 }
         NumberAnimation {
           target: window
           property: "contentOpacity"
@@ -90,15 +97,28 @@ Item {
 
       SequentialAnimation {
         id: contentMotionAnimation
-        PauseAnimation { duration: 120 }
+        PauseAnimation { duration: 60 }
         SpringAnimation {
           target: window
-          property: "contentMotion"
-          from: 0
-          to: 1
-          spring: 2.6
-          damping: 0.34
-          epsilon: 0.001
+          property: "contentOffset"
+          from: Style.space(64)
+          to: 0
+          spring: 1.5
+          damping: 0.3
+          epsilon: 0.05
+        }
+      }
+
+      SequentialAnimation {
+        id: contentBlurAnimation
+        PauseAnimation { duration: 60 }
+        NumberAnimation {
+          target: window
+          property: "contentBlur"
+          from: 0.72
+          to: 0
+          duration: 760
+          easing.type: Easing.OutCubic
         }
       }
 
@@ -127,9 +147,17 @@ Item {
           width: Math.min(parent.width - Style.space(48), Style.space(520))
           spacing: Style.space(18)
           opacity: Math.max(0, Math.min(1, window.contentOpacity))
-          scale: 0.975 + 0.025 * window.contentMotion
+          scale: 1 - 0.025 * Math.min(1, Math.max(0, window.contentOffset / Style.space(64)))
           transform: Translate {
-            y: Style.space(36) * (1 - window.contentMotion)
+            y: window.contentOffset
+          }
+          layer.enabled: window.contentBlur > 0.001
+          layer.smooth: true
+          layer.effect: MultiEffect {
+            blurEnabled: true
+            blur: window.contentBlur
+            blurMax: 32
+            blurMultiplier: 1
           }
 
           Text {
