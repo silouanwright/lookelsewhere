@@ -27,7 +27,7 @@ Panel {
   readonly property bool idlePaused: service && service.idlePauseActive
   readonly property bool delayActionsVisible: !manuallyPaused && service
   readonly property bool delayActionsEnabled: delayActionsVisible && service.canPostpone
-  readonly property bool shortcutsActive: opened && popup.active
+  readonly property bool shortcutsActive: opened && popup.activeFocusItem !== null
   readonly property int snoozesRemaining: service
     ? Math.max(0, Number(service.config.snoozeBudget || 0) - Number(service.snapshot.snoozesUsed || 0))
     : 0
