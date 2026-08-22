@@ -131,6 +131,8 @@ Panel {
 
         ColumnLayout {
           Layout.fillWidth: true
+          Layout.leftMargin: toolbarRow.implicitWidth
+          Layout.rightMargin: toolbarRow.implicitWidth
           Layout.topMargin: Style.space(8)
           visible: root.page === "now"
           spacing: Style.space(4)
@@ -186,6 +188,7 @@ Panel {
                 fontSize: Style.font.display * 1.55
                 fontWeight: Font.Bold
                 reducedMotion: root.service && root.service.config.reducedMotion
+                animationActive: root.opened && root.page === "now" && !root.idlePaused
               }
 
               Text {
@@ -205,6 +208,7 @@ Panel {
                 fontSize: Style.font.display * 1.55
                 fontWeight: Font.Bold
                 reducedMotion: root.service && root.service.config.reducedMotion
+                animationActive: root.opened && root.page === "now" && !root.idlePaused
               }
 
               Behavior on opacity { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
@@ -228,6 +232,8 @@ Panel {
 
         ColumnLayout {
           Layout.fillWidth: true
+          Layout.leftMargin: toolbarRow.implicitWidth
+          Layout.rightMargin: toolbarRow.implicitWidth
           Layout.topMargin: Style.space(8)
           visible: root.page === "stats"
           spacing: Style.space(10)
@@ -269,6 +275,8 @@ Panel {
 
         ColumnLayout {
           Layout.fillWidth: true
+          Layout.leftMargin: toolbarRow.implicitWidth
+          Layout.rightMargin: toolbarRow.implicitWidth
           Layout.topMargin: Style.space(8)
           visible: root.page === "options"
           spacing: Style.space(8)

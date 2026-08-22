@@ -9,6 +9,7 @@ Item {
   property real fontSize: 24
   property int fontWeight: Font.Normal
   property bool reducedMotion: false
+  property bool animationActive: true
 
   property int currentValue: -1
   property int previousValue: -1
@@ -16,7 +17,7 @@ Item {
 
   function syncValue() {
     var next = Math.max(0, Math.min(9, Number(value)))
-    if (currentValue < 0 || reducedMotion) {
+    if (currentValue < 0 || reducedMotion || !animationActive) {
       roll.stop()
       previousValue = -1
       currentValue = next
@@ -33,6 +34,7 @@ Item {
 
   onValueChanged: syncValue()
   onReducedMotionChanged: if (reducedMotion) syncValue()
+  onAnimationActiveChanged: syncValue()
   Component.onCompleted: syncValue()
 
   implicitWidth: Math.max(incoming.implicitWidth, outgoing.implicitWidth)

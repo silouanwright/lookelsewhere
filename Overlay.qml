@@ -208,6 +208,7 @@ Item {
               fontSize: Style.font.display
               fontWeight: Font.DemiBold
               reducedMotion: root.service && root.service.config.reducedMotion
+              animationActive: window.visible && root.breaking
             }
             Text {
               text: qsTr("s")

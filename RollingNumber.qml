@@ -9,6 +9,7 @@ Item {
   property real fontSize: 24
   property int fontWeight: Font.Normal
   property bool reducedMotion: false
+  property bool animationActive: true
   property int minimumDigits: 1
 
   readonly property int safeValue: Math.max(0, Math.floor(Number(value)))
@@ -34,6 +35,7 @@ Item {
         fontSize: root.fontSize
         fontWeight: root.fontWeight
         reducedMotion: root.reducedMotion
+        animationActive: root.animationActive
       }
     }
   }

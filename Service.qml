@@ -20,6 +20,7 @@ Item {
 
   property var config: Model.defaultConfig()
   property var snapshot: Model.defaultSnapshot(Date.now())
+  property bool stateStorageReady: false
   property bool stateLoaded: false
   property bool dictationActive: false
   property bool dictationAvailable: false
@@ -306,16 +307,26 @@ Item {
   Process {
     id: ensureStateDir
     command: ["mkdir", "-p", service.stateDir]
+    onExited: function(exitCode) {
+      if (exitCode === 0) {
+        service.stateStorageReady = true
+        Qt.callLater(function() { stateFile.reload() })
+      } else {
+        service.recoveryWarning = "Local state storage could not be prepared. Changes will not be saved."
+        service.persistenceBlocked = true
+        service.stateLoaded = true
+      }
+    }
   }
 
   FileView {
     id: stateFile
-    path: service.statePath
+    path: service.stateStorageReady ? service.statePath : ""
     watchChanges: false
     atomicWrites: true
     printErrors: false
-    onLoaded: service.loadState(text())
-    onLoadFailed: service.loadState("")
+    onLoaded: if (service.stateStorageReady) service.loadState(text())
+    onLoadFailed: if (service.stateStorageReady) service.loadState("")
   }
 
   Timer {
@@ -374,7 +385,6 @@ Item {
 
   Component.onCompleted: {
     ensureStateDir.running = true
-    Qt.callLater(function() { stateFile.reload() })
   }
 
   IpcHandler {
