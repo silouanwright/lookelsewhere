@@ -371,6 +371,7 @@ Panel {
         RowLayout {
           Layout.fillWidth: true
           Layout.alignment: Qt.AlignHCenter
+          Layout.topMargin: -Style.space(6)
           visible: root.page === "now"
           spacing: Style.space(5)
 
