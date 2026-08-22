@@ -73,9 +73,21 @@ one focused `HDMI-A-2` output at 3840×2160 with scale 2.
 - The test ended with demo mode off, the anchored panel showing the real
   countdown, and no coredump.
 
+## Output hotplug during a break
+
+- A transient Hyprland headless output was created while the real service was
+  already in the breaking state, exercising delegate creation after the state
+  transition rather than before it.
+- The new `HEADLESS-1` output immediately received one Look Elsewhere layer and
+  rendered the complete themed break surface; it did not become a transparent
+  input-blocking window.
+- The output was removed cleanly, the original display remained active, demo
+  mode was cleared, and the service returned to its preserved working schedule
+  without a coredump.
+
 ## Current limitations
 
-- Only one physical output is connected, so real output hotplug and
-  cross-monitor action-authority acceptance remain unproven. The deterministic
-  delegate lifecycle review and focused-output selection logic cover the code
-  path but do not replace physical multi-monitor evidence.
+- Only one physical output is connected. Compositor-level creation and removal
+  during an active break is verified with a transient headless output, but
+  physical multi-monitor focus handoff and mixed-scale presentation remain
+  candidates for future hardware acceptance.

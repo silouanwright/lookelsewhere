@@ -122,9 +122,11 @@ with the freedom to use agentic coding as deeply as the work deserves.
 
 Look Elsewhere is a demonstration of how I work. I care about the last
 few pixels, but also the state model beneath them; I research unfamiliar
-territory, communicate decisions clearly, and keep iterating until the whole
-experience holds together. Omarchy feels like the kind of product and community
-I would love to help build full time.
+territory until I understand the real constraints, turn that research into
+clear product decisions, and communicate what is wrong precisely enough to fix
+it. I move comfortably between product strategy, interaction design, systems
+engineering, debugging, documentation, and release discipline. Omarchy feels
+like the kind of product and community I would love to help build full time.
 
 I built this project in close collaboration with an AI coding agent, from the
 first research question through product decisions, ADRs, implementation, live
@@ -132,7 +134,10 @@ visual iteration, debugging, and release verification. That process is part of
 the work sample. I can direct agents across a long, complex effort without
 outsourcing judgment: recognize when something merely passes versus actually
 feels right, explain why, separate a stale deployment from a flawed design, and
-keep product quality, technical truth, and scope aligned.
+keep product quality, technical truth, and scope aligned. The long development
+record also shows persistence without aimlessness: test an assumption, inspect
+the evidence, revise the implementation or the direction, and preserve what was
+learned so the next iteration starts further ahead.
 
 I am entering because I want to contribute, not for the prize. If Look Elsewhere
 wins, I will donate the prize money to charity. More than anything, I would love

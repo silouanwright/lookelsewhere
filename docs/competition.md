@@ -51,7 +51,17 @@ and release preparation while retaining final judgment. He repeatedly detected
 the difference between technically functional and genuinely polished work,
 identified stale-runtime evidence when it masqueraded as a design failure, and
 kept architecture, privacy, scope, and user experience aligned through a long
-feedback loop.
+feedback loop. He communicated small visual problems with unusual precision,
+challenged behavior that was technically correct but experientially wrong, and
+converted discoveries into ADRs, research records, verification notes, tests,
+and reusable plugin guidance instead of allowing the reasoning to disappear
+into chat history.
+
+That record demonstrates more than prompt fluency. It shows research synthesis,
+product judgment, visual taste, systems thinking, debugging discipline,
+technical communication, and the ability to maintain direction across a large
+agentic project. The AI supplied leverage; Silouan supplied the standards,
+decisions, corrections, and accountability for the result.
 
 The direct ask is honest: Silouan would love to return to work by helping build
 Omarchy full time. The competition is not a cash motivation; if Look Elsewhere
