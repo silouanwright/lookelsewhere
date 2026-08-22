@@ -7,7 +7,7 @@ Rectangle {
   required property string keyText
   property bool available: true
 
-  readonly property real badgeSize: Style.space(12)
+  readonly property real badgeSize: Style.space(14)
 
   anchors.top: parent.bottom
   anchors.horizontalCenter: parent.horizontalCenter
