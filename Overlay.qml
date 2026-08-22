@@ -199,7 +199,7 @@ Item {
             color: Color.lock.text
             font.family: Style.font.family
             font.pixelSize: Style.font.displayLarge
-            font.weight: Font.DemiBold
+            font.weight: Font.Bold
           }
           Text {
             Layout.fillWidth: true
