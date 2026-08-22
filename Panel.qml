@@ -23,6 +23,20 @@ Panel {
   function syncSettings() { if (service) service.configure(settings) }
   onSettingsChanged: syncSettings()
   onServiceChanged: syncSettings()
+  onOpenedChanged: {
+    if (opened) initialFocusTimer.restart()
+    else initialFocusTimer.stop()
+  }
+
+  // KeyboardPanel primes the layer-shell surface before settling to
+  // OnDemand focus. Move focus once that prime has completed so a panel
+  // opened from IPC or a keybinding starts on the primary action instead of
+  // requiring a throwaway first Tab press.
+  Timer {
+    id: initialFocusTimer
+    interval: 100
+    onTriggered: if (root.opened) breakNowButton.forceActiveFocus()
+  }
 
   KeyboardPanel {
     id: popup
