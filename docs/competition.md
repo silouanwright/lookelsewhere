@@ -44,6 +44,15 @@ coding without artificial limits. Look Elsewhere should stand as the evidence:
 careful research, explicit architecture, responsive iteration, reliable state,
 and a finished product experience rather than a generated prototype.
 
+The development record demonstrates a specific agentic skill: Silouan directed
+one continuous AI collaboration across competitive research, product strategy,
+interaction design, QML engineering, live debugging, visual QA, documentation,
+and release preparation while retaining final judgment. He repeatedly detected
+the difference between technically functional and genuinely polished work,
+identified stale-runtime evidence when it masqueraded as a design failure, and
+kept architecture, privacy, scope, and user experience aligned through a long
+feedback loop.
+
 The direct ask is honest: Silouan would love to return to work by helping build
 Omarchy full time. The competition is not a cash motivation; if Look Elsewhere
 wins, he will donate the prize money to charity.

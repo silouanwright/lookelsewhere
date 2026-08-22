@@ -126,6 +126,14 @@ territory, communicate decisions clearly, and keep iterating until the whole
 experience holds together. Omarchy feels like the kind of product and community
 I would love to help build full time.
 
+I built this project in close collaboration with an AI coding agent, from the
+first research question through product decisions, ADRs, implementation, live
+visual iteration, debugging, and release verification. That process is part of
+the work sample. I can direct agents across a long, complex effort without
+outsourcing judgment: recognize when something merely passes versus actually
+feels right, explain why, separate a stale deployment from a flawed design, and
+keep product quality, technical truth, and scope aligned.
+
 I am entering because I want to contribute, not for the prize. If Look Elsewhere
 wins, I will donate the prize money to charity. More than anything, I would love
 the opportunity to get back to work with people building something this alive.
