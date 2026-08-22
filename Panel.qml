@@ -462,7 +462,6 @@ Panel {
         Item {
           Layout.fillWidth: true
           Layout.preferredHeight: actionRow.implicitHeight * actionRow.fitScale
-            + (root.keyboardHintsVisible ? Style.space(16) : 0)
           Layout.topMargin: -Style.space(3)
           visible: root.page === "now"
 
