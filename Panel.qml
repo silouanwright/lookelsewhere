@@ -33,6 +33,7 @@ Panel {
     // The control surface belongs spatially to the eye button. Warning and
     // break surfaces are separate and intentionally centered by Overlay.qml.
     centerOnBar: false
+    focusTarget: breakNowButton
     contentWidth: popup.fittedContentWidth(Style.space(390))
     contentHeight: popup.fittedContentHeight(content.implicitHeight)
 
@@ -127,6 +128,7 @@ Panel {
         spacing: Style.space(8)
 
         Button {
+          id: breakNowButton
           Layout.fillWidth: true
           text: qsTr("Break now")
           selected: true
@@ -134,9 +136,16 @@ Panel {
           foreground: root.foreground
           accent: root.accent
           fontFamily: root.fontFamily
+          KeyNavigation.tab: pauseButton
+          KeyNavigation.backtab: pauseButton
+          Keys.onEscapePressed: root.close()
+          Accessible.role: Accessible.Button
+          Accessible.name: text
+          Accessible.onPressAction: clicked()
           onClicked: { if (root.service) root.service.takeBreak(); root.close() }
         }
         Button {
+          id: pauseButton
           Layout.fillWidth: true
           text: root.manuallyPaused ? qsTr("Resume") : qsTr("Pause 1h")
           bordered: true
@@ -144,6 +153,12 @@ Panel {
           foreground: root.foreground
           accent: root.accent
           fontFamily: root.fontFamily
+          KeyNavigation.tab: breakNowButton
+          KeyNavigation.backtab: breakNowButton
+          Keys.onEscapePressed: root.close()
+          Accessible.role: Accessible.Button
+          Accessible.name: text
+          Accessible.onPressAction: clicked()
           onClicked: {
             if (root.service) {
               if (root.manuallyPaused) root.service.resume()

@@ -371,5 +371,8 @@ Item {
     fontFamily: Style.font.family
     horizontalPadding: Style.space(12)
     verticalPadding: Style.space(8)
+    Accessible.role: Accessible.Button
+    Accessible.name: text
+    Accessible.onPressAction: clicked()
   }
 }
