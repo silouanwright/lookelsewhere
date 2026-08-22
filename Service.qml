@@ -5,6 +5,9 @@ import Quickshell.Io
 import Quickshell.Services.Mpris
 import Quickshell.Services.Pipewire
 import Quickshell.Wayland
+// Quickshell 0.3 does not reliably re-export this optional submodule when a
+// component is loaded dynamically as a third-party plugin.
+import Quickshell.Wayland._IdleNotify
 import "Model.js" as Model
 
 Item {
