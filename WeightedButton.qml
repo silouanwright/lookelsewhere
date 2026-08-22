@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Controls as Controls
 import qs.Commons
 import qs.Ui
 
@@ -7,13 +8,15 @@ Button {
 
   property string label: ""
   property int labelWeight: Font.Bold
+  property bool actionEnabled: true
+  property string disabledTooltipText: ""
 
   text: ""
   verticalPadding: Style.space(4)
   radius: Math.min(height / 2, Style.cornerRadius + Style.space(2))
   implicitWidth: labelText.implicitWidth + horizontalPadding * 2 + Math.max(2, Style.normalBorderWidth * 2)
   implicitHeight: labelText.implicitHeight + verticalPadding * 2 + Math.max(2, Style.normalBorderWidth * 2)
-  opacity: enabled ? 1 : 0.42
+  opacity: actionEnabled ? 1 : 0.42
 
   Behavior on opacity { NumberAnimation { duration: 120 } }
 
@@ -27,5 +30,21 @@ Button {
     font.weight: root.labelWeight
     renderType: Text.NativeRendering
     Accessible.ignored: true
+  }
+
+  MouseArea {
+    id: disabledHover
+    anchors.fill: parent
+    z: 2
+    visible: !root.actionEnabled
+    hoverEnabled: true
+    cursorShape: Qt.ArrowCursor
+  }
+
+  Controls.ToolTip {
+    visible: !root.actionEnabled && root.disabledTooltipText !== ""
+      && disabledHover.containsMouse
+    text: root.disabledTooltipText
+    delay: 350
   }
 }

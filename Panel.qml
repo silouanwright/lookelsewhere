@@ -27,6 +27,11 @@ Panel {
   readonly property bool delayActionsVisible: !manuallyPaused && service
     && service.config.enforcement !== "focused"
   readonly property bool delayActionsEnabled: delayActionsVisible && service.canPostpone
+  readonly property string snoozeBudgetSummary: service
+    ? qsTr("%1 of %2 snoozes used")
+        .arg(Number(service.snapshot.snoozesUsed || 0))
+        .arg(Number(service.config.snoozeBudget || 0))
+    : ""
   readonly property int remainingSeconds: service ? Math.max(0, Math.ceil(service.remainingMs / 1000)) : 0
   readonly property int remainingMinutesPart: Math.floor(remainingSeconds / 60)
   readonly property int remainingSecondsPart: remainingSeconds % 60
@@ -127,7 +132,7 @@ Panel {
             KeyNavigation.tab: settingsButton
             KeyNavigation.backtab: root.page === "stats" ? settingsButton
               : (root.page === "options" ? editSettingsButton
-                : (root.delayActionsVisible ? postpone15Button : breakNowButton))
+                : (root.delayActionsEnabled ? postpone15Button : breakNowButton))
             Keys.onEscapePressed: root.close()
             Accessible.role: Accessible.Button
             Accessible.name: tooltipText
@@ -427,7 +432,7 @@ Panel {
             fontFamily: root.fontFamily
             fontSize: Style.font.bodySmall
             horizontalPadding: Style.space(7)
-            KeyNavigation.tab: root.delayActionsVisible ? postpone1Button : statsButton
+            KeyNavigation.tab: root.delayActionsEnabled ? postpone1Button : statsButton
             KeyNavigation.backtab: settingsButton
             Keys.onEscapePressed: root.close()
             Accessible.role: Accessible.Button
@@ -439,10 +444,11 @@ Panel {
           WeightedButton {
             id: postpone1Button
             visible: root.delayActionsVisible
-            enabled: root.delayActionsEnabled
+            actionEnabled: root.delayActionsEnabled
+            disabledTooltipText: root.delayActionsEnabled ? "" : root.snoozeBudgetSummary
             label: qsTr("+1m")
             bordered: true
-            focusable: true
+            focusable: root.delayActionsEnabled
             foreground: root.foreground
             accent: root.accent
             fontFamily: root.fontFamily
@@ -452,7 +458,9 @@ Panel {
             KeyNavigation.backtab: breakNowButton
             Keys.onEscapePressed: root.close()
             Accessible.role: Accessible.Button
-            Accessible.name: qsTr("Snooze next break for 1 minute")
+            Accessible.name: root.delayActionsEnabled
+              ? qsTr("Snooze next break for 1 minute")
+              : qsTr("Snooze unavailable; %1").arg(root.snoozeBudgetSummary)
             Accessible.onPressAction: clicked()
             onClicked: root.postponeAndClose(1)
           }
@@ -460,10 +468,11 @@ Panel {
           WeightedButton {
             id: postpone5Button
             visible: root.delayActionsVisible
-            enabled: root.delayActionsEnabled
+            actionEnabled: root.delayActionsEnabled
+            disabledTooltipText: root.delayActionsEnabled ? "" : root.snoozeBudgetSummary
             label: qsTr("+5m")
             bordered: true
-            focusable: true
+            focusable: root.delayActionsEnabled
             foreground: root.foreground
             accent: root.accent
             fontFamily: root.fontFamily
@@ -473,7 +482,9 @@ Panel {
             KeyNavigation.backtab: postpone1Button
             Keys.onEscapePressed: root.close()
             Accessible.role: Accessible.Button
-            Accessible.name: qsTr("Snooze next break for 5 minutes")
+            Accessible.name: root.delayActionsEnabled
+              ? qsTr("Snooze next break for 5 minutes")
+              : qsTr("Snooze unavailable; %1").arg(root.snoozeBudgetSummary)
             Accessible.onPressAction: clicked()
             onClicked: root.postponeAndClose(5)
           }
@@ -481,10 +492,11 @@ Panel {
             WeightedButton {
               id: postpone15Button
               visible: root.delayActionsVisible
-              enabled: root.delayActionsEnabled
+              actionEnabled: root.delayActionsEnabled
+              disabledTooltipText: root.delayActionsEnabled ? "" : root.snoozeBudgetSummary
               label: qsTr("+15m")
               bordered: true
-              focusable: true
+              focusable: root.delayActionsEnabled
               foreground: root.foreground
               accent: root.accent
               fontFamily: root.fontFamily
@@ -494,7 +506,9 @@ Panel {
               KeyNavigation.backtab: postpone5Button
               Keys.onEscapePressed: root.close()
               Accessible.role: Accessible.Button
-              Accessible.name: qsTr("Snooze next break for 15 minutes")
+              Accessible.name: root.delayActionsEnabled
+                ? qsTr("Snooze next break for 15 minutes")
+                : qsTr("Snooze unavailable; %1").arg(root.snoozeBudgetSummary)
               Accessible.onPressAction: clicked()
               onClicked: root.postponeAndClose(15)
             }
