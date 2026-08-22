@@ -197,6 +197,7 @@ Item {
           }
           Text {
             Layout.alignment: Qt.AlignHCenter
+            Layout.topMargin: -Style.space(4)
             text: qsTr("Look Elsewhere")
             color: Color.lock.text
             font.family: Style.font.family
@@ -205,7 +206,7 @@ Item {
           }
           Text {
             Layout.fillWidth: true
-            Layout.topMargin: -Style.space(8)
+            Layout.topMargin: -Style.space(12)
             horizontalAlignment: Text.AlignHCenter
             text: qsTr("Let your eyes settle on something distant. Breathe. The screen will still be here.")
             color: Color.lock.placeholder
