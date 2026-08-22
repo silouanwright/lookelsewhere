@@ -381,10 +381,11 @@ Panel {
             horizontalAlignment: Text.AlignHCenter
           }
 
-          Button {
+          WeightedButton {
             id: pauseBreaksButton
             Layout.alignment: Qt.AlignHCenter
-            text: root.manuallyPaused ? qsTr("Resume breaks") : qsTr("Pause breaks")
+            label: root.manuallyPaused ? qsTr("Resume breaks") : qsTr("Pause breaks")
+            labelWeight: Font.DemiBold
             enabled: root.service && !root.service.interrupting
             selected: root.manuallyPaused
             bordered: true
@@ -396,7 +397,7 @@ Panel {
             KeyNavigation.backtab: settingsButton
             Keys.onEscapePressed: root.dismissHintsOrClose()
             Accessible.role: Accessible.Button
-            Accessible.name: text
+            Accessible.name: label
             Accessible.onPressAction: clicked()
             onClicked: root.toggleManualPause()
 
@@ -408,10 +409,11 @@ Panel {
             }
           }
 
-          Button {
+          WeightedButton {
             id: stopButton
             Layout.alignment: Qt.AlignHCenter
-            text: qsTr("Stop LookElsewhere")
+            label: qsTr("Stop LookElsewhere")
+            labelWeight: Font.DemiBold
             bordered: true
             focusable: true
             foreground: root.foreground
@@ -430,15 +432,16 @@ Panel {
 
             KeyHintBadge {
               visible: root.keyboardHintsVisible
-              keyText: "⇧D"
+              keyText: "⬆D"
               placeRight: true
             }
           }
 
-          Button {
+          WeightedButton {
             id: editSettingsButton
             Layout.alignment: Qt.AlignHCenter
-            text: qsTr("Edit settings file")
+            label: qsTr("Edit settings file")
+            labelWeight: Font.DemiBold
             bordered: true
             focusable: true
             foreground: root.foreground
@@ -448,7 +451,7 @@ Panel {
             KeyNavigation.backtab: stopButton
             Keys.onEscapePressed: root.dismissHintsOrClose()
             Accessible.role: Accessible.Button
-            Accessible.name: text
+            Accessible.name: label
             Accessible.onPressAction: clicked()
             onClicked: {
               root.close()
