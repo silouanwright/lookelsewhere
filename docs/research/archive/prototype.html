@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wayland Break Coach — Interaction Prototype</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #11110f;
+      --panel: #1b1b18;
+      --panel-2: #24241f;
+      --text: #f2efe4;
+      --muted: #aaa797;
+      --accent: #d8b46a;
+      --accent-2: #75623b;
+      --danger: #dc7878;
+      --line: #37362e;
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; font: 15px/1.45 system-ui, sans-serif; background: radial-gradient(circle at 50% 0%, #28251d 0, var(--bg) 48%); color: var(--text); }
+    button, select, input { font: inherit; }
+    button { color: var(--text); background: var(--panel-2); border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; cursor: pointer; }
+    button:hover, button:focus-visible { border-color: var(--accent); outline: none; }
+    button.primary { background: var(--accent); color: #19150d; border-color: var(--accent); font-weight: 700; }
+    button.quiet { background: transparent; }
+    button.danger { color: var(--danger); }
+    .app { width: min(1120px, calc(100% - 32px)); margin: 28px auto; }
+    .header { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 18px; }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .mark { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 13px; background: var(--accent); color: #17130b; font-weight: 900; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { font-size: 18px; margin-bottom: 2px; }
+    h2 { font-size: 26px; letter-spacing: -0.02em; }
+    .muted { color: var(--muted); }
+    .shell { display: grid; grid-template-columns: 210px 1fr; min-height: 660px; background: rgba(20,20,17,.9); border: 1px solid var(--line); border-radius: 24px; overflow: hidden; box-shadow: 0 30px 80px rgba(0,0,0,.35); }
+    nav { padding: 18px; border-right: 1px solid var(--line); background: rgba(255,255,255,.015); }
+    nav button { display: block; width: 100%; text-align: left; margin-bottom: 7px; background: transparent; border-color: transparent; }
+    nav button.active { background: var(--panel-2); border-color: var(--line); }
+    .nav-section { margin: 18px 12px 8px; color: var(--muted); font-size: 12px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+    .nav-section:first-child { margin-top: 4px; }
+    main { padding: 30px; }
+    .screen { display: none; }
+    .screen.active { display: block; }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 14px; }
+    .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; }
+    .hero { padding: 28px; background: linear-gradient(135deg, #29251b, #1a1a17); }
+    .metric { font-size: 42px; font-weight: 750; letter-spacing: -.04em; margin: 8px 0; }
+    .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .stack { display: flex; flex-wrap: wrap; gap: 8px; }
+    .pill { display: inline-flex; gap: 7px; align-items: center; padding: 6px 10px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+    .routine { margin-bottom: 10px; }
+    .routine:last-child { margin-bottom: 0; }
+    .progress { height: 5px; border-radius: 999px; background: #303029; overflow: hidden; margin-top: 12px; }
+    .progress i { display: block; height: 100%; background: var(--accent); width: 68%; }
+    .evidence { display: grid; grid-template-columns: 30px 1fr auto; gap: 10px; align-items: center; padding: 12px 0; border-top: 1px solid var(--line); }
+    .evidence:first-of-type { border-top: 0; }
+    .confidence { color: var(--accent); font-variant-numeric: tabular-nums; }
+    .overlay { position: fixed; inset: 0; display: none; place-items: center; background: rgba(8,8,7,.88); backdrop-filter: blur(16px); z-index: 10; padding: 24px; }
+    .overlay.open { display: grid; }
+    .break-card { width: min(540px, 100%); text-align: center; padding: 42px; border-radius: 28px; border: 1px solid #4b4739; background: #1b1a16; box-shadow: 0 30px 100px #000; }
+    .orb { width: 92px; height: 92px; border-radius: 50%; margin: 0 auto 24px; background: radial-gradient(circle at 35% 32%, #ffe1a0, #ad7e2d 45%, #322718 72%); box-shadow: 0 0 70px rgba(216,180,106,.25); animation: breathe 5s ease-in-out infinite; }
+    @keyframes breathe { 50% { transform: scale(.86); opacity: .75; } }
+    .countdown { font-size: 56px; font-weight: 300; font-variant-numeric: tabular-nums; letter-spacing: -.04em; }
+    .toast { position: fixed; top: 24px; left: 50%; transform: translateX(-50%); width: min(440px, calc(100% - 48px)); display: none; z-index: 11; box-shadow: 0 20px 70px rgba(0,0,0,.45); }
+    .toast.open { display: block; }
+    .warning-head { display: grid; grid-template-columns: 48px 1fr; gap: 14px; align-items: center; }
+    .warning-icon { width: 48px; height: 48px; display: grid; place-items: center; border-radius: 15px; color: #17130b; background: linear-gradient(145deg, #ead08d, #b88939); font-size: 24px; }
+    .warning-time { font-size: 26px; font-weight: 750; font-variant-numeric: tabular-nums; line-height: 1.1; }
+    .warning-actions { display: grid; grid-template-columns: minmax(150px, 1fr) repeat(3, auto); gap: 8px; margin-top: 17px; }
+    .starting-chip { position: fixed; top: 34px; left: 32px; display: none; align-items: center; gap: 11px; z-index: 12; padding: 11px 15px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); box-shadow: 0 18px 60px rgba(0,0,0,.42); }
+    .starting-chip.open { display: flex; }
+    .setting { display: grid; grid-template-columns: 1fr 150px; gap: 14px; padding: 14px 0; border-top: 1px solid var(--line); }
+    .setting:first-of-type { border-top: 0; }
+    .choice-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 14px; }
+    .choice { min-height: 112px; text-align: left; padding: 15px; }
+    .choice.selected { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); background: linear-gradient(145deg, #30291c, var(--panel-2)); }
+    .choice strong, .choice span { display: block; }
+    select { width: 100%; color: var(--text); background: var(--panel-2); border: 1px solid var(--line); border-radius: 9px; padding: 8px; }
+    @media (max-width: 760px) { .shell { grid-template-columns: 1fr; } nav { border-right: 0; border-bottom: 1px solid var(--line); display: flex; overflow-x: auto; } nav button { width: auto; white-space: nowrap; margin: 0 5px 0 0; } .grid, .choice-grid { grid-template-columns: 1fr; } .warning-actions { grid-template-columns: 1fr 1fr 1fr; } .warning-actions .primary { grid-column: 1 / -1; } .starting-chip { left: 50%; transform: translateX(-50%); } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; scroll-behavior: auto !important; } }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="header">
+      <div class="brand"><div class="mark">◌</div><div><h1>Break Coach</h1><div class="muted">Wayland interaction prototype</div></div></div>
+      <div class="stack"><button id="simulateWarning">Simulate warning</button><button class="primary" id="takeNow">Take a break</button></div>
+    </div>
+    <div class="shell">
+      <nav>
+        <div class="nav-section">Overview</div>
+        <button class="active" data-screen="today">Today</button>
+        <div class="nav-section">Breaks</div>
+        <button data-screen="routines">Routines</button>
+        <button data-screen="context">Smart context</button>
+        <button data-screen="settings">Break experience</button>
+      </nav>
+      <main>
+        <section id="today" class="screen active">
+          <h2>Your next break can wait for a good moment.</h2>
+          <p class="muted">The timer tracks active use. Protected contexts delay presentation without hiding what happened.</p>
+          <div class="grid">
+            <div class="card hero"><div class="muted">Next · Eye reset</div><div class="metric" id="nextMetric">18 min</div><div class="stack"><span class="pill"><i class="dot"></i> Working</span><span class="pill">68% active-use cycle</span></div><div class="progress"><i></i></div></div>
+            <div class="card"><h3>Current decision</h3><p><strong>Breaks are allowed</strong></p><p class="muted">No protected context is active. If the routine becomes due, it will first wait briefly for you to stop typing.</p><button class="quiet" data-go="context">Explain context</button></div>
+            <div class="card"><h3>Today</h3><div class="row"><span>Completed</span><strong>7</strong></div><div class="row"><span>Postponed</span><strong>2</strong></div><div class="row"><span>Skipped</span><strong>0</strong></div></div>
+            <div class="card"><h3>Quick pause</h3><p class="muted">Pause reminders without losing your schedule.</p><div class="stack"><button data-pause="15">15m</button><button data-pause="30">30m</button><button data-pause="60">1h</button></div></div>
+          </div>
+        </section>
+        <section id="routines" class="screen">
+          <h2>Routines</h2><p class="muted">Different recovery modalities share the same interruption engine.</p>
+          <div class="card routine"><div class="row"><div><strong>Eye reset</strong><div class="muted">Distant focus · 20 seconds</div></div><span class="pill">Every 25m active</span></div></div>
+          <div class="card routine"><div class="row"><div><strong>Move</strong><div class="muted">Stand, walk, or stretch · 5 minutes</div></div><span class="pill">Every 90m active</span></div></div>
+          <div class="card routine"><div class="row"><div><strong>Afternoon walk</strong><div class="muted">Planned recovery · 10 minutes</div></div><span class="pill">3:00 PM weekdays</span></div></div>
+          <button class="primary">Add routine</button>
+        </section>
+        <section id="context" class="screen">
+          <h2>Smart context</h2><p class="muted">Signals are evidence, not surveillance. Content and window titles are never recorded.</p>
+          <div class="card">
+            <div class="evidence"><span>◉</span><div><strong>User active</strong><div class="muted">Wayland idle notification</div></div><span class="confidence">High</span></div>
+            <div class="evidence"><span>▣</span><div><strong>Terminal focused</strong><div class="muted">Hyprland app class; not fullscreen</div></div><span class="confidence">High</span></div>
+            <div class="evidence"><span>▶</span><div><strong>Browser media available</strong><div class="muted">MPRIS exists but playback is paused</div></div><span class="confidence">Medium</span></div>
+            <div class="evidence"><span>♬</span><div><strong>No capture stream</strong><div class="muted">PipeWire microphone evidence</div></div><span class="confidence">Medium</span></div>
+          </div>
+          <div class="card" style="margin-top:14px"><div class="row"><div><strong>Decision: allow</strong><div class="muted">There is no reason to suppress the next break.</div></div><button>Correction rules</button></div></div>
+        </section>
+        <section id="settings" class="screen">
+          <h2>Settings</h2>
+          <div class="card">
+            <div class="setting"><div><strong>Natural-pause wait</strong><div class="muted">Begin when input stops briefly.</div></div><select><option>5 seconds</option><option>3 seconds</option><option>8 seconds</option></select></div>
+            <div class="setting"><div><strong>Maximum overdue</strong><div class="muted">Escalate after continued activity.</div></div><select><option>3 minutes</option><option>1 minute</option><option>Never</option></select></div>
+            <div class="setting"><div><strong>Fullscreen behavior</strong><div class="muted">How protected fullscreen apps affect breaks.</div></div><select><option>Ask or infer</option><option>Always suppress</option><option>Never suppress</option></select></div>
+            <div class="setting"><div><strong>Advance warning</strong><div class="muted">Top-center card before the final countdown.</div></div><select><option>30 seconds</option><option>1 minute</option><option>Off</option></select></div>
+          </div>
+          <h3 style="margin-top:24px">Enforcement</h3>
+          <p class="muted">Choose how much intention it takes to dismiss a break.</p>
+          <div class="choice-grid">
+            <button class="choice"><strong>Gentle</strong><span class="muted">Skip immediately</span></button>
+            <button class="choice selected"><strong>Deliberate</strong><span class="muted">Skip after a short pause</span></button>
+            <button class="choice"><strong>Locked</strong><span class="muted">Use Omarchy lock</span></button>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <div class="toast card" id="warning">
+    <div class="row" style="align-items:start">
+      <div class="warning-head"><div class="warning-icon">◌</div><div><div class="warning-time" id="warningTime">00:23</div><div class="muted">Almost time. Give your eyes a distant view.</div></div></div>
+      <button class="quiet" id="closeWarning" aria-label="Dismiss warning">×</button>
+    </div>
+    <div class="warning-actions"><button class="primary" id="warningStart">Start this break now</button><button data-postpone="1">+1m</button><button data-postpone="5">+5m</button><button data-postpone="15">+15m</button></div>
+  </div>
+
+  <div class="starting-chip" id="startingChip"><span class="warning-icon" style="width:32px;height:32px;border-radius:10px;font-size:16px">◌</span><strong id="startingText">Starting break in 3</strong></div>
+
+  <div class="overlay" id="breakOverlay">
+    <div class="break-card">
+      <div class="orb"></div><div class="muted">Look beyond the screen</div><div class="countdown" id="countdown">20</div><p>Let your focus settle on something distant.</p>
+      <div class="stack" style="justify-content:center"><button class="quiet danger" id="skipBreak" disabled>Skip available in 5s</button><button id="endBreak">End prototype break</button></div>
+    </div>
+  </div>
+
+  <script>
+    const screens = [...document.querySelectorAll('.screen')];
+    const tabs = [...document.querySelectorAll('nav button')];
+    function show(id) { screens.forEach(x => x.classList.toggle('active', x.id === id)); tabs.forEach(x => x.classList.toggle('active', x.dataset.screen === id)); }
+    tabs.forEach(x => x.addEventListener('click', () => show(x.dataset.screen)));
+    document.querySelectorAll('[data-go]').forEach(x => x.addEventListener('click', () => show(x.dataset.go)));
+    const warning = document.querySelector('#warning');
+    const overlay = document.querySelector('#breakOverlay');
+    const startingChip = document.querySelector('#startingChip');
+    function closeWarning() { clearInterval(window.warningTimer); warning.classList.remove('open'); startingChip.classList.remove('open'); }
+    function beginWarning() {
+      closeWarning(); warning.classList.add('open');
+      let remaining = 23; document.querySelector('#warningTime').textContent = '00:23';
+      window.warningTimer = setInterval(() => {
+        remaining -= 1;
+        document.querySelector('#warningTime').textContent = `00:${String(Math.max(0, remaining)).padStart(2, '0')}`;
+        if (remaining <= 3 && remaining > 0) {
+          warning.classList.remove('open'); startingChip.classList.add('open');
+          document.querySelector('#startingText').textContent = `Starting break in ${remaining}`;
+        }
+        if (remaining <= 0) { clearInterval(window.warningTimer); startingChip.classList.remove('open'); startBreak(); }
+      }, 1000);
+    }
+    function startBreak() {
+      closeWarning(); overlay.classList.add('open');
+      let remaining = 20, unlock = 5; const label = document.querySelector('#countdown'); const skip = document.querySelector('#skipBreak');
+      skip.disabled = true; skip.textContent = 'Skip available in 5s'; label.textContent = remaining;
+      clearInterval(window.breakTimer); window.breakTimer = setInterval(() => {
+        remaining -= 1; unlock -= 1; label.textContent = Math.max(0, remaining);
+        if (unlock > 0) skip.textContent = `Skip available in ${unlock}s`; else { skip.disabled = false; skip.textContent = 'Skip this break'; }
+        if (remaining <= 0) { clearInterval(window.breakTimer); overlay.classList.remove('open'); }
+      }, 1000);
+    }
+    document.querySelector('#simulateWarning').onclick = beginWarning;
+    document.querySelector('#closeWarning').onclick = closeWarning;
+    document.querySelector('#takeNow').onclick = startBreak;
+    document.querySelector('#warningStart').onclick = startBreak;
+    document.querySelector('#endBreak').onclick = () => { clearInterval(window.breakTimer); overlay.classList.remove('open'); };
+    document.querySelector('#skipBreak').onclick = () => { clearInterval(window.breakTimer); overlay.classList.remove('open'); };
+    document.querySelectorAll('[data-postpone]').forEach(x => x.onclick = () => { closeWarning(); document.querySelector('#nextMetric').textContent = `${x.dataset.postpone} min`; });
+    document.querySelectorAll('[data-pause]').forEach(x => x.onclick = () => { document.querySelector('#nextMetric').textContent = `Paused ${x.dataset.pause}m`; });
+    document.querySelectorAll('.choice').forEach(x => x.onclick = () => {
+      document.querySelectorAll('.choice').forEach(y => y.classList.remove('selected'));
+      x.classList.add('selected');
+    });
+  </script>
+</body>
+</html>

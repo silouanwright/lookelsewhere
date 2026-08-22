@@ -1,0 +1,18 @@
+# Architecture Decision Records
+
+ADRs use `Accepted`, `Proposed`, or `Superseded` status. Accepted decisions govern implementation until explicitly superseded.
+
+| ADR | Decision | Status |
+|---|---|---|
+| [0001](0001-self-contained-competition-plugin.md) | Ship a self-contained competition plugin | Accepted |
+| [0002](0002-quickshell-native-surfaces.md) | Use Quickshell and Omarchy native surfaces | Accepted |
+| [0003](0003-timestamp-state-and-recovery.md) | Persist timestamps and reconstruct state | Accepted |
+| [0004](0004-explicit-state-machine.md) | Centralize behavior in an explicit state machine | Accepted |
+| [0005](0005-confidence-based-smart-context.md) | Treat context detectors as confidence-weighted evidence | Accepted |
+| [0006](0006-data-minimization.md) | Minimize and localize observed data | Accepted |
+| [0007](0007-balanced-default-enforcement.md) | Default to Balanced enforcement | Accepted |
+| [0008](0008-progressive-interruption-surfaces.md) | Use progressive interruption surfaces | Accepted |
+| [0009](0009-single-interactive-monitor-authority.md) | Allow one interactive authority across outputs | Accepted |
+| [0010](0010-dedicated-settings-surface.md) | Keep deep settings out of the bar popup | Accepted |
+| [0011](0011-deterministic-demo-and-fixtures.md) | Make every state deterministically stageable | Accepted |
+| [0012](0012-public-plugin-packaging.md) | Package as a public, dependency-light marketplace plugin | Accepted |
