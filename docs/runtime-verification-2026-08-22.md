@@ -60,7 +60,7 @@ one focused `HDMI-A-2` output at 3840×2160 with scale 2.
   cue, natural completion selects the return cue, and unrelated transitions
   remain silent. Demo and restoration paths are explicitly suppressed.
 - A lightweight timer runs only during a break and arms the return cue once in
-  the final 400 milliseconds, keeping its onset close to visual dismissal. The
+  the final 100 milliseconds, keeping its onset aligned with visual dismissal. The
   state transition retains a guarded fallback without double-playing.
 - The master switch, independent cue switches, 0–100 app volume, bundled
   defaults, and optional absolute or `~/` custom paths are manifest-backed.

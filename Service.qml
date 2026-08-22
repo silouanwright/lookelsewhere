@@ -396,7 +396,7 @@ Item {
     running: service.stateLoaded && !service.demoMode
       && service.phase === Model.State.Breaking && !service.completionCuePlayed
     onTriggered: {
-      if (Model.shouldLeadCompletionCue(service.phase, service.remainingMs, 400))
+      if (Model.shouldLeadCompletionCue(service.phase, service.remainingMs, 100))
         service.playCompletionCue()
     }
   }
