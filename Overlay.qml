@@ -213,10 +213,26 @@ Item {
               onClicked: if (root.service) root.service.postponeMinutes(1)
             }
           }
+          Text {
+            Layout.alignment: Qt.AlignHCenter
+            visible: root.service && root.service.config.enforcement === "focused"
+            text: qsTr("Emergency exit: Ctrl + Shift + Esc")
+            color: Color.lock.placeholder
+            font.family: Style.font.family
+            font.pixelSize: Style.font.bodySmall
+          }
         }
 
-        Keys.onEscapePressed: {
-          if (root.service && root.service.config.enforcement !== "focused") root.service.skipBreak()
+        Keys.onPressed: function(event) {
+          if (event.key !== Qt.Key_Escape || !root.service) return
+          var emergency = (event.modifiers & Qt.ControlModifier) && (event.modifiers & Qt.ShiftModifier)
+          if (emergency) {
+            root.service.emergencyExit()
+            event.accepted = true
+          } else if (root.service.config.enforcement !== "focused") {
+            root.service.skipBreak()
+            event.accepted = true
+          }
         }
       }
 

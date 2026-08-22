@@ -31,6 +31,8 @@ Item {
   property var demoEvidence: []
   property var preDemoSnapshot: null
   property var preDemoConfig: null
+  property string preDemoRecoveryWarning: ""
+  property bool preDemoPersistenceBlocked: false
 
   readonly property var players: Mpris.players ? Mpris.players.values : []
   readonly property var pipewireNodes: Pipewire.nodes ? Pipewire.nodes.values : []
@@ -136,13 +138,21 @@ Item {
     scheduleSave()
   }
 
+  function emergencyExit() {
+    if (state === Model.State.Breaking) skipBreak()
+  }
+
   function setDemo(name) {
     if (!demoMode) {
       preDemoSnapshot = JSON.parse(JSON.stringify(snapshot))
       preDemoConfig = JSON.parse(JSON.stringify(config))
+      preDemoRecoveryWarning = recoveryWarning
+      preDemoPersistenceBlocked = persistenceBlocked
     }
     demoMode = true
     demoEvidence = []
+    recoveryWarning = ""
+    persistenceBlocked = false
     var now = Date.now()
     var next = Model.defaultSnapshot(now)
     if (name === "working") next.accumulatedActiveMs = config.focusMs * 0.35
@@ -163,7 +173,17 @@ Item {
     } else if (name === "warning" || name === "final") {
       next = Model.startWarning(next, now, config)
       if (name === "final") next.warningEndsAtMs = now + config.finalMs
-    } else if (name === "break") next = Model.startBreak(next, now, config)
+    } else if (["break", "gentle-break", "balanced-break", "focused-break"].indexOf(name) >= 0) {
+      if (name !== "break") {
+        var demoConfig = JSON.parse(JSON.stringify(config))
+        demoConfig.enforcement = name.replace("-break", "")
+        config = Model.normalizeConfig(demoConfig)
+      }
+      next = Model.startBreak(next, now, config)
+    } else if (name === "recovery") {
+      recoveryWarning = "Saved state could not be read. The original file has been preserved."
+      persistenceBlocked = true
+    }
     snapshot = next
     observe()
   }
@@ -173,9 +193,13 @@ Item {
     demoEvidence = []
     snapshot = preDemoSnapshot || Model.defaultSnapshot(Date.now())
     config = preDemoConfig || config
+    recoveryWarning = preDemoRecoveryWarning
+    persistenceBlocked = preDemoPersistenceBlocked
     snapshot.lastObservedAtMs = Date.now()
     preDemoSnapshot = null
     preDemoConfig = null
+    preDemoRecoveryWarning = ""
+    preDemoPersistenceBlocked = false
   }
 
   function scheduleSave() {
@@ -326,6 +350,7 @@ Item {
     function pause(minutes: int): string { service.pauseMinutes(minutes); return service.state }
     function resume(): string { service.resume(); return service.state }
     function skip(): string { service.skipBreak(); return service.state }
+    function emergencyExit(): string { service.emergencyExit(); return service.state }
     function resetHistory(): string { service.resetHistory(); return "ok" }
     function resetLocalData(): string { service.resetLocalData(); return "ok" }
     function demo(state: string): string { service.setDemo(state); return service.state }

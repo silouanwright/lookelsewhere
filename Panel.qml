@@ -17,6 +17,7 @@ Panel {
   readonly property color muted: Color.muted
   readonly property color accent: Color.accent
   readonly property string fontFamily: bar ? bar.fontFamily : Style.font.family
+  readonly property bool manuallyPaused: service && service.state === "waiting-for-pause" && service.snapshot.pauseReason === "manual"
 
   function syncSettings() { if (service) service.configure(settings) }
   onSettingsChanged: syncSettings()
@@ -98,6 +99,16 @@ Panel {
         wrapMode: Text.WordWrap
       }
 
+      Text {
+        Layout.fillWidth: true
+        visible: root.service && root.service.recoveryWarning !== ""
+        text: root.service ? root.service.recoveryWarning : ""
+        color: Color.urgent
+        font.family: root.fontFamily
+        font.pixelSize: Style.font.bodySmall
+        wrapMode: Text.WordWrap
+      }
+
       RowLayout {
         Layout.fillWidth: true
         spacing: Style.space(8)
@@ -114,14 +125,36 @@ Panel {
         }
         Button {
           Layout.fillWidth: true
-          text: qsTr("Pause 1h")
+          text: root.manuallyPaused ? qsTr("Resume") : qsTr("Pause 1h")
           bordered: true
           focusable: true
           foreground: root.foreground
           accent: root.accent
           fontFamily: root.fontFamily
-          onClicked: { if (root.service) root.service.pauseMinutes(60); root.close() }
+          onClicked: {
+            if (root.service) {
+              if (root.manuallyPaused) root.service.resume()
+              else root.service.pauseMinutes(60)
+            }
+            root.close()
+          }
         }
+      }
+
+      Text {
+        Layout.fillWidth: true
+        text: {
+          if (!root.service || !root.service.snapshot || !root.service.snapshot.totals) return qsTr("No break history yet")
+          var totals = root.service.snapshot.totals
+          return qsTr("History · %1 completed · %2 postponed · %3 delayed")
+            .arg(Number(totals.completed || 0))
+            .arg(Number(totals.postponed || 0))
+            .arg(Number(totals.delayed || 0))
+        }
+        color: root.muted
+        font.family: root.fontFamily
+        font.pixelSize: Style.font.bodySmall
+        elide: Text.ElideRight
       }
 
       RowLayout {

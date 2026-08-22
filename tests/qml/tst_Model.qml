@@ -157,4 +157,11 @@ TestCase {
     compare(Model.protectedExplanation("meeting"), "Held quietly while your meeting is active.")
     compare(Model.protectedExplanation("dictation"), "Held quietly while dictation is active.")
   }
+
+  function test_manualPauseLabel() {
+    var snapshot = Model.defaultSnapshot(0)
+    snapshot.state = Model.State.Waiting
+    snapshot.pauseReason = "manual"
+    compare(Model.stateLabel(snapshot), "Breaks paused")
+  }
 }

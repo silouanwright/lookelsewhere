@@ -300,6 +300,7 @@ function formatDuration(milliseconds) {
 function stateLabel(snapshot) {
   var state = snapshot ? snapshot.state : ""
   if (state === State.Protected) return "Waiting until " + (snapshot.protectedCategory || "protected work") + " ends"
+  if (state === State.Waiting && snapshot.pauseReason === "manual") return "Breaks paused"
   if (state === State.Waiting) return "Waiting for a natural pause"
   if (state === State.Warning) return "Break starting soon"
   if (state === State.Final) return "Starting break"
