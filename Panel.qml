@@ -23,6 +23,7 @@ Panel {
   readonly property color accent: Color.accent
   readonly property string fontFamily: bar ? bar.fontFamily : Style.font.family
   readonly property bool manuallyPaused: service && service.phase === "waiting-for-pause" && service.snapshot.pauseReason === "manual"
+  readonly property bool idlePaused: service && service.idlePauseActive
   readonly property bool delayActionsVisible: !manuallyPaused && service && service.canPostpone
   readonly property int remainingSeconds: service ? Math.max(0, Math.ceil(service.remainingMs / 1000)) : 0
   readonly property int remainingMinutesPart: Math.floor(remainingSeconds / 60)
@@ -88,17 +89,15 @@ Panel {
             Layout.fillWidth: true
           }
 
-          Button {
+          PhosphorIconButton {
             id: statsButton
-            iconText: "󰄧"
+            iconPath: "M232,208a8,8,0,0,1-8,8H32a8,8,0,0,1-8-8V48a8,8,0,0,1,16,0V156.69l50.34-50.35a8,8,0,0,1,11.32,0L128,132.69,180.69,80H160a8,8,0,0,1,0-16h40a8,8,0,0,1,8,8v40a8,8,0,0,1-16,0V91.31l-58.34,58.35a8,8,0,0,1-11.32,0L96,123.31l-56,56V200H224A8,8,0,0,1,232,208Z"
             tooltipText: root.page === "stats" ? qsTr("Back to timer") : qsTr("Break history")
             selected: root.page === "stats"
-            focusable: true
             foreground: root.foreground
+            idleForeground: root.muted
             accent: root.accent
-            fontFamily: root.fontFamily
-            horizontalPadding: Style.space(5)
-            verticalPadding: Style.space(4)
+            iconSize: Style.font.icon
             KeyNavigation.tab: settingsButton
             KeyNavigation.backtab: root.page === "stats" ? settingsButton
               : (root.page === "options" ? editSettingsButton
@@ -110,17 +109,15 @@ Panel {
             onClicked: root.page = root.page === "stats" ? "now" : "stats"
           }
 
-          Button {
+          PhosphorIconButton {
             id: settingsButton
-            iconText: "󰒓"
+            iconPath: "M128,80a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160Zm88-29.84q.06-2.16,0-4.32l14.92-18.64a8,8,0,0,0,1.48-7.06,107.21,107.21,0,0,0-10.88-26.25,8,8,0,0,0-6-3.93l-23.72-2.64q-1.48-1.56-3-3L186,40.54a8,8,0,0,0-3.94-6,107.71,107.71,0,0,0-26.25-10.87,8,8,0,0,0-7.06,1.49L130.16,40Q128,40,125.84,40L107.2,25.11a8,8,0,0,0-7.06-1.48A107.6,107.6,0,0,0,73.89,34.51a8,8,0,0,0-3.93,6L67.32,64.27q-1.56,1.49-3,3L40.54,70a8,8,0,0,0-6,3.94,107.71,107.71,0,0,0-10.87,26.25,8,8,0,0,0,1.49,7.06L40,125.84Q40,128,40,130.16L25.11,148.8a8,8,0,0,0-1.48,7.06,107.21,107.21,0,0,0,10.88,26.25,8,8,0,0,0,6,3.93l23.72,2.64q1.49,1.56,3,3L70,215.46a8,8,0,0,0,3.94,6,107.71,107.71,0,0,0,26.25,10.87,8,8,0,0,0,7.06-1.49L125.84,216q2.16.06,4.32,0l18.64,14.92a8,8,0,0,0,7.06,1.48,107.21,107.21,0,0,0,26.25-10.88,8,8,0,0,0,3.93-6l2.64-23.72q1.56-1.48,3-3L215.46,186a8,8,0,0,0,6-3.94,107.71,107.71,0,0,0,10.87-26.25,8,8,0,0,0-1.49-7.06Zm-16.1-6.5a73.93,73.93,0,0,1,0,8.68,8,8,0,0,0,1.74,5.48l14.19,17.73a91.57,91.57,0,0,1-6.23,15L187,173.11a8,8,0,0,0-5.1,2.64,74.11,74.11,0,0,1-6.14,6.14,8,8,0,0,0-2.64,5.1l-2.51,22.58a91.32,91.32,0,0,1-15,6.23l-17.74-14.19a8,8,0,0,0-5-1.75h-.48a73.93,73.93,0,0,1-8.68,0,8,8,0,0,0-5.48,1.74L100.45,215.8a91.57,91.57,0,0,1-15-6.23L82.89,187a8,8,0,0,0-2.64-5.1,74.11,74.11,0,0,1-6.14-6.14,8,8,0,0,0-5.1-2.64L46.43,170.6a91.32,91.32,0,0,1-6.23-15l14.19-17.74a8,8,0,0,0,1.74-5.48,73.93,73.93,0,0,1,0-8.68,8,8,0,0,0-1.74-5.48L40.2,100.45a91.57,91.57,0,0,1,6.23-15L69,82.89a8,8,0,0,0,5.1-2.64,74.11,74.11,0,0,1,6.14-6.14A8,8,0,0,0,82.89,69L85.4,46.43a91.32,91.32,0,0,1,15-6.23l17.74,14.19a8,8,0,0,0,5.48,1.74,73.93,73.93,0,0,1,8.68,0,8,8,0,0,0,5.48-1.74L155.55,40.2a91.57,91.57,0,0,1,15,6.23L173.11,69a8,8,0,0,0,2.64,5.1,74.11,74.11,0,0,1,6.14,6.14,8,8,0,0,0,5.1,2.64l22.58,2.51a91.32,91.32,0,0,1,6.23,15l-14.19,17.74A8,8,0,0,0,199.87,123.66Z"
             tooltipText: root.page === "options" ? qsTr("Back to timer") : qsTr("Look Elsewhere options")
             selected: root.page === "options"
-            focusable: true
             foreground: root.foreground
+            idleForeground: root.muted
             accent: root.accent
-            fontFamily: root.fontFamily
-            horizontalPadding: Style.space(5)
-            verticalPadding: Style.space(4)
+            iconSize: Style.font.icon
             KeyNavigation.tab: root.page === "stats" ? statsButton
               : (root.page === "options" ? pauseBreaksButton : breakNowButton)
             KeyNavigation.backtab: statsButton
@@ -152,7 +149,7 @@ Panel {
           Text {
             Layout.fillWidth: true
             Layout.bottomMargin: -Style.space(5)
-            text: qsTr("Break starts in")
+            text: root.idlePaused ? qsTr("Look Elsewhere is paused") : qsTr("Break starts in")
             color: root.foreground
             font.family: root.fontFamily
             font.pixelSize: Style.font.body
@@ -160,42 +157,69 @@ Panel {
             horizontalAlignment: Text.AlignHCenter
           }
 
-          Row {
+          Item {
             Layout.alignment: Qt.AlignHCenter
-            // Remove only the active font's unused colon side-bearing. This
-            // preserves natural glyph metrics across Omarchy themes while
-            // keeping independently rolling digit columns visually unified.
-            spacing: -root.clockSeparatorOverlap
+            Layout.preferredWidth: Math.max(clockRow.implicitWidth, idleClock.implicitWidth)
+            Layout.preferredHeight: Math.max(clockRow.implicitHeight, idleClock.implicitHeight)
             Accessible.role: Accessible.StaticText
-            Accessible.name: qsTr("Time remaining: %1").arg(root.service ? root.service.remainingText : qsTr("Starting"))
+            Accessible.name: root.idlePaused
+              ? qsTr("Idle; focus timer paused")
+              : qsTr("Time remaining: %1").arg(root.service ? root.service.remainingText : qsTr("Starting"))
 
-            RollingNumber {
-              value: root.remainingMinutesPart
-              minimumDigits: 2
-              color: root.foreground
-              fontFamily: root.fontFamily
-              fontSize: Style.font.display * 1.55
-              fontWeight: Font.Bold
-              reducedMotion: root.service && root.service.config.reducedMotion
+            Row {
+              id: clockRow
+              anchors.centerIn: parent
+              // Remove only the active font's unused colon side-bearing. This
+              // preserves natural glyph metrics across Omarchy themes while
+              // keeping independently rolling digit columns visually unified.
+              spacing: -root.clockSeparatorOverlap
+              opacity: root.idlePaused ? 0 : 1
+              Accessible.ignored: true
+
+              RollingNumber {
+                value: root.remainingMinutesPart
+                minimumDigits: 2
+                color: root.foreground
+                fontFamily: root.fontFamily
+                fontSize: Style.font.display * 1.55
+                fontWeight: Font.Bold
+                reducedMotion: root.service && root.service.config.reducedMotion
+              }
+
+              Text {
+                text: ":"
+                color: root.foreground
+                font.family: root.fontFamily
+                font.pixelSize: Style.font.display * 1.55
+                font.weight: Font.Bold
+                Accessible.ignored: true
+              }
+
+              RollingNumber {
+                value: root.remainingSecondsPart
+                minimumDigits: 2
+                color: root.foreground
+                fontFamily: root.fontFamily
+                fontSize: Style.font.display * 1.55
+                fontWeight: Font.Bold
+                reducedMotion: root.service && root.service.config.reducedMotion
+              }
+
+              Behavior on opacity { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
             }
 
             Text {
-              text: ":"
+              id: idleClock
+              anchors.centerIn: parent
+              text: qsTr("Idle")
               color: root.foreground
               font.family: root.fontFamily
               font.pixelSize: Style.font.display * 1.55
               font.weight: Font.Bold
+              opacity: root.idlePaused ? 1 : 0
               Accessible.ignored: true
-            }
 
-            RollingNumber {
-              value: root.remainingSecondsPart
-              minimumDigits: 2
-              color: root.foreground
-              fontFamily: root.fontFamily
-              fontSize: Style.font.display * 1.55
-              fontWeight: Font.Bold
-              reducedMotion: root.service && root.service.config.reducedMotion
+              Behavior on opacity { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
             }
           }
         }

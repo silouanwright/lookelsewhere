@@ -10,6 +10,7 @@ This directory is the product and engineering source of truth. Earlier competiti
 - [Architecture](architecture.md)
 - [State model](state-model.md)
 - [Experience and surfaces](experience.md)
+- [Design feedback reconciliation](design-feedback-reconciliation.md)
 - [Privacy and trust](privacy.md)
 - [Competition delivery plan](competition.md)
 - [Marketplace submission draft](marketplace-submission.md)
