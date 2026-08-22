@@ -20,6 +20,18 @@ Item {
   readonly property bool breaking: service && service.phase === "breaking"
   readonly property bool finalCountdown: service && service.phase === "final-countdown"
   readonly property int remainingSeconds: service ? Math.max(0, Math.ceil(service.remainingMs / 1000)) : 0
+  readonly property int remainingMinutesPart: Math.floor(remainingSeconds / 60)
+  readonly property int remainingSecondsPart: remainingSeconds % 60
+  readonly property real clockSeparatorOverlap: Math.max(0,
+    (clockColonMetrics.advanceWidth - clockColonMetrics.tightBoundingRect.width) / 2)
+
+  TextMetrics {
+    id: clockColonMetrics
+    text: ":"
+    font.family: Style.font.family
+    font.pixelSize: Style.font.display
+    font.weight: Font.DemiBold
+  }
 
   Variants {
     model: Quickshell.screens
@@ -201,12 +213,15 @@ Item {
           }
           Row {
             Layout.alignment: Qt.AlignHCenter
-            spacing: 0
+            spacing: -root.clockSeparatorOverlap
             Accessible.role: Accessible.StaticText
-            Accessible.name: qsTr("%1 seconds remaining").arg(root.remainingSeconds)
+            Accessible.name: qsTr("%1 minutes and %2 seconds remaining")
+              .arg(root.remainingMinutesPart)
+              .arg(root.remainingSecondsPart)
 
             RollingNumber {
-              value: root.remainingSeconds
+              value: root.remainingMinutesPart
+              minimumDigits: 2
               color: Color.lock.text
               fontFamily: Style.font.family
               fontSize: Style.font.display
@@ -215,12 +230,22 @@ Item {
               animationActive: window.visible && root.breaking
             }
             Text {
-              text: qsTr("s")
+              text: ":"
               color: Color.lock.text
               font.family: Style.font.family
               font.pixelSize: Style.font.display
               font.weight: Font.DemiBold
               Accessible.ignored: true
+            }
+            RollingNumber {
+              value: root.remainingSecondsPart
+              minimumDigits: 2
+              color: Color.lock.text
+              fontFamily: Style.font.family
+              fontSize: Style.font.display
+              fontWeight: Font.DemiBold
+              reducedMotion: root.service && root.service.config.reducedMotion
+              animationActive: window.visible && root.breaking
             }
           }
           RowLayout {
