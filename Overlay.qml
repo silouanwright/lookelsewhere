@@ -35,15 +35,19 @@ Item {
 
       readonly property bool authoritative: Hyprland.focusedMonitor && Hyprland.focusedMonitor.name === modelData.name
       property real backdropReveal: 0
-      property real contentReveal: 0
+      property real contentOpacity: 0
+      property real contentMotion: 0
 
       function beginBreakReveal() {
         backdropAnimation.stop()
-        contentAnimation.stop()
+        contentOpacityAnimation.stop()
+        contentMotionAnimation.stop()
         backdropReveal = 0
-        contentReveal = 0
+        contentOpacity = 0
+        contentMotion = 0
         backdropAnimation.start()
-        contentAnimation.start()
+        contentOpacityAnimation.start()
+        contentMotionAnimation.start()
       }
 
       Connections {
@@ -52,9 +56,11 @@ Item {
           if (root.breaking) window.beginBreakReveal()
           else {
             backdropAnimation.stop()
-            contentAnimation.stop()
+            contentOpacityAnimation.stop()
+            contentMotionAnimation.stop()
             window.backdropReveal = 0
-            window.contentReveal = 0
+            window.contentOpacity = 0
+            window.contentMotion = 0
           }
         }
       }
@@ -65,20 +71,33 @@ Item {
         property: "backdropReveal"
         from: 0
         to: 1
-        duration: 650
-        easing.type: Easing.OutCubic
+        duration: 900
+        easing.type: Easing.OutQuint
       }
 
       SequentialAnimation {
-        id: contentAnimation
-        PauseAnimation { duration: 90 }
-        SpringAnimation {
+        id: contentOpacityAnimation
+        PauseAnimation { duration: 180 }
+        NumberAnimation {
           target: window
-          property: "contentReveal"
+          property: "contentOpacity"
           from: 0
           to: 1
-          spring: 4
-          damping: 0.42
+          duration: 620
+          easing.type: Easing.OutCubic
+        }
+      }
+
+      SequentialAnimation {
+        id: contentMotionAnimation
+        PauseAnimation { duration: 120 }
+        SpringAnimation {
+          target: window
+          property: "contentMotion"
+          from: 0
+          to: 1
+          spring: 2.6
+          damping: 0.34
           epsilon: 0.001
         }
       }
@@ -107,8 +126,11 @@ Item {
           anchors.centerIn: parent
           width: Math.min(parent.width - Style.space(48), Style.space(520))
           spacing: Style.space(18)
-          opacity: Math.max(0, Math.min(1, window.contentReveal))
-          scale: 0.96 + 0.04 * Math.max(0, Math.min(1, window.contentReveal))
+          opacity: Math.max(0, Math.min(1, window.contentOpacity))
+          scale: 0.975 + 0.025 * window.contentMotion
+          transform: Translate {
+            y: Style.space(36) * (1 - window.contentMotion)
+          }
 
           Text {
             Layout.alignment: Qt.AlignHCenter
