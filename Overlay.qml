@@ -1,6 +1,7 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import QtQuick.Controls as Controls
 import QtQuick.Effects
 import QtQuick.Layouts
 import Quickshell
@@ -254,7 +255,9 @@ Item {
             spacing: Style.space(10)
             OverlayButton {
               text: qsTr("Skip break")
-              visible: root.service && root.service.canSkipBreak
+              visible: !!root.service
+              actionEnabled: root.service && root.service.canSkipBreak
+              disabledTooltipText: qsTr("Breaks cannot be skipped in Focused mode")
               onClicked: if (root.service) root.service.skipBreak()
             }
             OverlayButton {
@@ -388,10 +391,14 @@ Item {
   }
 
   component OverlayButton: Button {
+    id: actionButton
     property bool primary: false
+    property bool actionEnabled: true
+    property string disabledTooltipText: ""
     selected: primary
     bordered: !primary
-    focusable: root.breaking
+    focusable: root.breaking && actionEnabled
+    opacity: actionEnabled ? 1 : 0.42
     foreground: root.breaking ? Color.lock.text : Color.popups.text
     accent: Color.accent
     // Give the full-screen escape action a visible resting affordance. Use
@@ -404,7 +411,27 @@ Item {
     horizontalPadding: Style.space(12)
     verticalPadding: Style.space(8)
     Accessible.role: Accessible.Button
-    Accessible.name: text
-    Accessible.onPressAction: clicked()
+    Accessible.name: actionEnabled || disabledTooltipText === ""
+      ? text
+      : qsTr("%1 unavailable; %2").arg(text).arg(disabledTooltipText)
+    Accessible.onPressAction: if (actionEnabled) clicked()
+
+    Behavior on opacity { NumberAnimation { duration: 120 } }
+
+    MouseArea {
+      id: disabledHover
+      anchors.fill: parent
+      z: 2
+      visible: !actionButton.actionEnabled
+      hoverEnabled: true
+      cursorShape: Qt.ArrowCursor
+    }
+
+    Controls.ToolTip {
+      visible: !actionButton.actionEnabled && actionButton.disabledTooltipText !== ""
+        && disabledHover.containsMouse
+      text: actionButton.disabledTooltipText
+      delay: 350
+    }
   }
 }
