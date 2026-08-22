@@ -9,6 +9,16 @@ bar → warning card → final countdown chip → break overlay → completion
 
 All surfaces inherit the installed Omarchy design system. Fixed colors, radii, typography, borders, and desktop coordinates are prohibited unless they represent semantic data and have theme-aware fallbacks.
 
+Surface roles remain distinct so themes can shape them independently:
+
+- the bar widget consumes bar roles;
+- the anchored quick panel and top-centered warning consume popup roles;
+- tooltips consume tooltip roles;
+- the full-screen break consumes modal/lock roles;
+- shared controls consume Omarchy control-state tokens for normal, hover, pressed, selected, focus, border, and fill treatment.
+
+Borders use Omarchy border specifications rather than flat `Rectangle.border` styling. This preserves gradient, per-side, sharp-corner, rounded, spacing-scale, typography-scale, and user `shell.toml` overrides. Look Elsewhere may add semantic iconography and hierarchy, but it does not introduce a parallel theme system.
+
 ## Bar widget
 
 The bar answers “when and why?” at a glance.
