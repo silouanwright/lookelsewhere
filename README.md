@@ -114,6 +114,22 @@ and all visual behavior continue normally without it.
 - Runtime target: Omarchy Quattro / Omarchy Shell
 - Source repository: `silouanwright/look-elsewhere`
 
+## A note from Silouan
+
+I voluntarily stepped away from full-time work about a year ago. After twenty
+years as an engineer, I know what I want to return for: work I genuinely love,
+with the freedom to use agentic coding as deeply as the work deserves.
+
+Look Elsewhere is a demonstration of how I work. I care about the last
+few pixels, but also the state model beneath them; I research unfamiliar
+territory, communicate decisions clearly, and keep iterating until the whole
+experience holds together. Omarchy feels like the kind of product and community
+I would love to help build full time.
+
+I am entering because I want to contribute, not for the prize. If Look Elsewhere
+wins, I will donate the prize money to charity. More than anything, I would love
+the opportunity to get back to work with people building something this alive.
+
 ## Documentation
 
 Product behavior, architecture, privacy boundaries, research, ADRs, verification, and competition delivery live under [`docs/`](docs/README.md).

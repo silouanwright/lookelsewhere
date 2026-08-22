@@ -35,6 +35,19 @@ Lead with the visible product experience, then explain technical depth:
 
 Avoid leading with settings, health claims, implementation language, or a long feature list.
 
+## Author story
+
+Silouan Wright voluntarily stepped away from full-time work about a year before
+this competition. He brings twenty years of engineering experience, strong
+written communication, close visual judgment, and a desire to practice agentic
+coding without artificial limits. Look Elsewhere should stand as the evidence:
+careful research, explicit architecture, responsive iteration, reliable state,
+and a finished product experience rather than a generated prototype.
+
+The direct ask is honest: Silouan would love to return to work by helping build
+Omarchy full time. The competition is not a cash motivation; if Look Elsewhere
+wins, he will donate the prize money to charity.
+
 ## Scope defense
 
 Protected quality areas:
