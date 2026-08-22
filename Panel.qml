@@ -374,7 +374,7 @@ Panel {
         Item {
           Layout.fillWidth: true
           Layout.preferredHeight: actionRow.implicitHeight
-          Layout.topMargin: -Style.space(2)
+          Layout.topMargin: -Style.space(3)
           visible: root.page === "now"
 
           RowLayout {
