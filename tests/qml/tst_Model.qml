@@ -327,6 +327,14 @@ TestCase {
     compare(Model.soundCueForTransition(Model.State.Breaking, Model.State.Breaking), "")
   }
 
+  function test_completionCueLeadsBreakDismissal() {
+    verify(!Model.shouldLeadCompletionCue(Model.State.Breaking, 1501, 1500))
+    verify(Model.shouldLeadCompletionCue(Model.State.Breaking, 1500, 1500))
+    verify(Model.shouldLeadCompletionCue(Model.State.Breaking, 1, 1500))
+    verify(!Model.shouldLeadCompletionCue(Model.State.Breaking, 0, 1500))
+    verify(!Model.shouldLeadCompletionCue(Model.State.Working, 500, 1500))
+  }
+
   function test_resetTotalsPreservesSchedule() {
     var s = Model.defaultSnapshot(1000)
     s.accumulatedActiveMs = 5000

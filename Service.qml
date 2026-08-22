@@ -26,6 +26,7 @@ Item {
   property bool dictationAvailable: false
   property bool startSoundAvailable: true
   property bool completionSoundAvailable: true
+  property bool completionCuePlayed: false
   property string recoveryWarning: ""
   property bool persistenceBlocked: false
   property bool demoMode: false
@@ -103,6 +104,7 @@ Item {
   function observe() {
     var beforeState = snapshot.state
     var effectiveIdle = config.detectors.idle && idle
+    if (Model.shouldLeadCompletionCue(beforeState, remainingMs, 1500)) playCompletionCue()
     snapshot = Model.observe(snapshot, {
       nowMs: Date.now(),
       active: !effectiveIdle,
@@ -192,10 +194,17 @@ Item {
   }
 
   function playTransitionSound(beforeState, afterState) {
-    if (demoMode || !config.soundEnabled) return
     var cue = Model.soundCueForTransition(beforeState, afterState)
+    if (cue === "start") completionCuePlayed = false
+    if (demoMode || !config.soundEnabled) return
     if (cue === "start" && config.startSoundEnabled && !breakStartSound.running) breakStartSound.running = true
-    else if (cue === "complete" && config.completionSoundEnabled && !breakCompletionSound.running) breakCompletionSound.running = true
+    else if (cue === "complete") playCompletionCue()
+  }
+
+  function playCompletionCue() {
+    if (completionCuePlayed || demoMode || !config.soundEnabled || !config.completionSoundEnabled) return
+    completionCuePlayed = true
+    if (!breakCompletionSound.running) breakCompletionSound.running = true
   }
 
   function resolvedSoundPath(configuredPath, bundledUrl) {

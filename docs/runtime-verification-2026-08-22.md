@@ -32,10 +32,12 @@ one focused `HDMI-A-2` output at 3840×2160 with scale 2.
   bounded one-minute postponed state. Clearing demo mode restored the exact
   real schedule.
 - Escape dismisses the panel without invoking either action.
-- The earlier Focused emergency-exit behavior was intentionally superseded:
-  Focused is now unskippable through pointer, keyboard, and IPC until natural
-  completion. Final installed-runtime acceptance of that stronger contract is
-  pending without changing the user's active configuration.
+- The earlier Focused emergency-exit behavior was intentionally superseded.
+  Installed Gentle and Balanced fixtures accepted IPC skip immediately.
+  Focused rejected IPC skip, Escape, and Ctrl+Escape while its countdown kept
+  advancing, then returned to working only at natural completion. The disabled
+  pointer action is guarded by the same `canSkipBreak` authority. Clearing the
+  fixture restored the real non-demo schedule and Focused configuration.
 - The shell journal contained no Look Elsewhere QML errors during the checks.
 
 ## Rolling countdown continuity
@@ -47,7 +49,7 @@ one focused `HDMI-A-2` output at 3840×2160 with scale 2.
   from (for example) `6` directly to `4`.
 - Large changes, including fixture changes and schedule resets, snap to the new
   authoritative value rather than animating through stale seconds.
-- Component acceptance covers both behaviors and the complete suite passes 44
+- Component acceptance covers both behaviors and the complete suite passes 45
   tests with zero failures.
 
 ## Break sounds
@@ -57,6 +59,9 @@ one focused `HDMI-A-2` output at 3840×2160 with scale 2.
 - Transition tests prove that scheduler and manual break entry select the start
   cue, natural completion selects the return cue, and unrelated transitions
   remain silent. Demo and restoration paths are explicitly suppressed.
+- The return cue is armed once during the final 1.5 seconds so its onset lands
+  before the break surface dismisses; the state transition retains a guarded
+  fallback if a delayed scheduler tick misses that lead window.
 - The master switch, independent cue switches, 0–100 app volume, bundled
   defaults, and optional absolute or `~/` custom paths are manifest-backed.
 

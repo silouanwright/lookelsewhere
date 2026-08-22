@@ -367,6 +367,11 @@ function soundCueForTransition(beforeState, afterState) {
   return ""
 }
 
+function shouldLeadCompletionCue(state, remainingMs, leadMs) {
+  var remaining = Number(remainingMs || 0)
+  return state === State.Breaking && remaining > 0 && remaining <= Number(leadMs || 0)
+}
+
 function resetTotals(snapshot) {
   var next = copySnapshot(snapshot)
   next.totals = { prompted: 0, completed: 0, postponed: 0, skipped: 0, delayed: 0 }
