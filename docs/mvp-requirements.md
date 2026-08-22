@@ -34,10 +34,11 @@
 
 ### Enforcement
 
-- Provide Gentle, Balanced, and Focused presets.
+- Provide Casual, Balanced, and Hardcore presets.
 - Default to Balanced.
 - Make preset consequences explicit before selection.
-- Make Focused breaks unskippable until their timer completes.
+- Keep bounded snoozing available in Hardcore, but make its active breaks
+  unskippable until their timer completes.
 - Track prompted, completed, postponed, skipped, and context-delayed outcomes locally.
 
 ### Configuration

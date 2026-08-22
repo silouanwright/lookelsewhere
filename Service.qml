@@ -65,7 +65,10 @@ Item {
   readonly property string label: idlePauseActive ? "Paused while you’re away" : Model.stateLabel(snapshot)
   readonly property string remainingText: Model.formatDuration(remainingMs)
   readonly property real progress: {
-    if (phase === Model.State.Breaking) return config.breakMs > 0 ? 1 - remainingMs / config.breakMs : 1
+    if (phase === Model.State.Breaking) {
+      var duration = Number(snapshot.activeBreakDurationMs || config.breakMs)
+      return duration > 0 ? 1 - remainingMs / duration : 1
+    }
     return config.focusMs > 0 ? Math.max(0, Math.min(1, Number(snapshot.accumulatedActiveMs || 0) / config.focusMs)) : 0
   }
   readonly property string protectedSummary: phase === Model.State.Protected
@@ -262,10 +265,12 @@ Item {
     } else if (name === "warning" || name === "final") {
       next = Model.startWarning(next, now, config)
       if (name === "final") next.warningEndsAtMs = now + config.finalMs
-    } else if (["break", "gentle-break", "balanced-break", "focused-break"].indexOf(name) >= 0) {
+    } else if (["break", "casual-break", "balanced-break", "hardcore-break", "gentle-break", "focused-break"].indexOf(name) >= 0) {
       if (name !== "break") {
         var demoConfig = JSON.parse(JSON.stringify(config))
-        demoConfig.enforcement = name.replace("-break", "")
+        var demoEnforcement = name.replace("-break", "")
+        demoConfig.enforcement = demoEnforcement === "gentle" ? "casual"
+          : demoEnforcement === "focused" ? "hardcore" : demoEnforcement
         config = Model.normalizeConfig(demoConfig)
       }
       next = Model.startBreak(next, now, config)

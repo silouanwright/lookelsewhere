@@ -13,7 +13,6 @@ This is a competition and portfolio quality plan, not a LookAway parity list. Pr
 
 ## P1 — high-leverage differentiation
 
-- Short/long break cadence with a restrained default.
 - Return-from-away choice when an idle interval makes session intent ambiguous.
 - Screen recording/sharing protection if a dependable Wayland/PipeWire signal can be established.
 - Per-app deep-focus overrides as transparent configuration, not opaque detection.

@@ -22,6 +22,8 @@ function defaultConfig() {
     enabled: true,
     focusMs: 20 * 60 * 1000,
     breakMs: 20 * 1000,
+    longBreakEvery: 4,
+    longBreakMs: 3 * 60 * 1000,
     dueSoonMs: 60 * 1000,
     warningMs: 25 * 1000,
     finalMs: 3 * 1000,
@@ -29,6 +31,8 @@ function defaultConfig() {
     maximumDelayMs: 15 * 60 * 1000,
     enforcement: "balanced",
     snoozeBudget: 3,
+    breakTitle: "Look Elsewhere",
+    breakSubtitle: "Let your eyes settle on something distant. Breathe. The screen will still be here.",
     reducedMotion: false,
     soundEnabled: true,
     soundVolume: 65,
@@ -48,13 +52,20 @@ function normalizeConfig(input) {
   base.enabled = value.enabled === undefined ? base.enabled : value.enabled === true
   base.focusMs = clamp(value.focusMs === undefined ? base.focusMs : value.focusMs, 60 * 1000, 12 * 60 * 60 * 1000)
   base.breakMs = clamp(value.breakMs === undefined ? base.breakMs : value.breakMs, 5 * 1000, 60 * 60 * 1000)
+  base.longBreakEvery = Math.round(clamp(value.longBreakEvery === undefined ? base.longBreakEvery : value.longBreakEvery, 0, 20))
+  base.longBreakMs = clamp(value.longBreakMs === undefined ? base.longBreakMs : value.longBreakMs, 5 * 1000, 60 * 60 * 1000)
   base.dueSoonMs = clamp(value.dueSoonMs === undefined ? base.dueSoonMs : value.dueSoonMs, 0, base.focusMs)
   base.warningMs = clamp(value.warningMs === undefined ? base.warningMs : value.warningMs, 3 * 1000, 5 * 60 * 1000)
   base.finalMs = clamp(value.finalMs === undefined ? base.finalMs : value.finalMs, 1 * 1000, base.warningMs)
   base.cooldownMs = clamp(value.cooldownMs === undefined ? base.cooldownMs : value.cooldownMs, 0, 60 * 60 * 1000)
   base.maximumDelayMs = clamp(value.maximumDelayMs === undefined ? base.maximumDelayMs : value.maximumDelayMs, 0, 12 * 60 * 60 * 1000)
-  base.enforcement = ["gentle", "balanced", "focused"].indexOf(value.enforcement) >= 0 ? value.enforcement : base.enforcement
+  var enforcement = String(value.enforcement || "")
+  if (enforcement === "gentle") enforcement = "casual"
+  else if (enforcement === "focused") enforcement = "hardcore"
+  base.enforcement = ["casual", "balanced", "hardcore"].indexOf(enforcement) >= 0 ? enforcement : base.enforcement
   base.snoozeBudget = Math.round(clamp(value.snoozeBudget === undefined ? base.snoozeBudget : value.snoozeBudget, 0, 20))
+  base.breakTitle = String(value.breakTitle === undefined ? base.breakTitle : value.breakTitle).trim()
+  base.breakSubtitle = String(value.breakSubtitle === undefined ? base.breakSubtitle : value.breakSubtitle).trim()
   base.reducedMotion = value.reducedMotion === true
   base.soundEnabled = value.soundEnabled === true
   base.soundVolume = Math.round(clamp(value.soundVolume === undefined ? base.soundVolume : value.soundVolume, 0, 100))
@@ -96,9 +107,13 @@ function configFromSettings(settings) {
   var next = defaultConfig()
   if (incoming.focusMinutes !== undefined) next.focusMs = finiteNumber(incoming.focusMinutes, next.focusMs / 60000) * 60000
   if (incoming.breakSeconds !== undefined) next.breakMs = finiteNumber(incoming.breakSeconds, next.breakMs / 1000) * 1000
+  if (incoming.longBreakEvery !== undefined) next.longBreakEvery = finiteNumber(incoming.longBreakEvery, next.longBreakEvery)
+  if (incoming.longBreakSeconds !== undefined) next.longBreakMs = finiteNumber(incoming.longBreakSeconds, next.longBreakMs / 1000) * 1000
   if (incoming.enforcement !== undefined) next.enforcement = String(incoming.enforcement)
   if (incoming.maximumDelayMinutes !== undefined) next.maximumDelayMs = finiteNumber(incoming.maximumDelayMinutes, next.maximumDelayMs / 60000) * 60000
   if (incoming.snoozeBudget !== undefined) next.snoozeBudget = finiteNumber(incoming.snoozeBudget, next.snoozeBudget)
+  if (incoming.breakTitle !== undefined) next.breakTitle = String(incoming.breakTitle)
+  if (incoming.breakSubtitle !== undefined) next.breakSubtitle = String(incoming.breakSubtitle)
   if (incoming.reducedMotion !== undefined) next.reducedMotion = incoming.reducedMotion === true
   if (incoming.soundEnabled !== undefined) next.soundEnabled = incoming.soundEnabled === true
   if (incoming.soundVolume !== undefined) next.soundVolume = finiteNumber(incoming.soundVolume, next.soundVolume)
@@ -131,6 +146,7 @@ function defaultSnapshot(nowMs) {
     cooldownUntilMs: 0,
     warningEndsAtMs: 0,
     breakEndsAtMs: 0,
+    activeBreakDurationMs: 0,
     protectedCategory: "",
     pauseReason: "",
     snoozesUsed: 0,
@@ -183,6 +199,7 @@ function copySnapshot(snapshot) {
     cooldownUntilMs: Number(value.cooldownUntilMs || 0),
     warningEndsAtMs: Number(value.warningEndsAtMs || 0),
     breakEndsAtMs: Number(value.breakEndsAtMs || 0),
+    activeBreakDurationMs: Number(value.activeBreakDurationMs || 0),
     protectedCategory: String(value.protectedCategory || ""),
     pauseReason: String(value.pauseReason || ""),
     snoozesUsed: Number(value.snoozesUsed || 0),
@@ -296,9 +313,14 @@ function startWarning(snapshot, nowMs, config, durationMs) {
 
 function startBreak(snapshot, nowMs, config) {
   var next = copySnapshot(snapshot)
+  var completedCycles = next.totals.completed + next.totals.skipped
+  var ordinal = completedCycles + 1
+  var longBreak = config.longBreakEvery > 0 && ordinal % config.longBreakEvery === 0
+  var duration = longBreak ? config.longBreakMs : config.breakMs
   next.state = State.Breaking
   next.stateEnteredAtMs = nowMs
-  next.breakEndsAtMs = nowMs + config.breakMs
+  next.activeBreakDurationMs = duration
+  next.breakEndsAtMs = nowMs + duration
   return next
 }
 
@@ -312,6 +334,7 @@ function completeBreak(snapshot, nowMs) {
   next.cooldownUntilMs = 0
   next.warningEndsAtMs = 0
   next.breakEndsAtMs = 0
+  next.activeBreakDurationMs = 0
   next.protectedCategory = ""
   next.snoozesUsed = 0
   next.totals.completed++
@@ -352,13 +375,12 @@ function delayNextBreak(snapshot, nowMs, durationMs, config) {
 
 function canPostpone(snapshot, config) {
   var cfg = config && config.version === 1 ? config : normalizeConfig(config)
-  if (cfg.enforcement === "focused") return false
   return Number(snapshot && snapshot.snoozesUsed || 0) < cfg.snoozeBudget
 }
 
 function canSkipBreak(config) {
   var cfg = config && config.version === 1 ? config : normalizeConfig(config)
-  return cfg.enforcement !== "focused"
+  return cfg.enforcement !== "hardcore"
 }
 
 function soundCueForTransition(beforeState, afterState) {

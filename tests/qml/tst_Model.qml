@@ -34,6 +34,8 @@ TestCase {
   function test_settingsRebuildFromDefaults() {
     var customized = Model.configFromSettings({
       focusMinutes: 25,
+      breakTitle: "Rest your eyes",
+      breakSubtitle: "Look across the room.",
       officeHoursEnabled: true,
       officeStart: "22:30",
       mediaDetection: false,
@@ -44,6 +46,8 @@ TestCase {
       outputMode: "focused"
     })
     compare(customized.focusMs, 25 * 60000)
+    compare(customized.breakTitle, "Rest your eyes")
+    compare(customized.breakSubtitle, "Look across the room.")
     verify(customized.officeHours.enabled)
     compare(customized.officeHours.startMinute, 22 * 60 + 30)
     verify(!customized.detectors.media)
@@ -217,6 +221,27 @@ TestCase {
     compare(s.totals.completed, 1)
   }
 
+  function test_periodicLongBreak() {
+    var c = config({ breakMs: 5000, longBreakEvery: 4, longBreakMs: 180000 })
+    var s = Model.defaultSnapshot(1000)
+    s.totals.completed = 2
+    s.totals.skipped = 1
+    s = Model.startBreak(s, 1000, c)
+    compare(s.activeBreakDurationMs, 180000)
+    compare(s.breakEndsAtMs, 181000)
+
+    s = Model.defaultSnapshot(1000)
+    s.totals.completed = 1
+    s = Model.startBreak(s, 1000, c)
+    compare(s.activeBreakDurationMs, 5000)
+    compare(s.breakEndsAtMs, 6000)
+
+    c.longBreakEvery = 0
+    s.totals.completed = 3
+    s = Model.startBreak(s, 1000, c)
+    compare(s.activeBreakDurationMs, 5000)
+  }
+
   function test_restartReconcilesExpiredBreakWithoutDuplication() {
     var c = config()
     var persisted = Model.defaultSnapshot(1000)
@@ -304,19 +329,24 @@ TestCase {
     compare(s.totals.prompted, 1)
   }
 
-  function test_postponeBudgetAndFocusedEnforcement() {
+  function test_postponeBudgetAcrossEnforcementModes() {
     var s = Model.defaultSnapshot(0)
     s.state = Model.State.Warning
     s.snoozesUsed = 1
     verify(!Model.canPostpone(s, config({ snoozeBudget: 1 })))
-    verify(!Model.canPostpone(s, config({ enforcement: "focused" })))
+    verify(Model.canPostpone(s, config({ snoozeBudget: 2, enforcement: "hardcore" })))
     verify(Model.canPostpone(s, config({ snoozeBudget: 2, enforcement: "balanced" })))
   }
 
-  function test_focusedEnforcementCannotSkipBreak() {
-    verify(Model.canSkipBreak(config({ enforcement: "gentle" })))
+  function test_hardcoreEnforcementCannotSkipBreak() {
+    verify(Model.canSkipBreak(config({ enforcement: "casual" })))
     verify(Model.canSkipBreak(config({ enforcement: "balanced" })))
-    verify(!Model.canSkipBreak(config({ enforcement: "focused" })))
+    verify(!Model.canSkipBreak(config({ enforcement: "hardcore" })))
+  }
+
+  function test_legacyEnforcementNamesMigrate() {
+    compare(config({ enforcement: "gentle" }).enforcement, "casual")
+    compare(config({ enforcement: "focused" }).enforcement, "hardcore")
   }
 
   function test_soundCuesFollowBreakTransitions() {

@@ -32,7 +32,8 @@ returns the real schedule unchanged when it ends.
 - Idle, Hyprland fullscreen, MPRIS playback, PipeWire microphone, and Omarchy dictation evidence
 - Confidence-based protected-context delay and cooldown
 - Wayland-native natural-pause timing before a due warning
-- Gentle, Balanced, and Focused enforcement policies
+- Casual, Balanced, and Hardcore enforcement policies
+- Configurable short breaks and periodic long breaks
 - Omarchy-native bar, popup, warning, countdown, and break surfaces
 - Manifest-backed configuration for timing, office hours, detectors, enforcement, snoozing, and reduced motion
 - One interactive authority across multiple outputs
@@ -50,8 +51,8 @@ omarchy-shell look-elsewhere demo flow
 omarchy-shell look-elsewhere demo warning
 omarchy-shell look-elsewhere demo final
 omarchy-shell look-elsewhere demo break
-omarchy-shell look-elsewhere demo gentle-break
-omarchy-shell look-elsewhere demo focused-break
+omarchy-shell look-elsewhere demo casual-break
+omarchy-shell look-elsewhere demo hardcore-break
 omarchy-shell look-elsewhere demo recovery
 omarchy-shell look-elsewhere demoOff
 ```
@@ -65,10 +66,14 @@ The competition MVP follows Omarchy's config-first plugin convention. Settings l
 ```bash
 omarchy bar set io.github.silouanwright.look-elsewhere focusMinutes 25 --json
 omarchy bar set io.github.silouanwright.look-elsewhere breakSeconds 45 --json
+omarchy bar set io.github.silouanwright.look-elsewhere longBreakEvery 4 --json
+omarchy bar set io.github.silouanwright.look-elsewhere longBreakSeconds 180 --json
 omarchy bar set io.github.silouanwright.look-elsewhere enforcement '"balanced"' --json
 omarchy bar set io.github.silouanwright.look-elsewhere officeHoursEnabled true --json
 omarchy bar set io.github.silouanwright.look-elsewhere reducedMotion false --json
 omarchy bar set io.github.silouanwright.look-elsewhere soundEnabled true --json
+omarchy bar set io.github.silouanwright.look-elsewhere breakTitle '"Look Elsewhere"' --json
+omarchy bar set io.github.silouanwright.look-elsewhere breakSubtitle '"Look across the room and breathe."' --json
 omarchy bar set io.github.silouanwright.look-elsewhere soundVolume 65 --json
 omarchy bar set io.github.silouanwright.look-elsewhere startSoundEnabled true --json
 omarchy bar set io.github.silouanwright.look-elsewhere completionSoundEnabled true --json
@@ -100,7 +105,10 @@ omarchy-shell look-elsewhere resetLocalData
 
 `resetLocalData` removes the local schedule and aggregate outcome history on the next atomic state write. It does not change Omarchy configuration.
 
-Enforcement behavior is explicit: Gentle permits snoozing and ordinary skipping, Balanced keeps snoozing bounded, and Focused cannot be skipped. In Focused mode the full-screen break ends only when its timer completes.
+Enforcement behavior is explicit: Casual and Balanced permit bounded snoozing
+and ordinary skipping. Hardcore still permits bounded snoozing, but the active
+break cannot be skipped and ends only when its timer completes. Legacy
+`gentle` and `focused` configuration values migrate to Casual and Hardcore.
 
 ## Keyboard control
 

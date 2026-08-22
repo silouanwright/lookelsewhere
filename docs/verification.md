@@ -38,7 +38,7 @@ Capture every material state at native scale:
 - Quick panel normal, protected, empty-history, error/recovery
 - Warning, focused warning if supported, final chip
 - Break overlay on single and multiple monitors
-- Gentle/Balanced/Focused action differences
+- Casual/Balanced/Hardcore action differences
 - Dark and contrasting light/high-contrast theme
 - Rounded and sharp-corner treatment
 - Reduced motion

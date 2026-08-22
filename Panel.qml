@@ -26,15 +26,19 @@ Panel {
   readonly property bool idlePaused: service && service.idlePauseActive
   readonly property bool delayActionsVisible: !manuallyPaused && service
   readonly property bool delayActionsEnabled: delayActionsVisible && service.canPostpone
+  readonly property int snoozesRemaining: service
+    ? Math.max(0, Number(service.config.snoozeBudget || 0) - Number(service.snapshot.snoozesUsed || 0))
+    : 0
   readonly property string snoozeBudgetSummary: service
     ? qsTr("%1 of %2 snoozes used")
         .arg(Number(service.snapshot.snoozesUsed || 0))
         .arg(Number(service.config.snoozeBudget || 0))
     : ""
   readonly property string snoozeUnavailableSummary: service
-    && service.config.enforcement === "focused"
-      ? qsTr("Snoozing is unavailable in Focused mode")
-      : snoozeBudgetSummary
+    ? snoozeBudgetSummary : ""
+  readonly property string snoozeAvailabilitySummary: snoozesRemaining === 0
+        ? qsTr("No snoozes available")
+        : qsTr("Snoozes available: %1").arg(snoozesRemaining)
   readonly property int remainingSeconds: service ? Math.max(0, Math.ceil(service.remainingMs / 1000)) : 0
   readonly property int remainingMinutesPart: Math.floor(remainingSeconds / 60)
   readonly property int remainingSecondsPart: remainingSeconds % 60
@@ -519,6 +523,17 @@ Panel {
               onClicked: root.postponeAndClose(15)
             }
           }
+        }
+
+        Text {
+          Layout.fillWidth: true
+          Layout.topMargin: -Style.space(2)
+          visible: root.page === "now" && root.delayActionsVisible
+          text: root.snoozeAvailabilitySummary
+          color: root.muted
+          font.family: root.fontFamily
+          font.pixelSize: Style.font.caption
+          horizontalAlignment: Text.AlignHCenter
         }
 
         Item {

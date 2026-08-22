@@ -39,7 +39,7 @@ submission.
 - [x] Idle state visibly pauses the bar and panel countdown.
 - [x] Warning begins before focus reaches zero, final countdown follows, and
   the break starts at the original zero without a second warning cycle.
-- [x] Gentle and Balanced exits work while Focused rejects button, Escape,
+- [x] Casual and Balanced exits work while Hardcore rejects button, Escape,
   modified-Escape, and IPC skips until natural completion.
 - [x] Keyboard traversal, Escape dismissal, accessible roles/names, and reduced
   motion are verified.

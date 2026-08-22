@@ -32,12 +32,12 @@ one focused `HDMI-A-2` output at 3840×2160 with scale 2.
   bounded one-minute postponed state. Clearing demo mode restored the exact
   real schedule.
 - Escape dismisses the panel without invoking either action.
-- The earlier Focused emergency-exit behavior was intentionally superseded.
-  Installed Gentle and Balanced fixtures accepted IPC skip immediately.
-  Focused rejected IPC skip, Escape, and Ctrl+Escape while its countdown kept
+- The earlier Hardcore emergency-exit behavior was intentionally superseded.
+  Installed Casual and Balanced fixtures accepted IPC skip immediately.
+  Hardcore rejected IPC skip, Escape, and Ctrl+Escape while its countdown kept
   advancing, then returned to working only at natural completion. The disabled
   pointer action is guarded by the same `canSkipBreak` authority. Clearing the
-  fixture restored the real non-demo schedule and Focused configuration.
+  fixture restored the real non-demo schedule and Hardcore configuration.
 - The shell journal contained no Look Elsewhere QML errors during the checks.
 
 ## Rolling countdown continuity
@@ -49,7 +49,7 @@ one focused `HDMI-A-2` output at 3840×2160 with scale 2.
   from (for example) `6` directly to `4`.
 - Large changes, including fixture changes and schedule resets, snap to the new
   authoritative value rather than animating through stale seconds.
-- Component acceptance covers both behaviors and the complete suite passes 45
+- Component acceptance covers both behaviors and the complete suite passes 47
   tests with zero failures.
 
 ## Break sounds

@@ -198,19 +198,22 @@ Item {
             color: Color.accent
           }
           Text {
-            Layout.alignment: Qt.AlignHCenter
+            Layout.fillWidth: true
             Layout.topMargin: -Style.space(4)
-            text: qsTr("Look Elsewhere")
+            text: root.service ? root.service.config.breakTitle : qsTr("Look Elsewhere")
             color: Color.lock.text
             font.family: Style.font.family
             font.pixelSize: Style.font.displayLarge * 1.35
             font.weight: Font.Bold
+            horizontalAlignment: Text.AlignHCenter
+            wrapMode: Text.WordWrap
           }
           Text {
             Layout.fillWidth: true
             Layout.topMargin: -Style.space(12)
             horizontalAlignment: Text.AlignHCenter
-            text: qsTr("Let your eyes settle on something distant. Breathe. The screen will still be here.")
+            text: root.service ? root.service.config.breakSubtitle
+              : qsTr("Let your eyes settle on something distant. Breathe. The screen will still be here.")
             color: Color.lock.placeholder
             font.family: Style.font.family
             font.pixelSize: Style.font.subtitle
@@ -261,12 +264,12 @@ Item {
               text: qsTr("Skip break")
               visible: !!root.service
               actionEnabled: root.service && root.service.canSkipBreak
-              disabledTooltipText: qsTr("Breaks cannot be skipped in Focused mode")
+              disabledTooltipText: qsTr("Breaks cannot be skipped in Hardcore mode")
               onClicked: if (root.service) root.service.skipBreak()
             }
             OverlayButton {
               text: qsTr("+1 minute")
-              visible: root.service && root.service.config.enforcement === "gentle" && root.service.canPostpone
+              visible: root.service && root.service.canPostpone
               onClicked: if (root.service) root.service.postponeMinutes(1)
             }
           }
