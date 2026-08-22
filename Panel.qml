@@ -135,20 +135,16 @@ Panel {
             Accessible.ignored: true
 
             Image {
-              id: breakIcon
               anchors.fill: parent
               source: Qt.resolvedUrl("assets/break.svg")
               sourceSize: Qt.size(width, height)
               fillMode: Image.PreserveAspectFit
               smooth: true
-              visible: false
-            }
-
-            MultiEffect {
-              anchors.fill: breakIcon
-              source: breakIcon
-              colorization: 1
-              colorizationColor: root.accent
+              layer.enabled: true
+              layer.effect: MultiEffect {
+                colorization: 1
+                colorizationColor: root.accent
+              }
             }
           }
 
