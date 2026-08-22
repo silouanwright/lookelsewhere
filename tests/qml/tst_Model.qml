@@ -112,6 +112,11 @@ TestCase {
     compare(Model.formatDuration(23000), "23s")
     compare(Model.formatDuration(61000), "1m 1s")
     compare(Model.formatDuration(3600000), "1h")
+    compare(Model.formatBarDuration(0), "0s")
+    compare(Model.formatBarDuration(999), "1s")
+    compare(Model.formatBarDuration(59001), "60s")
+    compare(Model.formatBarDuration(60000), "1m")
+    compare(Model.formatBarDuration(60001), "2m")
   }
 
   function test_protectedExplanationAvoidsInternalLabels() {

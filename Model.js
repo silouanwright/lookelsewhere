@@ -242,6 +242,13 @@ function resetTotals(snapshot) {
   return next
 }
 
+function formatBarDuration(milliseconds) {
+  var remaining = Math.max(0, Number(milliseconds || 0))
+  var seconds = Math.ceil(remaining / 1000)
+  if (remaining < 60000) return seconds + "s"
+  return Math.ceil(seconds / 60) + "m"
+}
+
 function formatDuration(milliseconds) {
   var totalSeconds = Math.max(0, Math.ceil(Number(milliseconds || 0) / 1000))
   if (totalSeconds < 60) return totalSeconds + "s"

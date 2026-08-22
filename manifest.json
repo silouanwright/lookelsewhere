@@ -35,7 +35,8 @@
       "mediaDetection": true,
       "microphoneDetection": true,
       "dictationDetection": true,
-      "reducedMotion": false
+      "reducedMotion": false,
+      "displayMode": "icon-and-time"
     },
     "schema": [
       { "key": "focusMinutes", "type": "integer", "label": "Focus interval (minutes)", "min": 1, "max": 180, "step": 1, "defaultValue": 20 },
@@ -51,7 +52,8 @@
       { "key": "mediaDetection", "type": "boolean", "label": "Delay during media playback", "defaultValue": true },
       { "key": "microphoneDetection", "type": "boolean", "label": "Delay while the microphone is active", "defaultValue": true, "description": "Uses PipeWire stream state. Look Elsewhere never records audio." },
       { "key": "dictationDetection", "type": "boolean", "label": "Delay during Omarchy dictation", "defaultValue": true },
-      { "key": "reducedMotion", "type": "boolean", "label": "Reduce motion", "defaultValue": false, "description": "Show the break surface without animated movement or soft focus." }
+      { "key": "reducedMotion", "type": "boolean", "label": "Reduce motion", "defaultValue": false, "description": "Show the break surface without animated movement or soft focus." },
+      { "key": "displayMode", "type": "enum", "label": "Bar display", "options": ["icon", "time", "icon-and-time"], "defaultValue": "icon-and-time", "description": "Show the eye, the compact countdown, or both. Vertical bars use the icon." }
     ]
   }
 }

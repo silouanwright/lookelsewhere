@@ -46,7 +46,10 @@ omarchy bar set io.github.silouanwright.look-elsewhere breakSeconds 45 --json
 omarchy bar set io.github.silouanwright.look-elsewhere enforcement '"balanced"' --json
 omarchy bar set io.github.silouanwright.look-elsewhere officeHoursEnabled true --json
 omarchy bar set io.github.silouanwright.look-elsewhere reducedMotion false --json
+omarchy bar set io.github.silouanwright.look-elsewhere displayMode '"icon-and-time"' --json
 ```
+
+`displayMode` accepts `icon`, `time`, or `icon-and-time`. The compact countdown shows minutes, then switches to seconds during the final minute. Vertical bars use the icon so the widget remains legible.
 
 The complete typed contract, defaults, ranges, and descriptions are declared in [`manifest.json`](manifest.json). A dedicated graphical settings client is intentionally deferred until after the competition MVP.
 

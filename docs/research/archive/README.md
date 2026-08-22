@@ -20,6 +20,7 @@ The differentiated product is not another fixed timer. It is an explainable inte
 - `lookaway-public-audit.md` — public documentation/blog feature inventory and disposition
 - `design-system.md` — visual language, surfaces, interaction, motion, sound, copy, and accessibility
 - `configuration-spec.md` — progressive configuration model, schema outline, polish gates, and usability tests
+- `SettingsView.prototype.qml` — exact deferred Quickshell settings prototype from commit `3d7bc50`; retained as non-runtime research material
 - `prototype.html` — clickable interaction prototype
 - `probes/` — safe, read-only environment probes
 
