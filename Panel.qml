@@ -242,24 +242,6 @@ Panel {
           }
         }
 
-        Text {
-          Layout.fillWidth: true
-          Layout.topMargin: Style.space(2)
-          text: {
-            if (!root.service || !root.service.snapshot || !root.service.snapshot.totals) return qsTr("No break history yet")
-            var totals = root.service.snapshot.totals
-            return qsTr("%1 completed · %2 postponed · %3 delayed")
-              .arg(Number(totals.completed || 0))
-              .arg(Number(totals.postponed || 0))
-              .arg(Number(totals.delayed || 0))
-          }
-          color: root.muted
-          font.family: root.fontFamily
-          font.pixelSize: Style.font.bodySmall
-          horizontalAlignment: Text.AlignHCenter
-          elide: Text.ElideRight
-        }
-
       }
     }
   }
