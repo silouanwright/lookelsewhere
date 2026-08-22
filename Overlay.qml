@@ -46,9 +46,9 @@ Item {
         contentMotionAnimation.stop()
         contentBlurAnimation.stop()
         backdropReveal = 0
-        contentOffset = Style.space(96)
-        contentOpacity = 0.24
-        contentBlur = 0.2
+        contentOffset = Style.space(80)
+        contentOpacity = 0.28
+        contentBlur = 0.08
         backdropAnimation.start()
         contentOpacityAnimation.start()
         contentMotionAnimation.start()
@@ -78,7 +78,7 @@ Item {
         property: "backdropReveal"
         from: 0
         to: 1
-        duration: 1100
+        duration: 900
         easing.type: Easing.InOutSine
       }
 
@@ -88,9 +88,9 @@ Item {
         NumberAnimation {
           target: window
           property: "contentOpacity"
-          from: 0.24
+          from: 0.28
           to: 1
-          duration: 850
+          duration: 700
           easing.type: Easing.InOutSine
         }
       }
@@ -101,9 +101,9 @@ Item {
         NumberAnimation {
           target: window
           property: "contentOffset"
-          from: Style.space(96)
+          from: Style.space(80)
           to: 0
-          duration: 1000
+          duration: 800
           easing.type: Easing.InOutSine
         }
       }
@@ -114,9 +114,9 @@ Item {
         NumberAnimation {
           target: window
           property: "contentBlur"
-          from: 0.2
+          from: 0.08
           to: 0
-          duration: 900
+          duration: 650
           easing.type: Easing.InOutSine
         }
       }
@@ -147,7 +147,7 @@ Item {
           width: Math.min(parent.width - Style.space(48), Style.space(520))
           spacing: Style.space(18)
           opacity: Math.max(0, Math.min(1, window.contentOpacity))
-          scale: 1 - 0.015 * Math.min(1, Math.max(0, window.contentOffset / Style.space(96)))
+          scale: 1 - 0.012 * Math.min(1, Math.max(0, window.contentOffset / Style.space(80)))
           layer.enabled: window.contentBlur > 0.001
           layer.smooth: true
           layer.effect: MultiEffect {
