@@ -40,7 +40,7 @@ window or media titles, create accounts, or use the network.
 
 ### Submission checklist
 
-- [x] The repository is public and contains installation and removal instructions.
+- [ ] The repository is public. Publication remains intentionally pending final approval; installation and removal instructions are ready.
 - [x] I have documented the plugin license and any external dependencies.
 - [x] I confirm that I own or have permission to submit this plugin and its preview assets.
 - [x] The plugin does not overwrite user configuration without explicit consent.

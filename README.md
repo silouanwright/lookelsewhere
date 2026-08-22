@@ -1,6 +1,6 @@
 # Look Elsewhere
 
-Look Elsewhere is a private, context-aware break coach built natively for Omarchy. It counts active screen use, waits through protected moments such as meetings, media, fullscreen work, and dictation, then delivers a calm warning and break at a better moment.
+Look Elsewhere is a privacy-conscious, context-aware break coach built natively for Omarchy. It counts active screen use, waits through protected moments such as meetings, media, fullscreen work, and dictation, then delivers a calm warning and break at a better moment.
 
 ![Look Elsewhere break overlay](preview.png)
 

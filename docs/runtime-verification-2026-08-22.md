@@ -19,7 +19,8 @@ one focused `HDMI-A-2` output at 3840×2160 with scale 2.
 ## Keyboard and accessibility
 
 - Opening the anchored panel through IPC establishes its keyboard surface.
-- Tab and Backtab traverse `Break now` and `Pause 1h` in both directions.
+- Tab and Backtab traverse `Break now`, the bounded snooze actions, history,
+  and options controls in both directions.
 - Escape dismisses the panel without invoking either action.
 - Focused enforcement's documented `Ctrl+Shift+Esc` emergency exit returned
   the service to `working` during a live break fixture.
@@ -45,12 +46,26 @@ one focused `HDMI-A-2` output at 3840×2160 with scale 2.
   blurred desktop treatment remained legible in both.
 - The original Osaka Jade theme was restored after the matrix.
 
+## Package lifecycle
+
+- A clean temporary home cloned the repository through the real
+  `omarchy plugin add file:///… --yes` path and passed the installed manifest
+  validator from the cloned directory.
+- The same staged clone was removed through `omarchy plugin remove … --yes`,
+  and its plugin directory no longer existed afterward.
+- Omarchy's removal command consults the one shared running shell by plugin ID,
+  even when `$HOME` points at a staging home. The isolated removal therefore
+  unloaded the live instance; it was immediately re-enabled from the real home,
+  retained its persisted working schedule, and produced no coredump. Future
+  lifecycle staging should run with no user shell active or use a separately
+  namespaced fixture ID.
+
 ## Current limitations
 
 - Only one physical output is connected, so real output hotplug and
   cross-monitor action-authority acceptance remain unproven. The deterministic
   delegate lifecycle review and focused-output selection logic cover the code
   path but do not replace physical multi-monitor evidence.
-- Corrupt-state preservation is implemented and fixture-tested visually; a
-  destructive live-file acceptance test still needs an isolated installed
-  state fixture or clean-install staging environment.
+- Corrupt-state preservation is implemented and fixture-tested visually; an
+  isolated runtime parse/write acceptance test remains because the plugin's
+  actual state path must never be destructively exercised for release QA.
