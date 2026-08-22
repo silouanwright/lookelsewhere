@@ -28,7 +28,7 @@ Panel {
   readonly property int remainingSeconds: service ? Math.max(0, Math.ceil(service.remainingMs / 1000)) : 0
   readonly property int remainingMinutesPart: Math.floor(remainingSeconds / 60)
   readonly property int remainingSecondsPart: remainingSeconds % 60
-  readonly property int topInsetTrim: Style.space(6)
+  readonly property int toolbarGapTrim: Style.space(6)
   readonly property real clockSeparatorOverlap: Math.max(0,
     (clockColonMetrics.advanceWidth - clockColonMetrics.tightBoundingRect.width) / 2)
 
@@ -56,12 +56,11 @@ Panel {
     centerOnBar: false
     focusTarget: neutralFocus
     contentWidth: popup.fittedContentWidth(Style.space(260))
-    contentHeight: popup.fittedContentHeight(content.implicitHeight - root.topInsetTrim)
+    contentHeight: popup.fittedContentHeight(content.implicitHeight)
 
     Flickable {
       id: panelScroll
       anchors.fill: parent
-      anchors.topMargin: -root.topInsetTrim
       contentWidth: width
       contentHeight: content.implicitHeight
       clip: true
@@ -83,9 +82,16 @@ Panel {
         width: panelScroll.width
         spacing: Style.space(16)
 
-        RowLayout {
+        Item {
           Layout.fillWidth: true
-          spacing: Style.space(8)
+          Layout.preferredHeight: Math.max(0, toolbarRow.implicitHeight - root.toolbarGapTrim)
+
+          RowLayout {
+            id: toolbarRow
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.right: parent.right
+            spacing: Style.space(8)
 
           Item {
             Layout.fillWidth: true
@@ -128,6 +134,7 @@ Panel {
             Accessible.name: tooltipText
             Accessible.onPressAction: clicked()
             onClicked: root.page = root.page === "options" ? "now" : "options"
+          }
           }
         }
 
