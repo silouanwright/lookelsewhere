@@ -46,7 +46,7 @@ Item {
         contentMotionAnimation.stop()
         contentBlurAnimation.stop()
         backdropReveal = 0
-        contentOffset = Style.space(80)
+        contentOffset = Style.space(32)
         contentOpacity = 0.28
         contentBlur = 0.08
         backdropAnimation.start()
@@ -78,13 +78,13 @@ Item {
         property: "backdropReveal"
         from: 0
         to: 1
-        duration: 500
+        duration: 450
         easing.type: Easing.InOutSine
       }
 
       SequentialAnimation {
         id: contentOpacityAnimation
-        PauseAnimation { duration: 110 }
+        PauseAnimation { duration: 250 }
         NumberAnimation {
           target: window
           property: "contentOpacity"
@@ -97,11 +97,11 @@ Item {
 
       SequentialAnimation {
         id: contentMotionAnimation
-        PauseAnimation { duration: 90 }
+        PauseAnimation { duration: 220 }
         NumberAnimation {
           target: window
           property: "contentOffset"
-          from: Style.space(80)
+          from: Style.space(32)
           to: 0
           duration: 900
           easing.type: Easing.InOutSine
@@ -110,7 +110,7 @@ Item {
 
       SequentialAnimation {
         id: contentBlurAnimation
-        PauseAnimation { duration: 110 }
+        PauseAnimation { duration: 250 }
         NumberAnimation {
           target: window
           property: "contentBlur"
@@ -147,7 +147,7 @@ Item {
           width: Math.min(parent.width - Style.space(48), Style.space(520))
           spacing: Style.space(18)
           opacity: Math.max(0, Math.min(1, window.contentOpacity))
-          scale: 1 - 0.012 * Math.min(1, Math.max(0, window.contentOffset / Style.space(80)))
+          scale: 1 - 0.008 * Math.min(1, Math.max(0, window.contentOffset / Style.space(32)))
           layer.enabled: window.contentBlur > 0.001
           layer.smooth: true
           layer.effect: MultiEffect {
