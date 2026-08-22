@@ -28,6 +28,7 @@ Item {
   property bool persistenceBlocked: false
   property bool demoMode: false
   property bool demoIdle: false
+  property bool demoNaturalPause: true
   property var demoEvidence: []
   property var preDemoSnapshot: null
   property var preDemoConfig: null
@@ -55,6 +56,7 @@ Item {
     return false
   }
   readonly property bool idle: demoMode ? demoIdle : idleMonitor.isIdle
+  readonly property bool naturalPauseReady: demoMode ? demoNaturalPause : naturalPauseMonitor.isIdle
   readonly property bool idlePauseActive: config.detectors.idle && idle
   readonly property string phase: snapshot.state || Model.State.Working
   readonly property string label: idlePauseActive ? "Paused while you’re away" : Model.stateLabel(snapshot)
@@ -91,7 +93,11 @@ Item {
     var beforeState = snapshot.state
     var effectiveIdle = config.detectors.idle && idle
     snapshot = Model.observe(snapshot, {
-      nowMs: Date.now(), active: !effectiveIdle, idle: effectiveIdle, evidence: evidence()
+      nowMs: Date.now(),
+      active: !effectiveIdle,
+      idle: effectiveIdle,
+      naturalPause: naturalPauseReady,
+      evidence: evidence()
     }, config)
     if (!demoMode && beforeState !== Model.State.Breaking && snapshot.state === Model.State.Breaking && config.soundEnabled)
       playBreakSound()
@@ -164,6 +170,7 @@ Item {
     }
     demoMode = true
     demoIdle = false
+    demoNaturalPause = true
     demoEvidence = []
     recoveryWarning = ""
     persistenceBlocked = false
@@ -216,6 +223,7 @@ Item {
   function clearDemo() {
     demoMode = false
     demoIdle = false
+    demoNaturalPause = true
     demoEvidence = []
     snapshot = preDemoSnapshot || Model.defaultSnapshot(Date.now())
     config = preDemoConfig || config
@@ -272,6 +280,17 @@ Item {
     enabled: true
     timeout: 60
     respectInhibitors: true
+  }
+
+  // Five quiet seconds is long enough to avoid interrupting an active input
+  // burst while remaining imperceptible when the user has naturally paused.
+  // Inhibitors are deliberately ignored: media/fullscreen policy is handled
+  // by Smart Context, while this monitor answers only whether input is quiet.
+  IdleMonitor {
+    id: naturalPauseMonitor
+    enabled: service.stateLoaded && !service.demoMode
+    timeout: 5
+    respectInhibitors: false
   }
 
   Process {
@@ -351,7 +370,7 @@ Item {
   IpcHandler {
     target: "look-elsewhere"
 
-    function status(): string { return JSON.stringify({ state: service.phase, remainingMs: service.remainingMs, evidence: service.evidence(), demo: service.demoMode, idlePaused: service.idlePauseActive, recoveryWarning: service.recoveryWarning }) }
+    function status(): string { return JSON.stringify({ state: service.phase, remainingMs: service.remainingMs, evidence: service.evidence(), demo: service.demoMode, idlePaused: service.idlePauseActive, naturalPauseReady: service.naturalPauseReady, recoveryWarning: service.recoveryWarning }) }
     function configuration(): string { return JSON.stringify(service.config) }
     function diagnostics(): string { return JSON.stringify({ fullscreen: service.fullscreenAvailable, dictation: service.dictationAvailable, mpris: true, pipewire: true, idle: true, sound: service.soundAvailable, persistenceBlocked: service.persistenceBlocked }) }
     function takeBreak(): string { service.takeBreak(); return service.phase }

@@ -92,6 +92,40 @@ TestCase {
     compare(s.state, Model.State.Warning)
   }
 
+  function test_dueBreakWaitsForNaturalPause() {
+    var c = config({ maximumDelayMs: 10000 })
+    var s = Model.defaultSnapshot(0)
+    s.accumulatedActiveMs = c.focusMs
+
+    s = Model.observe(s, {
+      nowMs: 1000, active: true, idle: false, naturalPause: false, evidence: []
+    }, c)
+    compare(s.state, Model.State.Waiting)
+    compare(s.dueAtMs, 1000)
+    compare(s.totals.prompted, 0)
+
+    s = Model.observe(s, {
+      nowMs: 4000, active: true, idle: false, naturalPause: true, evidence: []
+    }, c)
+    compare(s.state, Model.State.Warning)
+    compare(s.totals.prompted, 1)
+  }
+
+  function test_naturalPauseCannotExceedMaximumDelay() {
+    var c = config({ maximumDelayMs: 5000 })
+    var s = Model.defaultSnapshot(0)
+    s.accumulatedActiveMs = c.focusMs
+    s.dueAtMs = 1000
+    s = Model.observe(s, {
+      nowMs: 5999, active: true, idle: false, naturalPause: false, evidence: []
+    }, c)
+    compare(s.state, Model.State.Waiting)
+    s = Model.observe(s, {
+      nowMs: 6000, active: true, idle: false, naturalPause: false, evidence: []
+    }, c)
+    compare(s.state, Model.State.Warning)
+  }
+
   function test_maximumDelayOverridesProtection() {
     var c = config({ maximumDelayMs: 5000 })
     var s = Model.defaultSnapshot(0)

@@ -17,3 +17,4 @@ ADRs use `Accepted`, `Proposed`, or `Superseded` status. Accepted decisions gove
 | [0011](0011-deterministic-demo-and-fixtures.md) | Make every state deterministically stageable | Accepted |
 | [0012](0012-public-plugin-packaging.md) | Package as a public, dependency-light marketplace plugin | Accepted |
 | [0013](0013-config-first-competition-mvp.md) | Use manifest-backed configuration for the competition MVP | Accepted |
+| [0014](0014-wayland-natural-pause-gate.md) | Gate due breaks on a short Wayland input pause | Accepted |

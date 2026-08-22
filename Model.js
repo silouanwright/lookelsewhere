@@ -252,6 +252,14 @@ function observe(snapshot, input, config) {
     next.state = State.Waiting
     return next
   }
+  // A due break should arrive at a transition in the user's activity, not in
+  // the middle of a burst of typing or pointer work. The service supplies a
+  // short Wayland idle signal here; maximumDelayMs remains the hard bound so
+  // continuous interaction can never suppress a break indefinitely.
+  if (input.naturalPause === false && now - next.dueAtMs < cfg.maximumDelayMs) {
+    next.state = State.Waiting
+    return next
+  }
   return startWarning(next, now, cfg)
 }
 

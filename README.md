@@ -17,6 +17,7 @@ The competition MVP is a self-contained Omarchy Shell plugin written with Quicks
 - Active-use scheduling with timestamp persistence and recovery
 - Idle, Hyprland fullscreen, MPRIS playback, PipeWire microphone, and Omarchy dictation evidence
 - Confidence-based protected-context delay and cooldown
+- Wayland-native natural-pause timing before a due warning
 - Gentle, Balanced, and Focused enforcement policies
 - Omarchy-native bar, popup, warning, countdown, and break surfaces
 - Manifest-backed configuration for timing, office hours, detectors, enforcement, snoozing, and reduced motion
