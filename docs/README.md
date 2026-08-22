@@ -13,6 +13,7 @@ This directory is the product and engineering source of truth. Earlier competiti
 - [Competition delivery plan](competition.md)
 - [Verification strategy](verification.md)
 - [QML review and remediations](qml-review-2026-08-22.md)
+- [Runtime verification](runtime-verification-2026-08-22.md)
 - [Completion matrix](completion-matrix.md)
 - [Research archive and synthesis](research/README.md)
 - [Architecture decision records](adr/README.md)

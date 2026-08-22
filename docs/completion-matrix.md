@@ -14,7 +14,7 @@ Status reflects inspected repository and installed-runtime evidence on 2026-08-2
 | Microphone/meeting detection | Partial | PipeWire stream heuristic works locally; communication classification and availability explanation remain |
 | Dictation detection | Implemented | Managed `omarchy-voxtype-status` event stream matches Omarchy's native Dictation indicator and exposes capability diagnostics |
 | Confidence policy, cooldown, maximum delay | Implemented | Pure policy and precedence exist; broader boundary tests remain |
-| Bar and anchored quick panel | Implemented | Installed and exercised; state/action/accessibility matrix remains |
+| Bar and anchored quick panel | Implemented | Installed and exercised with status-only content, keyboard actions, and correct inward anchoring on every bar edge |
 | Warning, final chip, break overlay | Implemented | Deterministic fixtures and approved theme-aware break transition |
 | Multi-monitor single authority | Implemented | Focused-monitor authority in `Overlay.qml`; hotplug/action tests remain |
 | Gentle/Balanced/Focused enforcement | Implemented | Policy-specific actions, bounded snoozing, documented consequences, and live Focused `Ctrl+Shift+Esc` emergency-exit proof |
@@ -23,7 +23,7 @@ Status reflects inspected repository and installed-runtime evidence on 2026-08-2
 | Privacy boundary | Implemented by design | No content capture/title persistence/network calls; release audit remains |
 | Deterministic fixtures | Implemented | Working/due/idle/paused/postponed/protected/warning/final/break/recovery/enforcement plus timer-driven `flow` exist and restore real state |
 | Keyboard and accessibility | Implemented | Native button roles/names/actions, deterministic Tab/Backtab order, Escape dismissal, Focused emergency exit, and reduced-motion behavior; live focus screenshots and clean runtime logs recorded |
-| Theme and bar-position QA | Partial | Native roles and anchored panel implemented; full contrasting-theme/bar-position matrix remains |
+| Theme and bar-position QA | Implemented | Osaka Jade and Catppuccin Latte plus top/bottom/left/right were exercised live and restored; transient panel IPC lifecycle issue found and fixed |
 | Automated tests and QML review | Partial | 23 model tests, manifest validation, system qmllint, six-pass semantic review, live flow proof, and keyboard acceptance evidence exist; release acceptance matrix remains |
 | Public packaging | Partial | Manifest, MIT license, install/removal commands, and release README exist; preview assets, marketplace metadata, and clean install/remove proof remain |
 | Competition submission | Missing | External publication and marketplace submission require final authorization |
