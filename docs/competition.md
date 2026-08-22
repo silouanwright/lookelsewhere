@@ -2,7 +2,12 @@
 
 ## Rules baseline
 
-At research time, eligible plugins must be submitted to the Omarchy Plugin Marketplace repository before Monday, 2026-08-24 at 09:00 CEST. The Core Team selects a three-place podium; prizes are $2,500, $1,000, and $500. Rules and timing must be rechecked immediately before submission.
+Reverified on 2026-08-22: eligible plugins must be submitted to the Omarchy
+Plugin Marketplace before Monday, 2026-08-24 at 09:00 CEST. The Core Team
+selects a three-place podium; prizes are $2,500, $1,000, and $500. A winner
+must be able to receive payment through Zelle, Venmo, PayPal, or EU IBAN.
+Recheck the [official announcement](https://omarchy.org/news/2026/08/the-first-plugin-competition/)
+immediately before submission.
 
 ## Submission definition of done
 
@@ -15,6 +20,7 @@ At research time, eligible plugins must be submitted to the Omarchy Plugin Marke
 - Short deterministic demonstration capture
 - Marketplace issue/form metadata prepared and submitted
 - Current commit tested on the installed Omarchy release
+- Owner confirms one supported prize-payment method
 
 ## Judging story
 

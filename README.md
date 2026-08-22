@@ -12,6 +12,20 @@ The repository contains a resident scheduling service, bar widget, anchored quic
 
 The competition MVP is a self-contained Omarchy Shell plugin written with Quickshell/QML. It observes only coarse local state. It does not record audio, capture the screen, retain window or media titles, require an account, or send telemetry.
 
+## From glance to break
+
+The bar countdown opens a compact, anchored control surface. When focused use
+reaches its final seconds, Look Elsewhere progresses from a top-centered warning
+to a small final countdown and then a calm, theme-aware break surface.
+
+| Anchored quick panel | Progressive warning |
+|---|---|
+| ![Look Elsewhere anchored quick panel](docs/assets/quick-panel.png) | ![Look Elsewhere top-centered warning](docs/assets/progressive-warning.png) |
+
+[Watch the 21-second deterministic warning-to-break demo](docs/assets/demo.mp4).
+The capture uses synthetic fixture state, does not inspect private context, and
+returns the real schedule unchanged when it ends.
+
 ## Current capabilities
 
 - Active-use scheduling with timestamp persistence and recovery

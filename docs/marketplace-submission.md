@@ -40,7 +40,7 @@ window or media titles, create accounts, or use the network.
 
 ### Submission checklist
 
-- [ ] The repository is public. Publication remains intentionally pending final approval; installation and removal instructions are ready.
+- [ ] The repository is public and contains installation and removal instructions.
 - [x] I have documented the plugin license and any external dependencies.
 - [x] I confirm that I own or have permission to submit this plugin and its preview assets.
 - [x] The plugin does not overwrite user configuration without explicit consent.
@@ -62,3 +62,7 @@ Authoritative references:
 
 - <https://github.com/basecamp/omarchy/blob/quattro/manual/32-shell-plugins.md>
 - <https://github.com/HANCORE-linux/omarchy-plugin-marketplace/blob/main/SUBMISSION.md>
+
+The first checkbox remains intentionally unchecked until the repository is
+public. Check all five only after the owner reviews the exact public commit and
+confirms every statement.

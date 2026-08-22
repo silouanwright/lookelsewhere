@@ -14,6 +14,7 @@ This directory is the product and engineering source of truth. Earlier competiti
 - [Privacy and trust](privacy.md)
 - [Competition delivery plan](competition.md)
 - [Marketplace submission draft](marketplace-submission.md)
+- [Final submission checklist](submission-checklist.md)
 - [Verification strategy](verification.md)
 - [QML review and remediations](qml-review-2026-08-22.md)
 - [Runtime verification](runtime-verification-2026-08-22.md)

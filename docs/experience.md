@@ -93,4 +93,4 @@ A post-MVP graphical client may organize settings into Overview, Breaks, Smart C
 - Prefer “Waiting until your meeting ends” over internal terminology
 - Prefer “Take break now” over vague “Start”
 - Never claim medical outcomes
-- Use “Look elsewhere” as an instruction sparingly enough to remain meaningful
+- Use “Look Elsewhere” as an instruction sparingly enough to remain meaningful
