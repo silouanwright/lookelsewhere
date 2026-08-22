@@ -24,6 +24,7 @@ on a particular workstation or chat history.
 - [Runtime verification](runtime-verification-2026-08-22.md)
 - [Completion matrix](completion-matrix.md)
 - [Research archive and synthesis](research/README.md)
+- [GitPulse keyboard-first audit](research/gitpulse-keyboard-audit-2026-08-22.md)
 - [Architecture decision records](adr/README.md)
 
 ## Documentation rules

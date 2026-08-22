@@ -21,10 +21,27 @@ one focused `HDMI-A-2` output at 3840×2160 with scale 2.
 - Opening the anchored panel through IPC establishes its keyboard surface.
 - Tab and Backtab traverse `Break now`, the bounded snooze actions, history,
   and options controls in both directions.
+- With the panel open, `B`, `1`, `2`, `3`, `P`, `H`, `O`, and `Q` invoke the
+  documented break, snooze, pause, page-navigation, and close actions. History,
+  options, pause/resume, and close were exercised in the installed shell.
+- Optional global binding examples use currently unclaimed `Super+Alt` chords;
+  they remain opt-in so installation never overwrites a user's Hyprland keys.
 - Escape dismisses the panel without invoking either action.
 - Focused enforcement's documented `Ctrl+Shift+Esc` emergency exit returned
   the service to `working` during a live break fixture.
 - The shell journal contained no Look Elsewhere QML errors during the checks.
+
+## Rolling countdown continuity
+
+- Countdown authority remains the persisted wall-clock deadline; presentation
+  never extends or shortens a focus interval.
+- If the QML event loop misses one or two displayed samples under load, the
+  rolling number traverses the small gap in order instead of visibly jumping
+  from (for example) `6` directly to `4`.
+- Large changes, including fixture changes and schedule resets, snap to the new
+  authoritative value rather than animating through stale seconds.
+- Component acceptance covers both behaviors and the complete suite passes 40
+  tests with zero failures.
 
 ## Bar geometry and lifecycle
 
