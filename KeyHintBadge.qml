@@ -12,7 +12,7 @@ Rectangle {
   readonly property real badgeSize: Style.space(14)
 
   x: placeRight ? parent.width + Style.space(3)
-    : (centerOnCorner ? -width / 2 : (parent.width - width) / 2)
+    : (centerOnCorner ? parent.width - width / 2 : (parent.width - width) / 2)
   y: placeRight ? (parent.height - height) / 2
     : (centerOnCorner ? -height / 2 : parent.height + Style.space(2))
   implicitWidth: keyText.length === 1
