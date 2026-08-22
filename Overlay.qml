@@ -78,19 +78,19 @@ Item {
         property: "backdropReveal"
         from: 0
         to: 1
-        duration: 450
+        duration: 540
         easing.type: Easing.InOutSine
       }
 
       SequentialAnimation {
         id: contentOpacityAnimation
-        PauseAnimation { duration: 60 }
+        PauseAnimation { duration: 72 }
         NumberAnimation {
           target: window
           property: "contentOpacity"
           from: 0.28
           to: 1
-          duration: 450
+          duration: 540
           easing.type: Easing.InOutSine
         }
       }
@@ -103,20 +103,20 @@ Item {
           property: "contentOffset"
           from: Style.space(24)
           to: 0
-          duration: 650
+          duration: 780
           easing.type: Easing.OutCubic
         }
       }
 
       SequentialAnimation {
         id: contentBlurAnimation
-        PauseAnimation { duration: 110 }
+        PauseAnimation { duration: 132 }
         NumberAnimation {
           target: window
           property: "contentBlur"
           from: 0.08
           to: 0
-          duration: 450
+          duration: 540
           easing.type: Easing.InOutSine
         }
       }
