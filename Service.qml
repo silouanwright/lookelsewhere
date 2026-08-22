@@ -208,6 +208,10 @@ Item {
 
   function setDemo(name) {
     if (!demoMode) {
+      // A plugin rescan can reconstruct this service while a fixture is open.
+      // Persist the real snapshot first so the replacement service recovers
+      // the user's schedule rather than an older periodic checkpoint.
+      flushState()
       preDemoSnapshot = JSON.parse(JSON.stringify(snapshot))
       preDemoConfig = JSON.parse(JSON.stringify(config))
       preDemoRecoveryWarning = recoveryWarning
@@ -379,7 +383,9 @@ Item {
   }
 
   Timer {
-    interval: 30000
+    // Bound visible rollback near a due break without writing every scheduler
+    // tick throughout the entire work interval.
+    interval: service.interrupting || service.remainingMs <= 60000 ? 5000 : 30000
     repeat: true
     running: service.stateLoaded && !service.demoMode
     onTriggered: service.flushState()

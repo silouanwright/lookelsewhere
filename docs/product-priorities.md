@@ -27,7 +27,7 @@ This is a competition and portfolio quality plan, not a LookAway parity list. Pr
 
 - Posture and other broader wellness reminders.
 - Calendar integration.
-- Sound packs, separate start/end sounds, preview and volume controls.
+- Additional sound packs and an in-panel sound preview.
 - Automatic lock on break as an explicit opt-in.
 - Diagnostics export and a richer support surface.
 - Dedicated graphical settings UI restored from the archived QML prototype.

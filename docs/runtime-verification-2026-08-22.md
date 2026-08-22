@@ -52,11 +52,13 @@ one focused `HDMI-A-2` output at 3840×2160 with scale 2.
 
 ## Break sounds
 
-- The installed freedesktop `dialog-information` start cue and `complete`
-  return cue were each played successfully through `canberra-gtk-play`.
+- The bundled CC0 Grand Piano K start and return cues were each played
+  successfully through `canberra-gtk-play` at the configured app volume.
 - Transition tests prove that scheduler and manual break entry select the start
   cue, natural completion selects the return cue, and unrelated transitions
   remain silent. Demo and restoration paths are explicitly suppressed.
+- The master switch, independent cue switches, 0–100 app volume, bundled
+  defaults, and optional absolute or `~/` custom paths are manifest-backed.
 
 ## Bar geometry and lifecycle
 

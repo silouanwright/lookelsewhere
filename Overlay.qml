@@ -57,7 +57,7 @@ Item {
       property real contentOffset: 0
       property real contentBlur: 0
       readonly property int backdropDuration: 495
-      readonly property int contentRevealDelay: backdropDuration + 325
+      readonly property int contentRevealDelay: backdropDuration + 200
 
       function beginBreakReveal() {
         backdropAnimation.stop()
