@@ -191,7 +191,7 @@ Item {
 
           BreakIcon {
             Layout.alignment: Qt.AlignHCenter
-            Layout.preferredWidth: Style.space(54)
+            Layout.preferredWidth: Style.space(64)
             Layout.preferredHeight: Layout.preferredWidth
             color: Color.accent
           }
