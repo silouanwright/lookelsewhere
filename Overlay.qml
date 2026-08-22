@@ -216,6 +216,12 @@ Item {
     focusable: root.breaking
     foreground: root.breaking ? Color.lock.text : Color.popups.text
     accent: Color.accent
+    // Give the full-screen escape action a visible resting affordance. Use
+    // the theme's hover fill rather than a fixed alpha/color so it remains
+    // coherent across Omarchy themes.
+    background: root.breaking && !primary
+      ? Style.hoverFillFor(Color.lock.text, Color.accent)
+      : "transparent"
     fontFamily: Style.font.family
     horizontalPadding: Style.space(12)
     verticalPadding: Style.space(8)
