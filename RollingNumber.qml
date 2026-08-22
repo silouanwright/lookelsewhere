@@ -13,9 +13,26 @@ Item {
   property bool reducedMotion: false
   property bool animationActive: true
   property int minimumDigits: 1
+  property int maximumSequentialGap: 3
+  property int displayedValue: safeValue
 
   readonly property int safeValue: Math.max(0, Math.floor(Number(value)))
-  readonly property int digitCount: Math.max(minimumDigits, String(safeValue).length)
+  readonly property int digitCount: Math.max(minimumDigits, String(displayedValue).length)
+
+  function syncDisplayedValue() {
+    var gap = displayedValue - safeValue
+    if (!animationActive || reducedMotion || gap <= 1 || gap > maximumSequentialGap) {
+      catchUp.stop()
+      displayedValue = safeValue
+      return
+    }
+    if (!catchUp.running) catchUp.start()
+  }
+
+  onSafeValueChanged: syncDisplayedValue()
+  onAnimationActiveChanged: syncDisplayedValue()
+  onReducedMotionChanged: syncDisplayedValue()
+  Component.onCompleted: syncDisplayedValue()
 
   implicitWidth: digits.implicitWidth
   implicitHeight: digits.implicitHeight
@@ -31,7 +48,7 @@ Item {
       RollingDigit {
         required property int index
         readonly property int place: root.digitCount - index - 1
-        value: Math.floor(root.safeValue / Math.pow(10, place)) % 10
+        value: Math.floor(root.displayedValue / Math.pow(10, place)) % 10
         color: root.color
         fontFamily: root.fontFamily
         fontSize: root.fontSize
@@ -39,6 +56,24 @@ Item {
         reducedMotion: root.reducedMotion
         animationActive: root.animationActive
       }
+    }
+  }
+
+  // QML's event loop can occasionally miss a wall-clock sample under load.
+  // Preserve timestamp authority while visually traversing a small missed gap
+  // instead of making the rolling ticker jump over a number.
+  Timer {
+    id: catchUp
+    interval: 280
+    repeat: true
+    triggeredOnStart: true
+    onTriggered: {
+      if (root.displayedValue <= root.safeValue) {
+        stop()
+        return
+      }
+      root.displayedValue--
+      if (root.displayedValue <= root.safeValue) stop()
     }
   }
 }

@@ -51,5 +51,30 @@ Item {
       number.reducedMotion = true
       compare(number.reducedMotion, true)
     }
+
+    function test_smallMissedCountdownGapIsTraversedSequentially() {
+      let number = createTemporaryObject(numberComponent, root, {
+        value: 6,
+        animationActive: true,
+        reducedMotion: false
+      })
+      verify(!!number, "Component exists")
+      compare(number.displayedValue, 6)
+
+      number.value = 4
+      tryCompare(number, "displayedValue", 5)
+      tryCompare(number, "displayedValue", 4, 600)
+    }
+
+    function test_largeResetSnapsInsteadOfCountingThrough() {
+      let number = createTemporaryObject(numberComponent, root, {
+        value: 20,
+        animationActive: true,
+        reducedMotion: false
+      })
+      verify(!!number, "Component exists")
+      number.value = 5
+      compare(number.displayedValue, 5)
+    }
   }
 }

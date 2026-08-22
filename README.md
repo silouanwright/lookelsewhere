@@ -88,6 +88,33 @@ omarchy-shell look-elsewhere resetLocalData
 
 Enforcement behavior is explicit: Gentle permits snoozing and ordinary skipping, Balanced keeps snoozing bounded, and Focused hides ordinary exits. Focused mode always retains `Ctrl+Shift+Esc` as a documented emergency exit.
 
+## Keyboard control
+
+The anchored panel takes keyboard focus when opened. Tab and Shift+Tab move
+through every control, Enter or Space activates the focused control, and Escape
+closes the panel. Direct panel keys keep common actions immediate:
+
+| Key | Action |
+|---|---|
+| `b` | Start a break now |
+| `1` / `2` / `3` | Snooze for 1 / 5 / 15 minutes when policy allows |
+| `p` | Pause or resume scheduled breaks |
+| `h` | Toggle break history |
+| `o` | Toggle options |
+| `q` or `Esc` | Close the panel |
+
+Look Elsewhere does not silently claim global keys. On a stock Omarchy install,
+these optional bindings can be added to `~/.config/hypr/bindings.lua`:
+
+```lua
+o.bind("SUPER + ALT + L", "Look Elsewhere", "omarchy-shell look-elsewhere-panel toggle")
+o.bind("SUPER + ALT + B", "Take an eye break", "omarchy-shell look-elsewhere takeBreak")
+o.bind("SUPER + ALT + P", "Pause or resume eye breaks", "omarchy-shell look-elsewhere togglePause")
+```
+
+Check `omarchy menu keybindings --print` before adopting the recipe if you have
+custom bindings. IPC remains available for different key choices and scripts.
+
 ## Install
 
 ```bash

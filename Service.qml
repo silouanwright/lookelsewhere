@@ -156,6 +156,13 @@ Item {
     scheduleSave()
   }
 
+  function togglePause() {
+    // A convenience binding must not become an alternate enforcement exit.
+    if (interrupting) return
+    if (phase === Model.State.Waiting && snapshot.pauseReason === "manual") resume()
+    else pauseBreaks()
+  }
+
   function skipBreak() {
     var next = Model.completeBreak(snapshot, Date.now())
     next.totals.completed = Math.max(0, next.totals.completed - 1)
@@ -397,6 +404,7 @@ Item {
     function postpone(minutes: int): string { service.postponeMinutes(minutes); return service.phase }
     function pause(minutes: int): string { service.pauseMinutes(minutes); return service.phase }
     function pauseBreaks(): string { service.pauseBreaks(); return service.phase }
+    function togglePause(): string { service.togglePause(); return service.phase }
     function resume(): string { service.resume(); return service.phase }
     function skip(): string { service.skipBreak(); return service.phase }
     function emergencyExit(): string { service.emergencyExit(); return service.phase }
