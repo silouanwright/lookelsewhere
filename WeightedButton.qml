@@ -6,10 +6,11 @@ Button {
   id: root
 
   property string label: ""
-  property int labelWeight: Font.DemiBold
+  property int labelWeight: Font.Bold
 
   text: ""
-  verticalPadding: Style.space(6)
+  verticalPadding: Style.space(4)
+  radius: Math.min(height / 2, Style.cornerRadius + Style.space(2))
   implicitWidth: labelText.implicitWidth + horizontalPadding * 2 + Math.max(2, Style.normalBorderWidth * 2)
   implicitHeight: labelText.implicitHeight + verticalPadding * 2 + Math.max(2, Style.normalBorderWidth * 2)
 

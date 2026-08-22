@@ -356,7 +356,7 @@ function stateLabel(snapshot) {
   if (state === State.Paused) return "Breaks paused"
   if (state === State.Disabled) return "Look Elsewhere is off"
   if (state === State.DueSoon) return "Break due soon"
-  return "Next eye break"
+  return "Break starts in"
 }
 
 function protectedExplanation(category) {

@@ -318,6 +318,10 @@ TestCase {
     compare(Model.stateLabel(snapshot), "Breaks paused")
   }
 
+  function test_workingLabelMatchesPanelLanguage() {
+    compare(Model.stateLabel(Model.defaultSnapshot(0)), "Break starts in")
+  }
+
   function test_manualPausePersistsUntilExplicitResume() {
     var c = config()
     var s = Model.defaultSnapshot(1000)
