@@ -10,6 +10,8 @@ Rectangle {
   property bool centerOnCorner: false
 
   readonly property real badgeSize: Style.space(14)
+  readonly property bool shiftChord: keyText === "⬆D"
+  readonly property real keyWidth: shiftChord ? shiftRow.implicitWidth : label.implicitWidth
 
   x: placeRight ? parent.width + Style.space(3)
     : (centerOnCorner ? parent.width - width / 2 : (parent.width - width) / 2)
@@ -17,7 +19,7 @@ Rectangle {
     : (centerOnCorner ? -height / 2 : parent.height + Style.space(2))
   implicitWidth: keyText.length === 1
     ? badgeSize
-    : Math.max(badgeSize, label.implicitWidth + Style.space(5))
+    : Math.max(badgeSize, keyWidth + Style.space(5))
   implicitHeight: badgeSize
   radius: height / 2
   color: Color.popups.text
@@ -27,10 +29,36 @@ Rectangle {
   Text {
     id: label
     anchors.centerIn: parent
+    visible: !root.shiftChord
     text: root.keyText
     color: Color.popups.background
     font.family: Style.font.family
     font.pixelSize: Style.font.caption
     font.weight: Font.Bold
+  }
+
+  Row {
+    id: shiftRow
+    anchors.centerIn: parent
+    visible: root.shiftChord
+    spacing: Style.space(1)
+
+    Text {
+      anchors.verticalCenter: parent.verticalCenter
+      text: "⬆"
+      color: Color.popups.background
+      font.family: Style.font.family
+      font.pixelSize: Style.font.caption * 0.72
+      font.weight: Font.Bold
+    }
+
+    Text {
+      anchors.verticalCenter: parent.verticalCenter
+      text: "D"
+      color: Color.popups.background
+      font.family: Style.font.family
+      font.pixelSize: Style.font.caption
+      font.weight: Font.Bold
+    }
   }
 }
