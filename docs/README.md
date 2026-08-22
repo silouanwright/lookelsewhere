@@ -5,6 +5,7 @@ This directory is the product and engineering source of truth. Earlier competiti
 ## Core documents
 
 - [Product brief](product-brief.md)
+- [Product priorities](product-priorities.md)
 - [MVP requirements](mvp-requirements.md)
 - [Architecture](architecture.md)
 - [State model](state-model.md)

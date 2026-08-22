@@ -8,6 +8,7 @@ This directory preserves the discovery work that preceded Look Elsewhere so futu
 - [Source and provenance ledger](sources.md) — what was inspected and where the preserved evidence lives
 - [Raw research archive](archive/) — original working documents and interactive HTML prototype
 - [Reference screenshots](reference-screenshots/) — supplied LookAway screens and installed Omarchy plugin contact sheet
+- [2026 screenshot audit](lookaway-screenshot-audit-2026-08-22.md) — screen-by-screen observations and adopt/adapt/defer decisions
 
 ## Raw archive contents
 

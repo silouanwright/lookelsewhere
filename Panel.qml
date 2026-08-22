@@ -20,6 +20,7 @@ Panel {
   readonly property color accent: Color.accent
   readonly property string fontFamily: bar ? bar.fontFamily : Style.font.family
   readonly property bool manuallyPaused: service && service.phase === "waiting-for-pause" && service.snapshot.pauseReason === "manual"
+  readonly property bool delayActionsVisible: !manuallyPaused && service && service.canPostpone
 
   function syncSettings() { if (service) service.configure(settings) }
   onSettingsChanged: syncSettings()
@@ -49,7 +50,7 @@ Panel {
     // break surfaces are separate and intentionally centered by Overlay.qml.
     centerOnBar: false
     focusTarget: breakNowButton
-    contentWidth: popup.fittedContentWidth(Style.space(300))
+    contentWidth: popup.fittedContentWidth(Style.space(260))
     contentHeight: popup.fittedContentHeight(content.implicitHeight)
 
     Flickable {
@@ -68,13 +69,12 @@ Panel {
         width: panelScroll.width
         spacing: Style.space(16)
 
-        RowLayout {
+        ColumnLayout {
           Layout.fillWidth: true
-          Layout.leftMargin: Style.space(2)
-          Layout.rightMargin: Style.space(2)
-          spacing: Style.space(8)
+          spacing: Style.space(6)
 
           Rectangle {
+            Layout.alignment: Qt.AlignHCenter
             Layout.preferredWidth: Style.space(32)
             Layout.preferredHeight: Layout.preferredWidth
             radius: width / 2
@@ -91,12 +91,13 @@ Panel {
           }
 
           Text {
+            Layout.fillWidth: true
             text: root.service ? root.service.label : qsTr("Look Elsewhere")
             color: root.foreground
             font.family: root.fontFamily
             font.pixelSize: Style.font.body
             font.weight: Font.DemiBold
-            Layout.fillWidth: true
+            horizontalAlignment: Text.AlignHCenter
             elide: Text.ElideRight
           }
         }
@@ -137,13 +138,13 @@ Panel {
           wrapMode: Text.WordWrap
         }
 
-        ColumnLayout {
+        RowLayout {
           Layout.fillWidth: true
+          Layout.alignment: Qt.AlignHCenter
           spacing: Style.space(8)
 
           Button {
             id: breakNowButton
-            Layout.fillWidth: true
             text: qsTr("Break now")
             selected: true
             focusable: true
@@ -151,7 +152,7 @@ Panel {
             accent: root.accent
             fontFamily: root.fontFamily
             KeyNavigation.tab: pauseButton
-            KeyNavigation.backtab: pauseButton
+            KeyNavigation.backtab: root.delayActionsVisible ? postpone15Button : pauseButton
             Keys.onEscapePressed: root.close()
             Accessible.role: Accessible.Button
             Accessible.name: text
@@ -161,14 +162,13 @@ Panel {
 
           Button {
             id: pauseButton
-            Layout.fillWidth: true
             text: root.manuallyPaused ? qsTr("Resume") : qsTr("Pause 1h")
             bordered: true
             focusable: true
             foreground: root.foreground
             accent: root.accent
             fontFamily: root.fontFamily
-            KeyNavigation.tab: breakNowButton
+            KeyNavigation.tab: root.delayActionsVisible ? postpone1Button : breakNowButton
             KeyNavigation.backtab: breakNowButton
             Keys.onEscapePressed: root.close()
             Accessible.role: Accessible.Button
@@ -181,6 +181,64 @@ Panel {
               }
               root.close()
             }
+          }
+        }
+
+        RowLayout {
+          Layout.fillWidth: true
+          Layout.alignment: Qt.AlignHCenter
+          visible: root.delayActionsVisible
+          spacing: Style.space(6)
+
+          Button {
+            id: postpone1Button
+            text: qsTr("+1m")
+            bordered: true
+            focusable: true
+            foreground: root.foreground
+            accent: root.accent
+            fontFamily: root.fontFamily
+            KeyNavigation.tab: postpone5Button
+            KeyNavigation.backtab: pauseButton
+            Keys.onEscapePressed: root.close()
+            Accessible.role: Accessible.Button
+            Accessible.name: qsTr("Delay next break by 1 minute")
+            Accessible.onPressAction: clicked()
+            onClicked: { if (root.service) root.service.postponeMinutes(1); root.close() }
+          }
+
+          Button {
+            id: postpone5Button
+            text: qsTr("+5m")
+            bordered: true
+            focusable: true
+            foreground: root.foreground
+            accent: root.accent
+            fontFamily: root.fontFamily
+            KeyNavigation.tab: postpone15Button
+            KeyNavigation.backtab: postpone1Button
+            Keys.onEscapePressed: root.close()
+            Accessible.role: Accessible.Button
+            Accessible.name: qsTr("Delay next break by 5 minutes")
+            Accessible.onPressAction: clicked()
+            onClicked: { if (root.service) root.service.postponeMinutes(5); root.close() }
+          }
+
+          Button {
+            id: postpone15Button
+            text: qsTr("+15m")
+            bordered: true
+            focusable: true
+            foreground: root.foreground
+            accent: root.accent
+            fontFamily: root.fontFamily
+            KeyNavigation.tab: breakNowButton
+            KeyNavigation.backtab: postpone5Button
+            Keys.onEscapePressed: root.close()
+            Accessible.role: Accessible.Button
+            Accessible.name: qsTr("Delay next break by 15 minutes")
+            Accessible.onPressAction: clicked()
+            onClicked: { if (root.service) root.service.postponeMinutes(15); root.close() }
           }
         }
 
