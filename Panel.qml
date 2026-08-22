@@ -153,6 +153,11 @@ Panel {
           Accessible.name: qsTr("Toggle keyboard shortcut hints")
           Accessible.onPressAction: clicked()
           onClicked: root.keyboardHintsVisible = !root.keyboardHintsVisible
+
+          KeyHintBadge {
+            visible: root.keyboardHintsVisible
+            keyText: "?"
+          }
         }
 
         Row {
