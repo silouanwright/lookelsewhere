@@ -47,9 +47,9 @@ The state document contains no configuration, is versioned, and is written atomi
 ## External integrations
 
 - Quickshell Wayland/idle facilities
-- Quickshell Hyprland integration
+- Quickshell's event-driven Hyprland active-toplevel integration
 - Quickshell MPRIS and PipeWire services
-- Omarchy indicator/dictation state through the most stable available local contract
+- Omarchy dictation state through the same managed status stream used by its native Dictation indicator
 - Quickshell IPC for control, inspection, and fixture staging
 
 No integration may require screen capture, audio recording, accessibility-style content scraping, or persistent application-title collection.

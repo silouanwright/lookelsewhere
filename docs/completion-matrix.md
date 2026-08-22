@@ -8,23 +8,23 @@ Status reflects inspected repository and installed-runtime evidence on 2026-08-2
 | Timestamp persistence and restart recovery | Partial | Atomic state snapshot exists; suspend/clock-jump and corrupt-state acceptance tests remain |
 | Office hours, including overnight | Implemented | Pure overnight test plus manifest-backed configuration; boundary/runtime schedule QA remains |
 | Manual pause/resume | Implemented | Service IPC, state-aware quick-panel Pause/Resume action, and paused fixture |
-| Idle detection | Implemented | Wayland idle monitor; runtime transition evidence remains |
-| Fullscreen detection | Implemented | Bounded `hyprctl activewindow -j` probe with explicit diagnostic availability |
+| Idle detection | Implemented | Wayland idle monitor plus live `idle` fixture proving bar pause/resume presentation |
+| Fullscreen detection | Implemented | Event-driven Quickshell active-toplevel fullscreen state with capability diagnostics |
 | Media detection | Implemented | Quickshell MPRIS playback state with manifest-backed detector toggle |
 | Microphone/meeting detection | Partial | PipeWire stream heuristic works locally; communication classification and availability explanation remain |
-| Dictation detection | Partial | Omarchy status probe and explicit capability diagnostics work; non-polling integration remains |
+| Dictation detection | Implemented | Managed `omarchy-voxtype-status` event stream matches Omarchy's native Dictation indicator and exposes capability diagnostics |
 | Confidence policy, cooldown, maximum delay | Implemented | Pure policy and precedence exist; broader boundary tests remain |
 | Bar and anchored quick panel | Implemented | Installed and exercised; state/action/accessibility matrix remains |
 | Warning, final chip, break overlay | Implemented | Deterministic fixtures and approved theme-aware break transition |
 | Multi-monitor single authority | Implemented | Focused-monitor authority in `Overlay.qml`; hotplug/action tests remain |
 | Gentle/Balanced/Focused enforcement | Implemented | Policy-specific actions, bounded snoozing, documented consequences, and Focused `Ctrl+Shift+Esc` emergency exit; live keyboard proof remains |
-| MVP configuration contract | Partial | Core typed manifest values are wired and README documents `omarchy bar set`; sound, output placement, and privacy-reset documentation remain |
+| MVP configuration contract | Implemented | Typed timing, policy, detector, motion, sound, output, and bar settings are wired; README documents `omarchy bar set` and local reset |
 | Outcome totals | Implemented | Prompted/completed/postponed/skipped/delayed persist, compact history summary is visible, and reset IPC exists |
 | Privacy boundary | Implemented by design | No content capture/title persistence/network calls; release audit remains |
-| Deterministic fixtures | Partial | Working/due/paused/postponed/protected/warning/final/break/recovery and enforcement break variants exist; offline/capability variants remain |
+| Deterministic fixtures | Implemented | Working/due/idle/paused/postponed/protected/warning/final/break/recovery/enforcement plus timer-driven `flow` exist and restore real state |
 | Keyboard and accessibility | Partial | Native controls, break Escape path, and reduced-motion behavior exist; focus-order/name tests remain |
 | Theme and bar-position QA | Partial | Native roles and anchored panel implemented; full contrasting-theme/bar-position matrix remains |
-| Automated tests and QML review | Partial | Pure model tests exist; test runner, component tests, lint/review gates remain |
+| Automated tests and QML review | Partial | 17 model tests, manifest validation, system qmllint, six-pass semantic review, and live flow proof exist; component/accessibility automation remains |
 | Public packaging | Missing | Manifest validates; license, preview, release README, marketplace metadata, and clean install/remove proof remain |
 | Competition submission | Missing | External publication and marketplace submission require final authorization |
 
