@@ -80,18 +80,12 @@ BarWidget {
       }
 
       Text {
-        id: countdown
         visible: root.showTime
-        // Reserve a stable field so final-minute updates do not shift the bar.
-        width: Style.space(28)
         text: root.compactTime
         color: button.active && button.useActiveColor ? button.activeColor : button.foreground
         font.family: button.fontFamily
         font.pixelSize: Style.font.body
         font.weight: Font.Medium
-        // Keep the icon-to-label gap constant as 10m becomes 9m; the stable
-        // field's unused space belongs on the outside edge of the widget.
-        horizontalAlignment: Text.AlignLeft
         renderType: Text.NativeRendering
         anchors.verticalCenter: parent.verticalCenter
       }
