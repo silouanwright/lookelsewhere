@@ -1,6 +1,9 @@
 # Look Elsewhere Documentation
 
-This directory is the product and engineering source of truth. Earlier competitive and feasibility research remains in `/home/silouan/Work/wayland-break-research`; repository documentation consolidates the decisions that implementation must follow.
+This directory is the product and engineering source of truth. It consolidates
+the competitive and feasibility research, accepted decisions, implementation
+contract, and release evidence needed to continue the project without relying
+on a particular workstation or chat history.
 
 ## Core documents
 

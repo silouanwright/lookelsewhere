@@ -7,7 +7,8 @@
 - Omarchy manifest validation behavior was read from the installed `omarchy-plugin-validate` command.
 - Runtime IPC targets were inspected through `qs -p /usr/share/omarchy/shell ipc show`.
 - User plugin manifests, QML, JavaScript, services, and supplied previews were inspected under `~/.config/omarchy/plugins/`.
-- Voice Journal source and prior build conversation were inspected under `/home/silouan/Repos/voice-journal` and local Codex session history.
+- A local working copy of Silouan Wright's Voice Journal plugin and its prior
+  build conversation were inspected for established Omarchy plugin patterns.
 - Environment capabilities were checked with the preserved read-only probes.
 
 ## User-provided evidence
@@ -15,7 +16,10 @@
 - [LookAway warning screenshot](reference-screenshots/lookaway-warning.png)
 - [LookAway settings screenshot](reference-screenshots/lookaway-settings.png)
 
-These images are references for research and must not be redistributed as Look Elsewhere product assets.
+These images are preserved solely as attributed comparative research evidence.
+They are not Look Elsewhere product or promotional assets, are excluded from
+the repository's MIT license, and remain the property of their respective
+rights holder.
 
 ## Public primary/authoritative sources consulted
 

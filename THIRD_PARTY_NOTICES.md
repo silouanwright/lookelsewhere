@@ -1,8 +1,9 @@
 # Third-party notices
 
-Look Elsewhere includes the regular `chart-line-up` and `gear` SVG artwork
+Look Elsewhere includes regular `bed`, `chart-line-up`, and `gear` SVG artwork
 from [Phosphor Icons](https://github.com/phosphor-icons/core), used under the
-MIT License.
+MIT License. The bed path is used by the break icon component and asset; the
+other two paths are used by the quick-panel toolbar.
 
 Copyright © 2023 Phosphor Icons
 
@@ -23,3 +24,15 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+## Comparative product screenshots
+
+The files under
+`docs/research/reference-screenshots/lookaway-cleanshot-2026-08-22/` and the
+two `lookaway-*.png` files beside that directory are screenshots supplied by
+the author from a licensed LookAway installation. They are retained only as
+comparative research evidence supporting the accompanying criticism,
+analysis, and design decisions. They are not Look Elsewhere product or
+promotional assets and are not covered by this repository's MIT license.
+LookAway and its interface remain the property of their respective rights
+holder; inclusion does not imply affiliation or endorsement.
