@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell.Io
 import qs.Commons
 import qs.Ui
 import "Model.js" as Model
@@ -52,6 +53,20 @@ BarWidget {
     source: Qt.resolvedUrl("Panel.qml")
     visible: false
     onLoaded: { root.injectPanel(); Qt.callLater(root.injectPanel) }
+  }
+
+  // Keep the single IPC authority on the bar-widget entry point. Panel
+  // instances are reconstructed during bar-position and theme changes; an
+  // IpcHandler inside those transient instances can briefly leave an obsolete
+  // handler authoritative after the new panel has appeared.
+  IpcHandler {
+    target: "look-elsewhere-panel"
+
+    function open(): void { root.open() }
+    function close(): void { root.close() }
+    function show(): void { root.open() }
+    function hide(): void { root.close() }
+    function toggle(): void { root.togglePanel() }
   }
 
   WidgetButton {

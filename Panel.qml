@@ -8,6 +8,7 @@ Panel {
   id: root
   moduleName: "io.github.silouanwright.look-elsewhere"
   ipcTarget: "look-elsewhere-panel"
+  manageIpc: false
 
   property var service: null
   property var anchorItem: null
