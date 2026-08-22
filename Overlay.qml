@@ -46,7 +46,7 @@ Item {
         contentMotionAnimation.stop()
         contentBlurAnimation.stop()
         backdropReveal = 0
-        contentOffset = Style.space(32)
+        contentOffset = Style.space(24)
         contentOpacity = 0.28
         contentBlur = 0.08
         backdropAnimation.start()
@@ -101,7 +101,7 @@ Item {
         NumberAnimation {
           target: window
           property: "contentOffset"
-          from: Style.space(32)
+          from: Style.space(24)
           to: 0
           duration: 650
           easing.type: Easing.OutCubic
@@ -147,7 +147,7 @@ Item {
           width: Math.min(parent.width - Style.space(48), Style.space(520))
           spacing: Style.space(18)
           opacity: Math.max(0, Math.min(1, window.contentOpacity))
-          scale: 1 - 0.008 * Math.min(1, Math.max(0, window.contentOffset / Style.space(32)))
+          scale: 1 - 0.008 * Math.min(1, Math.max(0, window.contentOffset / Style.space(24)))
           layer.enabled: window.contentBlur > 0.001
           layer.smooth: true
           layer.effect: MultiEffect {
