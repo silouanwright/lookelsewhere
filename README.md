@@ -35,6 +35,7 @@ returns the real schedule unchanged when it ends.
 - Casual, Balanced, and Hardcore enforcement policies
 - Configurable short breaks and periodic long breaks
 - Omarchy-native bar, popup, warning, countdown, and break surfaces
+- Keyboard-native operation with global invocation, complete focus traversal, direct action keys, and persistent visual hints
 - Manifest-backed configuration for timing, office hours, detectors, enforcement, snoozing, and reduced motion
 - One interactive authority across multiple outputs
 - Deterministic IPC demo states that do not persist synthetic data
@@ -112,11 +113,14 @@ and ordinary skipping. Hardcore still permits bounded snoozing, but the active
 break cannot be skipped and ends only when its timer completes. Legacy
 `gentle` and `focused` configuration values migrate to Casual and Hardcore.
 
-## Keyboard control
+## Keyboard-native control
 
-The anchored panel takes keyboard focus when opened. Tab and Shift+Tab move
-through every control, Enter or Space activates the focused control, and Escape
-closes the panel. Direct panel keys keep common actions immediate:
+LookElsewhere is designed to be fully operated without a pointer. The anchored
+panel takes keyboard focus when opened; Tab and Shift+Tab traverse every control
+in a closed loop, Enter or Space activates the focused control, and Escape closes
+the panel without changing preferences. Direct action keys make frequent paths
+immediate, while `?` reveals persistent, theme-aware shortcut badges. Shortcuts
+automatically deactivate when another Omarchy surface takes keyboard focus.
 
 | Key | Action |
 |---|---|
@@ -126,15 +130,21 @@ closes the panel. Direct panel keys keep common actions immediate:
 | `h` | Toggle break history |
 | `o` | Toggle options |
 | `e` | Edit settings while Options is open |
-| `Shift+d` | Stop and disable Look Elsewhere while Options is open |
+| `Shift+d` | Stop and disable LookElsewhere while Options is open |
 | `?` | Toggle visible key hints for every action; the choice persists for the shell session |
 | `q` or `Esc` | Close the panel without changing key-hint visibility |
 
-Look Elsewhere does not silently claim global keys. On a stock Omarchy install,
-these optional bindings can be added to `~/.config/hypr/bindings.lua`:
+LookElsewhere does not silently claim global keys. For first-class invocation
+from anywhere, add the recommended `Super+Alt+L` binding to
+`~/.config/hypr/bindings.lua`:
 
 ```lua
-o.bind("SUPER + ALT + L", "Look Elsewhere", "omarchy-shell look-elsewhere-panel toggle")
+o.bind("SUPER + ALT + L", "LookElsewhere", "omarchy-shell look-elsewhere-panel toggle")
+```
+
+Optional direct-action bindings can sit beside it:
+
+```lua
 o.bind("SUPER + ALT + B", "Take an eye break", "omarchy-shell look-elsewhere takeBreak")
 o.bind("SUPER + ALT + P", "Pause or resume eye breaks", "omarchy-shell look-elsewhere togglePause")
 ```
