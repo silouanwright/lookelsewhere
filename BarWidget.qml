@@ -77,9 +77,11 @@ BarWidget {
     hasVisualContent: true
     fixedWidth: vertical ? -1 : Math.max(Style.bar.iconSlot, barContent.implicitWidth + scaledHorizontalMargin * 2)
     active: root.service && (root.service.phase === "due-soon" || root.service.interrupting)
-    tooltipText: root.service ? qsTr("%1 · %2").arg(root.service.label).arg(root.service.remainingText) : qsTr("Look Elsewhere")
+    tooltipText: ""
     Accessible.role: Accessible.Button
-    Accessible.name: tooltipText
+    Accessible.name: root.service
+      ? qsTr("LookElsewhere: %1, %2").arg(root.service.label).arg(root.service.remainingText)
+      : qsTr("LookElsewhere")
     Accessible.onPressAction: root.togglePanel()
 
     Row {
