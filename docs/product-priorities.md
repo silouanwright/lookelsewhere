@@ -6,6 +6,7 @@ This is a competition and portfolio quality plan, not a LookAway parity list. Pr
 
 - **Correct interruption timeline:** warning begins during the final configured seconds of focus time, final countdown follows, and the break begins at the original zero without a hidden second cycle.
 - **Portrait quick panel:** anchored to the bar icon, narrow vertical hierarchy, large countdown, no progress bar, one obvious primary action, compact secondary state.
+- **Bounded snoozing:** visible +1/+5/+15 minute actions, enforcement-aware availability, persisted budget use, and deterministic expiry behavior.
 - **Trustworthy active-time behavior:** away time pauses visibly in the bar and panel; natural-pause behavior is either proven live or described conservatively.
 - **Reliable core surfaces:** warning, final countdown, full-screen break, keyboard exit policy, multi-monitor authority, shell restart, and contrasting themes pass live acceptance.
 - **Original product story:** README and demo show the problem, Omarchy/Wayland architecture, privacy boundary, native theming, and verified behavior without third-party screenshots as marketing assets.

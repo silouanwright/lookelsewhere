@@ -16,7 +16,7 @@ Adopt information hierarchy and proven interaction patterns. Adapt them to Omarc
 
 | Capture | Visible behavior | Look Elsewhere decision |
 |---|---|---|
-| [`01-menu-now.png`](reference-screenshots/lookaway-cleanshot-2026-08-22/01-menu-now.png) | Tall anchored popover; dominant countdown; Start break and +1/+5/+15 actions; three compact status facts | Adopt the countdown hierarchy and economical vertical composition. Keep Omarchy buttons and bar anchoring. Add richer snooze choices only after policy review. |
+| [`01-menu-now.png`](reference-screenshots/lookaway-cleanshot-2026-08-22/01-menu-now.png) | Tall anchored popover; dominant countdown; Start break and +1/+5/+15 actions; three compact status facts | Adopt the countdown hierarchy, economical vertical composition, and bounded +1/+5/+15 snooze choices. Keep Omarchy buttons, policy limits, and bar anchoring. |
 | [`02-menu-stats.png`](reference-screenshots/lookaway-cleanshot-2026-08-22/02-menu-stats.png) | Daily screen score, date navigation, score ring and explanation | Defer. A score is gamification and does not improve the core break transition. |
 | [`03-general.png`](reference-screenshots/lookaway-cleanshot-2026-08-22/03-general.png) | Login launch, live menu-bar state, icon/text and timer display, updates | Bar display modes already exist. Omarchy owns plugin launch/update lifecycle; do not reproduce it. |
 | [`04-screen-breaks-top.png`](reference-screenshots/lookaway-cleanshot-2026-08-22/04-screen-breaks-top.png) | Focus interval, break duration, break-screen customization, long-break cadence, office hours | Core interval/duration/office hours exist. Long-break cadence is a useful P1 extension. |

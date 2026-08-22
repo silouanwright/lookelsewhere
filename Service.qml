@@ -135,6 +135,16 @@ Item {
     scheduleSave()
   }
 
+  function pauseBreaks() {
+    var next = JSON.parse(JSON.stringify(snapshot))
+    next.state = Model.State.Waiting
+    next.pauseReason = "manual"
+    next.postponedUntilMs = 0
+    next.lastObservedAtMs = Date.now()
+    snapshot = next
+    scheduleSave()
+  }
+
   function resume() {
     var next = JSON.parse(JSON.stringify(snapshot))
     next.state = Model.State.Working
@@ -376,6 +386,7 @@ Item {
     function takeBreak(): string { service.takeBreak(); return service.phase }
     function postpone(minutes: int): string { service.postponeMinutes(minutes); return service.phase }
     function pause(minutes: int): string { service.pauseMinutes(minutes); return service.phase }
+    function pauseBreaks(): string { service.pauseBreaks(); return service.phase }
     function resume(): string { service.resume(); return service.phase }
     function skip(): string { service.skipBreak(); return service.phase }
     function emergencyExit(): string { service.emergencyExit(); return service.phase }

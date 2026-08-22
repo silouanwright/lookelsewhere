@@ -220,6 +220,7 @@ function observe(snapshot, input, config) {
     if (now >= next.warningEndsAtMs - cfg.finalMs) next.state = State.Final
     return next
   }
+  if (next.state === State.Waiting && next.pauseReason === "manual") return next
   if (next.postponedUntilMs > now) {
     next.state = State.Waiting
     return next

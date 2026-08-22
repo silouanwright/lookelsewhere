@@ -316,4 +316,18 @@ TestCase {
     snapshot.pauseReason = "manual"
     compare(Model.stateLabel(snapshot), "Breaks paused")
   }
+
+  function test_manualPausePersistsUntilExplicitResume() {
+    var c = config()
+    var s = Model.defaultSnapshot(1000)
+    s.state = Model.State.Waiting
+    s.pauseReason = "manual"
+    s.accumulatedActiveMs = 12000
+    s = Model.observe(s, {
+      nowMs: 10 * 60 * 60 * 1000, active: true, idle: false, naturalPause: true, evidence: []
+    }, c)
+    compare(s.state, Model.State.Waiting)
+    compare(s.pauseReason, "manual")
+    compare(s.accumulatedActiveMs, 12000)
+  }
 }
