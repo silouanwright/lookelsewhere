@@ -17,6 +17,7 @@ Item {
   readonly property bool visibleState: service && service.interrupting
   readonly property bool breaking: service && service.phase === "breaking"
   readonly property bool finalCountdown: service && service.phase === "final-countdown"
+  readonly property int remainingSeconds: service ? Math.max(0, Math.ceil(service.remainingMs / 1000)) : 0
 
   Variants {
     model: Quickshell.screens
@@ -194,13 +195,28 @@ Item {
             font.pixelSize: Style.font.subtitle
             wrapMode: Text.WordWrap
           }
-          Text {
+          Row {
             Layout.alignment: Qt.AlignHCenter
-            text: root.service ? root.service.remainingText : ""
-            color: Color.lock.text
-            font.family: Style.font.family
-            font.pixelSize: Style.font.display
-            font.weight: Font.DemiBold
+            spacing: 0
+            Accessible.role: Accessible.StaticText
+            Accessible.name: qsTr("%1 seconds remaining").arg(root.remainingSeconds)
+
+            RollingNumber {
+              value: root.remainingSeconds
+              color: Color.lock.text
+              fontFamily: Style.font.family
+              fontSize: Style.font.display
+              fontWeight: Font.DemiBold
+              reducedMotion: root.service && root.service.config.reducedMotion
+            }
+            Text {
+              text: qsTr("s")
+              color: Color.lock.text
+              font.family: Style.font.family
+              font.pixelSize: Style.font.display
+              font.weight: Font.DemiBold
+              Accessible.ignored: true
+            }
           }
           RowLayout {
             Layout.alignment: Qt.AlignHCenter
