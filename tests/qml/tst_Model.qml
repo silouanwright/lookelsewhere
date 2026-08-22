@@ -23,12 +23,16 @@ TestCase {
       focusMinutes: 25,
       officeHoursEnabled: true,
       officeStart: "22:30",
-      mediaDetection: false
+      mediaDetection: false,
+      soundEnabled: true,
+      outputMode: "focused"
     })
     compare(customized.focusMs, 25 * 60000)
     verify(customized.officeHours.enabled)
     compare(customized.officeHours.startMinute, 22 * 60 + 30)
     verify(!customized.detectors.media)
+    verify(customized.soundEnabled)
+    compare(customized.outputMode, "focused")
 
     // Omarchy supplies no key after an override is removed. A fresh
     // reconciliation must restore defaults rather than retain old config.
@@ -37,6 +41,8 @@ TestCase {
     verify(!restored.officeHours.enabled)
     compare(restored.officeHours.startMinute, 8 * 60)
     verify(restored.detectors.media)
+    verify(!restored.soundEnabled)
+    compare(restored.outputMode, "all")
   }
 
   function test_settingsNormalizeInvalidValues() {

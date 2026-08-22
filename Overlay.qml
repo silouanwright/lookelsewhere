@@ -25,7 +25,7 @@ Item {
       id: window
       required property var modelData
       screen: modelData
-      visible: root.visibleState
+      visible: root.visibleState && (!root.service || root.service.config.outputMode !== "focused" || window.authoritative)
       anchors { top: true; bottom: true; left: true; right: true }
       color: "transparent"
       exclusionMode: ExclusionMode.Ignore

@@ -51,12 +51,23 @@ omarchy bar set io.github.silouanwright.look-elsewhere breakSeconds 45 --json
 omarchy bar set io.github.silouanwright.look-elsewhere enforcement '"balanced"' --json
 omarchy bar set io.github.silouanwright.look-elsewhere officeHoursEnabled true --json
 omarchy bar set io.github.silouanwright.look-elsewhere reducedMotion false --json
+omarchy bar set io.github.silouanwright.look-elsewhere soundEnabled true --json
+omarchy bar set io.github.silouanwright.look-elsewhere outputMode '"all"' --json
 omarchy bar set io.github.silouanwright.look-elsewhere displayMode '"icon-and-time"' --json
 ```
 
 `displayMode` accepts `icon`, `time`, or `icon-and-time`. The compact countdown shows minutes, then switches to seconds during the final minute. Vertical bars use the icon so the widget remains legible.
 
 The complete typed contract, defaults, ranges, and descriptions are declared in [`manifest.json`](manifest.json). A dedicated graphical settings client is intentionally deferred until after the competition MVP.
+
+Inspect or reset private local state with:
+
+```bash
+omarchy-shell look-elsewhere diagnostics
+omarchy-shell look-elsewhere resetLocalData
+```
+
+`resetLocalData` removes the local schedule and aggregate outcome history on the next atomic state write. It does not change Omarchy configuration.
 
 Enforcement behavior is explicit: Gentle permits snoozing and ordinary skipping, Balanced keeps snoozing bounded, and Focused hides ordinary exits. Focused mode always retains `Ctrl+Shift+Esc` as a documented emergency exit.
 

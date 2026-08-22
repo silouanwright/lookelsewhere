@@ -30,6 +30,8 @@ function defaultConfig() {
     enforcement: "balanced",
     snoozeBudget: 3,
     reducedMotion: false,
+    soundEnabled: false,
+    outputMode: "all",
     officeHours: { enabled: false, startMinute: 8 * 60, endMinute: 18 * 60 },
     detectors: { idle: true, fullscreen: true, media: true, microphone: true, dictation: true }
   }
@@ -49,6 +51,8 @@ function normalizeConfig(input) {
   base.enforcement = ["gentle", "balanced", "focused"].indexOf(value.enforcement) >= 0 ? value.enforcement : base.enforcement
   base.snoozeBudget = Math.round(clamp(value.snoozeBudget === undefined ? base.snoozeBudget : value.snoozeBudget, 0, 20))
   base.reducedMotion = value.reducedMotion === true
+  base.soundEnabled = value.soundEnabled === true
+  base.outputMode = ["all", "focused"].indexOf(value.outputMode) >= 0 ? value.outputMode : base.outputMode
   if (value.officeHours) {
     base.officeHours.enabled = value.officeHours.enabled === true
     base.officeHours.startMinute = clamp(value.officeHours.startMinute === undefined ? base.officeHours.startMinute : value.officeHours.startMinute, 0, 1439)
@@ -86,6 +90,8 @@ function configFromSettings(settings) {
   if (incoming.maximumDelayMinutes !== undefined) next.maximumDelayMs = finiteNumber(incoming.maximumDelayMinutes, next.maximumDelayMs / 60000) * 60000
   if (incoming.snoozeBudget !== undefined) next.snoozeBudget = finiteNumber(incoming.snoozeBudget, next.snoozeBudget)
   if (incoming.reducedMotion !== undefined) next.reducedMotion = incoming.reducedMotion === true
+  if (incoming.soundEnabled !== undefined) next.soundEnabled = incoming.soundEnabled === true
+  if (incoming.outputMode !== undefined) next.outputMode = String(incoming.outputMode)
   if (incoming.officeHoursEnabled !== undefined) next.officeHours.enabled = incoming.officeHoursEnabled === true
   if (incoming.officeStart !== undefined) next.officeHours.startMinute = parseClockMinute(incoming.officeStart, next.officeHours.startMinute)
   if (incoming.officeEnd !== undefined) next.officeHours.endMinute = parseClockMinute(incoming.officeEnd, next.officeHours.endMinute)

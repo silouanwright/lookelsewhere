@@ -25,6 +25,7 @@ Item {
   property bool fullscreenAvailable: false
   property bool dictationActive: false
   property bool dictationAvailable: false
+  property bool soundAvailable: true
   property string recoveryWarning: ""
   property bool persistenceBlocked: false
   property bool demoMode: false
@@ -91,6 +92,8 @@ Item {
     snapshot = Model.observe(snapshot, {
       nowMs: Date.now(), active: !effectiveIdle, idle: effectiveIdle, evidence: evidence()
     }, config)
+    if (!demoMode && beforeState !== Model.State.Breaking && snapshot.state === Model.State.Breaking && config.soundEnabled)
+      playBreakSound()
     if (!demoMode && snapshot.state !== beforeState) scheduleSave()
   }
 
@@ -145,6 +148,10 @@ Item {
 
   function emergencyExit() {
     if (phase === Model.State.Breaking) skipBreak()
+  }
+
+  function playBreakSound() {
+    if (!breakSound.running) breakSound.running = true
   }
 
   function setDemo(name) {
@@ -363,6 +370,12 @@ Item {
     }
   }
 
+  Process {
+    id: breakSound
+    command: ["canberra-gtk-play", "-i", "dialog-information", "-d", "Look Elsewhere break"]
+    onExited: function(exitCode) { service.soundAvailable = exitCode === 0 }
+  }
+
   Component.onCompleted: {
     ensureStateDir.running = true
     Qt.callLater(function() { stateFile.reload() })
@@ -373,7 +386,7 @@ Item {
 
     function status(): string { return JSON.stringify({ state: service.phase, remainingMs: service.remainingMs, evidence: service.evidence(), demo: service.demoMode, idlePaused: service.idlePauseActive, recoveryWarning: service.recoveryWarning }) }
     function configuration(): string { return JSON.stringify(service.config) }
-    function diagnostics(): string { return JSON.stringify({ fullscreen: service.fullscreenAvailable, dictation: service.dictationAvailable, mpris: true, pipewire: true, idle: true, persistenceBlocked: service.persistenceBlocked }) }
+    function diagnostics(): string { return JSON.stringify({ fullscreen: service.fullscreenAvailable, dictation: service.dictationAvailable, mpris: true, pipewire: true, idle: true, sound: service.soundAvailable, persistenceBlocked: service.persistenceBlocked }) }
     function takeBreak(): string { service.takeBreak(); return service.phase }
     function postpone(minutes: int): string { service.postponeMinutes(minutes); return service.phase }
     function pause(minutes: int): string { service.pauseMinutes(minutes); return service.phase }
