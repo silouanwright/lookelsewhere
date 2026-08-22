@@ -2,7 +2,9 @@
 
 Look Elsewhere is a private, context-aware break coach built natively for Omarchy. It counts active screen use, waits through protected moments such as meetings, media, fullscreen work, and dictation, then delivers a calm warning and break at a better moment.
 
-The repository currently contains a runnable competition prototype: a resident scheduling service, bar widget, anchored quick panel, progressive warning, final countdown, and theme-aware multi-monitor break overlay. The remaining release work is tracked in the [completion matrix](docs/completion-matrix.md).
+![Look Elsewhere break overlay](preview.png)
+
+The repository contains a resident scheduling service, bar widget, anchored quick panel, progressive warning, final countdown, and theme-aware multi-monitor break overlay. Release verification is tracked in the [completion matrix](docs/completion-matrix.md).
 
 ## Product promise
 
@@ -73,8 +75,6 @@ Enforcement behavior is explicit: Gentle permits snoozing and ordinary skipping,
 
 ## Install
 
-The public repository is not published yet. Once available:
-
 ```bash
 omarchy plugin add https://github.com/silouanwright/look-elsewhere.git --enable
 ```
@@ -86,7 +86,10 @@ omarchy plugin disable io.github.silouanwright.look-elsewhere
 omarchy plugin remove io.github.silouanwright.look-elsewhere
 ```
 
-Look Elsewhere has no installer hook, privileged operation, external daemon, account, or network dependency.
+Look Elsewhere requires Omarchy Quattro with Omarchy Shell. It has no installer
+hook, privileged operation, external daemon, account, or network dependency.
+Its optional break sound uses `canberra-gtk-play` when available; the scheduler
+and all visual behavior continue normally without it.
 
 ## Project identity
 

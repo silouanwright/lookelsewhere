@@ -25,7 +25,7 @@ Status reflects inspected repository and installed-runtime evidence on 2026-08-2
 | Keyboard and accessibility | Implemented | Native button roles/names/actions, deterministic Tab/Backtab order, Escape dismissal, Focused emergency exit, and reduced-motion behavior; live focus screenshots and clean runtime logs recorded |
 | Theme and bar-position QA | Implemented | Osaka Jade and Catppuccin Latte plus top/bottom/left/right were exercised live and restored; transient panel IPC lifecycle issue found and fixed |
 | Automated tests and QML review | Partial | 23 model tests, manifest validation, system qmllint, six-pass semantic review, live flow proof, and keyboard acceptance evidence exist; release acceptance matrix remains |
-| Public packaging | Partial | Manifest, MIT license, install/removal commands, and release README exist; preview assets, marketplace metadata, and clean install/remove proof remain |
+| Public packaging | Partial | Manifest, MIT license, release README, root `preview.png`, and marketplace submission draft exist; clean install/remove proof remains |
 | Competition submission | Missing | External publication and marketplace submission require final authorization |
 
 ## Immediate release sequence
