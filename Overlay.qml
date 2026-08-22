@@ -198,7 +198,7 @@ Item {
             text: qsTr("Look Elsewhere")
             color: Color.lock.text
             font.family: Style.font.family
-            font.pixelSize: Style.font.displayLarge * 1.2
+            font.pixelSize: Style.font.displayLarge * 1.35
             font.weight: Font.Bold
           }
           Text {
