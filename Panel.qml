@@ -27,6 +27,7 @@ Panel {
   readonly property bool idlePaused: service && service.idlePauseActive
   readonly property bool delayActionsVisible: !manuallyPaused && service
   readonly property bool delayActionsEnabled: delayActionsVisible && service.canPostpone
+  readonly property bool shortcutsActive: opened && popup.active
   readonly property int snoozesRemaining: service
     ? Math.max(0, Number(service.config.snoozeBudget || 0) - Number(service.snapshot.snoozesUsed || 0))
     : 0
@@ -81,17 +82,17 @@ Panel {
 
   // Window-local mnemonics complement native Tab/Backtab traversal. They are
   // intentionally inactive whenever the anchored panel is closed.
-  Shortcut { sequence: "B"; context: Qt.ApplicationShortcut; enabled: root.opened; onActivated: root.takeBreakAndClose() }
-  Shortcut { sequence: "1"; context: Qt.ApplicationShortcut; enabled: root.opened && root.delayActionsEnabled; onActivated: root.postponeAndClose(1) }
-  Shortcut { sequence: "2"; context: Qt.ApplicationShortcut; enabled: root.opened && root.delayActionsEnabled; onActivated: root.postponeAndClose(5) }
-  Shortcut { sequence: "3"; context: Qt.ApplicationShortcut; enabled: root.opened && root.delayActionsEnabled; onActivated: root.postponeAndClose(15) }
-  Shortcut { sequence: "P"; context: Qt.ApplicationShortcut; enabled: root.opened && root.service && !root.service.interrupting; onActivated: root.toggleManualPause() }
-  Shortcut { sequence: "H"; context: Qt.ApplicationShortcut; enabled: root.opened; onActivated: root.togglePage("stats") }
-  Shortcut { sequence: "O"; context: Qt.ApplicationShortcut; enabled: root.opened; onActivated: root.togglePage("options") }
-  Shortcut { sequence: "E"; context: Qt.ApplicationShortcut; enabled: root.opened && root.page === "options"; onActivated: { root.close(); settingsEditor.running = true } }
-  Shortcut { sequence: "Shift+D"; context: Qt.ApplicationShortcut; enabled: root.opened && root.page === "options"; onActivated: { root.close(); stopPlugin.running = true } }
-  Shortcut { sequence: "Q"; context: Qt.ApplicationShortcut; enabled: root.opened; onActivated: root.close() }
-  Shortcut { sequence: "?"; context: Qt.ApplicationShortcut; enabled: root.opened; onActivated: root.keyboardHintsVisible = !root.keyboardHintsVisible }
+  Shortcut { sequence: "B"; context: Qt.ApplicationShortcut; enabled: root.shortcutsActive; onActivated: root.takeBreakAndClose() }
+  Shortcut { sequence: "1"; context: Qt.ApplicationShortcut; enabled: root.shortcutsActive && root.delayActionsEnabled; onActivated: root.postponeAndClose(1) }
+  Shortcut { sequence: "2"; context: Qt.ApplicationShortcut; enabled: root.shortcutsActive && root.delayActionsEnabled; onActivated: root.postponeAndClose(5) }
+  Shortcut { sequence: "3"; context: Qt.ApplicationShortcut; enabled: root.shortcutsActive && root.delayActionsEnabled; onActivated: root.postponeAndClose(15) }
+  Shortcut { sequence: "P"; context: Qt.ApplicationShortcut; enabled: root.shortcutsActive && root.service && !root.service.interrupting; onActivated: root.toggleManualPause() }
+  Shortcut { sequence: "H"; context: Qt.ApplicationShortcut; enabled: root.shortcutsActive; onActivated: root.togglePage("stats") }
+  Shortcut { sequence: "O"; context: Qt.ApplicationShortcut; enabled: root.shortcutsActive; onActivated: root.togglePage("options") }
+  Shortcut { sequence: "E"; context: Qt.ApplicationShortcut; enabled: root.shortcutsActive && root.page === "options"; onActivated: { root.close(); settingsEditor.running = true } }
+  Shortcut { sequence: "Shift+D"; context: Qt.ApplicationShortcut; enabled: root.shortcutsActive && root.page === "options"; onActivated: { root.close(); stopPlugin.running = true } }
+  Shortcut { sequence: "Q"; context: Qt.ApplicationShortcut; enabled: root.shortcutsActive; onActivated: root.close() }
+  Shortcut { sequence: "?"; context: Qt.ApplicationShortcut; enabled: root.shortcutsActive; onActivated: root.keyboardHintsVisible = !root.keyboardHintsVisible }
 
   KeyboardPanel {
     id: popup

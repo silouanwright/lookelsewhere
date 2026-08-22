@@ -29,6 +29,7 @@ Button {
     height: 256
     anchors.centerIn: parent
     scale: root.iconSize / 256
+    preferredRendererType: Shape.CurveRenderer
 
     ShapePath {
       strokeWidth: -1
