@@ -21,8 +21,6 @@ Item {
   property var config: Model.defaultConfig()
   property var snapshot: Model.defaultSnapshot(Date.now())
   property bool stateLoaded: false
-  property bool fullscreenActive: false
-  property bool fullscreenAvailable: false
   property bool dictationActive: false
   property bool dictationAvailable: false
   property bool soundAvailable: true
@@ -38,6 +36,10 @@ Item {
 
   readonly property var players: Mpris.players ? Mpris.players.values : []
   readonly property var pipewireNodes: Pipewire.nodes ? Pipewire.nodes.values : []
+  readonly property var activeToplevel: Hyprland.activeToplevel
+  readonly property bool fullscreenAvailable: !activeToplevel || !!activeToplevel.wayland
+  readonly property bool fullscreenActive: config.detectors.fullscreen
+    && !!(activeToplevel && activeToplevel.wayland && activeToplevel.wayland.fullscreen)
   readonly property bool mediaActive: {
     for (var i = 0; i < players.length; i++)
       if (players[i] && players[i].isPlaying) return true
@@ -52,7 +54,6 @@ Item {
     }
     return false
   }
-  property int dictationRetryTicks: 0
   readonly property bool idle: demoMode ? demoIdle : idleMonitor.isIdle
   readonly property bool idlePauseActive: config.detectors.idle && idle
   readonly property string phase: snapshot.state || Model.State.Working
@@ -310,60 +311,26 @@ Item {
     onTriggered: service.flushState()
   }
 
-  Timer {
-    interval: 2000
-    repeat: true
-    running: !service.demoMode
-    triggeredOnStart: true
-    onTriggered: {
-      if (service.config.detectors.fullscreen) {
-        if (!fullscreenProbe.running) fullscreenProbe.running = true
-      } else {
-        service.fullscreenActive = false
-      }
-      if (!service.config.detectors.dictation) {
-        service.dictationActive = false
-      } else if (service.dictationAvailable || service.dictationRetryTicks <= 0) {
-        if (!dictationProbe.running) dictationProbe.running = true
-        service.dictationRetryTicks = 30
-      } else {
-        service.dictationRetryTicks--
-      }
-    }
-  }
-
-  Process {
-    id: fullscreenProbe
-    command: ["hyprctl", "activewindow", "-j"]
-    stdout: StdioCollector {
-      waitForEnd: true
-      onStreamFinished: {
-        try {
-          var value = JSON.parse(text)
-          service.fullscreenActive = Number(value.fullscreen || value.fullscreenClient || 0) > 0
-          service.fullscreenAvailable = true
-        } catch (error) {
-          service.fullscreenActive = false
-          service.fullscreenAvailable = false
-        }
-      }
-    }
-    onExited: function(exitCode) { if (exitCode !== 0) service.fullscreenAvailable = false }
-  }
-
   Process {
     id: dictationProbe
     command: ["omarchy-voxtype-status"]
-    stdout: StdioCollector {
-      waitForEnd: true
-      onStreamFinished: {
-        var value = String(text || "").toLowerCase()
-        service.dictationActive = value.indexOf("record") >= 0 || value.indexOf("transcrib") >= 0
-        service.dictationAvailable = true
+    running: service.config.detectors.dictation && !service.demoMode
+    onRunningChanged: if (!running) service.dictationActive = false
+    stdout: SplitParser {
+      onRead: function(data) {
+        try {
+          var value = JSON.parse(String(data || "{}"))
+          var state = String(value.alt || value.class || "").toLowerCase()
+          service.dictationAvailable = state !== ""
+          service.dictationActive = state === "recording" || state === "transcribing"
+        } catch (error) {
+          service.dictationActive = false
+          service.dictationAvailable = false
+        }
       }
     }
     onExited: function(exitCode) {
-      if (exitCode !== 0) {
+      if (service.config.detectors.dictation && !service.demoMode) {
         service.dictationActive = false
         service.dictationAvailable = false
       }

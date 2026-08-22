@@ -104,7 +104,8 @@ Panel {
 
       Text {
         Layout.fillWidth: true
-        text: root.service && root.service.protectedSummary !== "" ? root.service.protectedSummary : qsTr("Only active screen time counts. Meetings, videos, fullscreen work, and dictation pause interruptions automatically.")
+        visible: root.service && root.service.protectedSummary !== ""
+        text: root.service ? root.service.protectedSummary : ""
         color: root.muted
         font.family: root.fontFamily
         font.pixelSize: Style.font.bodySmall
@@ -169,22 +170,6 @@ Panel {
         elide: Text.ElideRight
       }
 
-      RowLayout {
-        Layout.fillWidth: true
-        Text {
-          Layout.fillWidth: true
-          text: root.service && root.service.demoMode ? qsTr("Demo mode") : qsTr("Smart pause is on")
-          color: root.muted
-          font.family: root.fontFamily
-          font.pixelSize: Style.font.bodySmall
-        }
-        Text {
-          text: qsTr("Middle-click the eye for a break")
-          color: root.muted
-          font.family: root.fontFamily
-          font.pixelSize: Style.font.bodySmall
-        }
-        }
       }
     }
   }
