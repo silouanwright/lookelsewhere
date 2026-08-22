@@ -45,7 +45,7 @@ Panel {
     close()
   }
   function postponeAndClose(minutes) {
-    if (service && delayActionsVisible) service.postponeMinutes(minutes)
+    if (service && delayActionsVisible) service.delayNextBreakMinutes(minutes)
     close()
   }
   function toggleManualPause() {
@@ -497,7 +497,7 @@ Panel {
 
         Item {
           Layout.fillWidth: true
-          Layout.preferredHeight: Style.space(8)
+          Layout.preferredHeight: Style.space(4)
         }
 
       }

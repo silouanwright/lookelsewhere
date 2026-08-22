@@ -122,6 +122,12 @@ Item {
     scheduleSave()
   }
 
+  function delayNextBreakMinutes(minutes) {
+    if (!canPostpone) return
+    snapshot = Model.delayNextBreak(snapshot, Date.now(), Math.max(1, Number(minutes || 1)) * 60000, config)
+    scheduleSave()
+  }
+
   function resetHistory() {
     snapshot = Model.resetTotals(snapshot)
     scheduleSave()

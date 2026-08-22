@@ -315,6 +315,26 @@ function postpone(snapshot, nowMs, durationMs, config) {
   return next
 }
 
+function delayNextBreak(snapshot, nowMs, durationMs, config) {
+  if (!canPostpone(snapshot, config)) return copySnapshot(snapshot)
+  var state = snapshot && snapshot.state
+  if (state !== State.Working && state !== State.DueSoon)
+    return postpone(snapshot, nowMs, durationMs, config)
+
+  var next = copySnapshot(snapshot)
+  next.state = State.Working
+  next.stateEnteredAtMs = nowMs
+  next.lastObservedAtMs = nowMs
+  next.accumulatedActiveMs = Math.max(0,
+    next.accumulatedActiveMs - Math.max(0, Number(durationMs || 0)))
+  next.dueAtMs = 0
+  next.postponedUntilMs = 0
+  next.warningEndsAtMs = 0
+  next.snoozesUsed++
+  next.totals.postponed++
+  return next
+}
+
 function canPostpone(snapshot, config) {
   var cfg = config && config.version === 1 ? config : normalizeConfig(config)
   if (cfg.enforcement === "focused") return false

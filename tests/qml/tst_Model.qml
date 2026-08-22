@@ -254,6 +254,32 @@ TestCase {
     compare(s.totals.postponed, 1)
   }
 
+  function test_delayNextBreakAddsTimeDuringOrdinaryFocus() {
+    var c = config({ focusMs: 20 * 60000 })
+    var s = Model.defaultSnapshot(1000)
+    s.accumulatedActiveMs = 60 * 1000
+    s.state = Model.State.Working
+
+    s = Model.delayNextBreak(s, 2000, 60 * 1000, c)
+
+    compare(s.state, Model.State.Working)
+    compare(c.focusMs - s.accumulatedActiveMs, 20 * 60000)
+    compare(s.lastObservedAtMs, 2000)
+    compare(s.snoozesUsed, 1)
+    compare(s.totals.postponed, 1)
+  }
+
+  function test_delayNextBreakPreservesDuePostponeSemantics() {
+    var s = Model.defaultSnapshot(0)
+    s.state = Model.State.Warning
+
+    s = Model.delayNextBreak(s, 1000, 60 * 1000, config())
+
+    compare(s.state, Model.State.Waiting)
+    compare(s.postponedUntilMs, 61000)
+    compare(s.snoozesUsed, 1)
+  }
+
   function test_postponeExpiryReturnsToWarning() {
     var c = config()
     var s = Model.defaultSnapshot(0)
