@@ -60,12 +60,22 @@ one focused `HDMI-A-2` output at 3840×2160 with scale 2.
   lifecycle staging should run with no user shell active or use a separately
   namespaced fixture ID.
 
+## Corrupt-state recovery
+
+- The running shell was stopped before the persisted snapshot was replaced
+  with deliberately invalid JSON, preventing a race with the periodic writer.
+- On restart, Look Elsewhere entered a safe default working state, exposed the
+  recovery warning through status and the quick panel, set persistence blocked,
+  logged the parse failure, and left the invalid source file unchanged.
+- The exact pre-test snapshot was restored, including accumulated focus time
+  and all outcome totals. A second shell restart loaded it with an empty
+  recovery warning and normal persistence resumed.
+- The test ended with demo mode off, the anchored panel showing the real
+  countdown, and no coredump.
+
 ## Current limitations
 
 - Only one physical output is connected, so real output hotplug and
   cross-monitor action-authority acceptance remain unproven. The deterministic
   delegate lifecycle review and focused-output selection logic cover the code
   path but do not replace physical multi-monitor evidence.
-- Corrupt-state preservation is implemented and fixture-tested visually; an
-  isolated runtime parse/write acceptance test remains because the plugin's
-  actual state path must never be destructively exercised for release QA.

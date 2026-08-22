@@ -5,7 +5,7 @@ Status reflects inspected repository and installed-runtime evidence on 2026-08-2
 | Requirement | Status | Current evidence / remaining proof |
 |---|---|---|
 | Active-use focus and break scheduling | Implemented | `Model.observe`, manifest settings, pure tests |
-| Timestamp persistence and restart recovery | Partial | Atomic state snapshot plus rollback, long-suspend, expired-warning, and expired-break reconciliation tests exist; corrupt-state live acceptance remains |
+| Timestamp persistence and restart recovery | Implemented | Atomic state snapshot plus rollback, long-suspend, expired-warning, and expired-break reconciliation tests exist; live invalid-JSON acceptance proved preservation, blocked writes, warning visibility, exact restoration, and clean reload |
 | Office hours, including overnight | Implemented | Daytime boundaries, equal-bound all-day behavior, overnight schedules, and pause-to-open accounting are covered by pure tests |
 | Manual pause/resume | Implemented | Service IPC, state-aware quick-panel Pause/Resume action, and paused fixture |
 | Idle detection | Implemented | Wayland idle monitor plus live `idle` fixture proving bar pause/resume presentation |
@@ -30,6 +30,7 @@ Status reflects inspected repository and installed-runtime evidence on 2026-08-2
 
 ## Immediate release sequence
 
-1. Complete corrupt-state recovery and remaining runtime acceptance checks.
+1. Complete the remaining runtime acceptance matrix, including the feasible
+   scaled/narrow-output and keyboard-focus checks.
 2. Produce the final original preview/demo assets and finish the release README.
 3. Audit the exact distributable commit, then request publication and submission approval.
