@@ -187,12 +187,11 @@ Item {
             blurMultiplier: 1
           }
 
-          Text {
+          BreakIcon {
             Layout.alignment: Qt.AlignHCenter
-            text: "󰈉"
+            Layout.preferredWidth: Style.space(54)
+            Layout.preferredHeight: Layout.preferredWidth
             color: Color.accent
-            font.family: Style.font.family
-            font.pixelSize: Style.space(54)
           }
           Text {
             Layout.alignment: Qt.AlignHCenter
