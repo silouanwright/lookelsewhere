@@ -496,6 +496,7 @@ Panel {
             KeyHintBadge {
               visible: root.keyboardHintsVisible
               keyText: "B"
+              centerOnCorner: true
             }
           }
 
@@ -528,6 +529,7 @@ Panel {
               visible: root.keyboardHintsVisible
               keyText: "1"
               available: postpone1Button.actionEnabled
+              centerOnCorner: true
             }
           }
 
@@ -560,6 +562,7 @@ Panel {
               visible: root.keyboardHintsVisible
               keyText: "2"
               available: postpone5Button.actionEnabled
+              centerOnCorner: true
             }
           }
 
@@ -592,6 +595,7 @@ Panel {
                 visible: root.keyboardHintsVisible
                 keyText: "3"
                 available: postpone15Button.actionEnabled
+                centerOnCorner: true
               }
             }
           }
