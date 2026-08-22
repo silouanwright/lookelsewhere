@@ -91,7 +91,7 @@ BarWidget {
 
       BarBreakIcon {
         visible: root.showIcon
-        width: Style.bar.iconFont
+        width: Style.space(16)
         height: width
         color: button.active && button.useActiveColor ? button.activeColor : button.foreground
         anchors.verticalCenter: parent.verticalCenter
