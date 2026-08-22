@@ -26,7 +26,7 @@ Item {
       screen: modelData
       visible: root.visibleState
       anchors { top: true; bottom: true; left: true; right: true }
-      color: root.breaking ? Color.lock.background : "transparent"
+      color: "transparent"
       exclusionMode: ExclusionMode.Ignore
       mask: Region {
         item: !window.authoritative ? emptyHitArea
@@ -34,12 +34,67 @@ Item {
       }
 
       readonly property bool authoritative: Hyprland.focusedMonitor && Hyprland.focusedMonitor.name === modelData.name
+      property real backdropReveal: 0
+      property real contentReveal: 0
+
+      function beginBreakReveal() {
+        backdropAnimation.stop()
+        contentAnimation.stop()
+        backdropReveal = 0
+        contentReveal = 0
+        backdropAnimation.start()
+        contentAnimation.start()
+      }
+
+      Connections {
+        target: root
+        function onBreakingChanged() {
+          if (root.breaking) window.beginBreakReveal()
+          else {
+            backdropAnimation.stop()
+            contentAnimation.stop()
+            window.backdropReveal = 0
+            window.contentReveal = 0
+          }
+        }
+      }
+
+      NumberAnimation {
+        id: backdropAnimation
+        target: window
+        property: "backdropReveal"
+        from: 0
+        to: 1
+        duration: 650
+        easing.type: Easing.OutCubic
+      }
+
+      SequentialAnimation {
+        id: contentAnimation
+        PauseAnimation { duration: 90 }
+        SpringAnimation {
+          target: window
+          property: "contentReveal"
+          from: 0
+          to: 1
+          spring: 4
+          damping: 0.42
+          epsilon: 0.001
+        }
+      }
 
       WlrLayershell.namespace: "look-elsewhere"
       WlrLayershell.layer: WlrLayer.Overlay
       WlrLayershell.keyboardFocus: root.breaking && authoritative ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
       Item { id: emptyHitArea; width: 0; height: 0 }
+
+      Rectangle {
+        anchors.fill: parent
+        visible: root.breaking || window.backdropReveal > 0
+        color: Color.lock.background
+        opacity: Math.max(0, Math.min(1, window.backdropReveal))
+      }
 
       Item {
         id: fullScreenHitArea
@@ -52,6 +107,8 @@ Item {
           anchors.centerIn: parent
           width: Math.min(parent.width - Style.space(48), Style.space(520))
           spacing: Style.space(18)
+          opacity: Math.max(0, Math.min(1, window.contentReveal))
+          scale: 0.96 + 0.04 * Math.max(0, Math.min(1, window.contentReveal))
 
           Text {
             Layout.alignment: Qt.AlignHCenter
