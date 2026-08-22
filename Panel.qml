@@ -355,7 +355,6 @@ Panel {
           Button {
             id: pauseBreaksButton
             Layout.alignment: Qt.AlignHCenter
-            Layout.bottomMargin: root.keyboardHintsVisible ? Style.space(16) : 0
             text: root.manuallyPaused ? qsTr("Resume breaks") : qsTr("Pause breaks")
             enabled: root.service && !root.service.interrupting
             selected: root.manuallyPaused
@@ -377,13 +376,13 @@ Panel {
               visible: root.keyboardHintsVisible
               keyText: "P"
               available: pauseBreaksButton.enabled
+              placeRight: true
             }
           }
 
           Button {
             id: stopButton
             Layout.alignment: Qt.AlignHCenter
-            Layout.bottomMargin: root.keyboardHintsVisible ? Style.space(16) : 0
             text: qsTr("Stop Look Elsewhere")
             bordered: true
             hasCursor: root.keyboardHintsVisible
@@ -405,13 +404,13 @@ Panel {
             KeyHintBadge {
               visible: root.keyboardHintsVisible
               keyText: "⇧D"
+              placeRight: true
             }
           }
 
           Button {
             id: editSettingsButton
             Layout.alignment: Qt.AlignHCenter
-            Layout.bottomMargin: root.keyboardHintsVisible ? Style.space(16) : 0
             text: qsTr("Edit settings file")
             bordered: true
             hasCursor: root.keyboardHintsVisible
@@ -433,6 +432,7 @@ Panel {
             KeyHintBadge {
               visible: root.keyboardHintsVisible
               keyText: "E"
+              placeRight: true
             }
           }
         }
