@@ -75,6 +75,10 @@ omarchy bar set io.github.silouanwright.look-elsewhere displayMode '"icon-and-ti
 
 `displayMode` accepts `icon`, `time`, or `icon-and-time`. The compact countdown shows minutes, then switches to seconds during the final minute. Vertical bars use the icon so the widget remains legible.
 
+When `soundEnabled` is true, Look Elsewhere plays a quiet freedesktop theme cue
+when a break begins and a distinct completion cue when it is time to return.
+Demo fixtures and state restoration never replay either cue.
+
 The complete typed contract, defaults, ranges, and descriptions are declared in [`manifest.json`](manifest.json). A dedicated graphical settings client is intentionally deferred until after the competition MVP.
 
 Inspect or reset private local state with:

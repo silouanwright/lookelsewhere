@@ -47,8 +47,16 @@ one focused `HDMI-A-2` output at 3840×2160 with scale 2.
   from (for example) `6` directly to `4`.
 - Large changes, including fixture changes and schedule resets, snap to the new
   authoritative value rather than animating through stale seconds.
-- Component acceptance covers both behaviors and the complete suite passes 40
+- Component acceptance covers both behaviors and the complete suite passes 44
   tests with zero failures.
+
+## Break sounds
+
+- The installed freedesktop `dialog-information` start cue and `complete`
+  return cue were each played successfully through `canberra-gtk-play`.
+- Transition tests prove that scheduler and manual break entry select the start
+  cue, natural completion selects the return cue, and unrelated transitions
+  remain silent. Demo and restoration paths are explicitly suppressed.
 
 ## Bar geometry and lifecycle
 

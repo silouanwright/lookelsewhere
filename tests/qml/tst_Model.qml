@@ -308,6 +308,14 @@ TestCase {
     verify(!Model.canSkipBreak(config({ enforcement: "focused" })))
   }
 
+  function test_soundCuesFollowBreakTransitions() {
+    compare(Model.soundCueForTransition(Model.State.Final, Model.State.Breaking), "start")
+    compare(Model.soundCueForTransition(Model.State.Working, Model.State.Breaking), "start")
+    compare(Model.soundCueForTransition(Model.State.Breaking, Model.State.Working), "complete")
+    compare(Model.soundCueForTransition(Model.State.Warning, Model.State.Final), "")
+    compare(Model.soundCueForTransition(Model.State.Breaking, Model.State.Breaking), "")
+  }
+
   function test_resetTotalsPreservesSchedule() {
     var s = Model.defaultSnapshot(1000)
     s.accumulatedActiveMs = 5000

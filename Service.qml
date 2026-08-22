@@ -24,7 +24,8 @@ Item {
   property bool stateLoaded: false
   property bool dictationActive: false
   property bool dictationAvailable: false
-  property bool soundAvailable: true
+  property bool startSoundAvailable: true
+  property bool completionSoundAvailable: true
   property string recoveryWarning: ""
   property bool persistenceBlocked: false
   property bool demoMode: false
@@ -72,6 +73,7 @@ Item {
   readonly property bool interrupting: phase === Model.State.Warning || phase === Model.State.Final || phase === Model.State.Breaking
   readonly property bool canPostpone: Model.canPostpone(snapshot, config)
   readonly property bool canSkipBreak: phase === Model.State.Breaking && Model.canSkipBreak(config)
+  readonly property bool soundAvailable: startSoundAvailable && completionSoundAvailable
   readonly property int remainingMs: {
     var now = Date.now()
     if (phase === Model.State.Breaking) return Math.max(0, Number(snapshot.breakEndsAtMs || 0) - now)
@@ -101,8 +103,7 @@ Item {
       naturalPause: naturalPauseReady,
       evidence: evidence()
     }, config)
-    if (!demoMode && beforeState !== Model.State.Breaking && snapshot.state === Model.State.Breaking && config.soundEnabled)
-      playBreakSound()
+    playTransitionSound(beforeState, snapshot.state)
     if (!demoMode && snapshot.state !== beforeState) scheduleSave()
   }
 
@@ -113,7 +114,9 @@ Item {
   }
 
   function takeBreak() {
+    var beforeState = snapshot.state
     snapshot = Model.startBreak(snapshot, Date.now(), config)
+    playTransitionSound(beforeState, snapshot.state)
     scheduleSave()
   }
 
@@ -172,15 +175,20 @@ Item {
 
   function skipBreak() {
     if (!canSkipBreak) return
+    var beforeState = snapshot.state
     var next = Model.completeBreak(snapshot, Date.now())
     next.totals.completed = Math.max(0, next.totals.completed - 1)
     next.totals.skipped++
     snapshot = next
+    playTransitionSound(beforeState, snapshot.state)
     scheduleSave()
   }
 
-  function playBreakSound() {
-    if (!breakSound.running) breakSound.running = true
+  function playTransitionSound(beforeState, afterState) {
+    if (demoMode || !config.soundEnabled) return
+    var cue = Model.soundCueForTransition(beforeState, afterState)
+    if (cue === "start" && !breakStartSound.running) breakStartSound.running = true
+    else if (cue === "complete" && !breakCompletionSound.running) breakCompletionSound.running = true
   }
 
   function setDemo(name) {
@@ -389,9 +397,15 @@ Item {
   }
 
   Process {
-    id: breakSound
-    command: ["canberra-gtk-play", "-i", "dialog-information", "-d", "Look Elsewhere break"]
-    onExited: function(exitCode) { service.soundAvailable = exitCode === 0 }
+    id: breakStartSound
+    command: ["canberra-gtk-play", "-i", "dialog-information", "-d", "Look Elsewhere break started"]
+    onExited: function(exitCode) { service.startSoundAvailable = exitCode === 0 }
+  }
+
+  Process {
+    id: breakCompletionSound
+    command: ["canberra-gtk-play", "-i", "complete", "-d", "Look Elsewhere break complete"]
+    onExited: function(exitCode) { service.completionSoundAvailable = exitCode === 0 }
   }
 
   Component.onCompleted: {

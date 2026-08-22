@@ -346,6 +346,12 @@ function canSkipBreak(config) {
   return cfg.enforcement !== "focused"
 }
 
+function soundCueForTransition(beforeState, afterState) {
+  if (beforeState !== State.Breaking && afterState === State.Breaking) return "start"
+  if (beforeState === State.Breaking && afterState === State.Working) return "complete"
+  return ""
+}
+
 function resetTotals(snapshot) {
   var next = copySnapshot(snapshot)
   next.totals = { prompted: 0, completed: 0, postponed: 0, skipped: 0, delayed: 0 }
