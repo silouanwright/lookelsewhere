@@ -37,7 +37,11 @@ Standalone `qmllint` cannot fully resolve Omarchy's runtime-root `qs.Commons` an
 
 ## Remaining investigation targets
 
-- Confirm the in-panel **Stop Look Elsewhere** action completes cleanly while
-  unloading the component that owns its process.
 - Profile lazy construction of secondary popup pages only if measurements show
   the current small eager object tree has material cost.
+
+The process-lifetime investigation is closed: the actual keyboard-accessible
+**Stop Look Elsewhere** control was invoked in the installed shell. Its child
+process completed after the panel and plugin objects were unloaded, the plugin
+became disabled, no orphan remained, and re-enabling restored the persisted
+non-demo schedule without a Look Elsewhere error or coredump.

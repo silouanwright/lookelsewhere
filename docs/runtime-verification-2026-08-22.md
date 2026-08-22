@@ -59,6 +59,15 @@ one focused `HDMI-A-2` output at 3840×2160 with scale 2.
   retained its persisted working schedule, and produced no coredump. Future
   lifecycle staging should run with no user shell active or use a separately
   namespaced fixture ID.
+- The installed quick panel's real **Stop Look Elsewhere** action was reached
+  through keyboard navigation and invoked. The plugin became disabled, its IPC
+  target disappeared, and the panel-owned process left no orphan even though
+  its action unloaded the owning component.
+- Re-enabling through `omarchy plugin enable` restored the widget immediately
+  after `omarchy.tray`, recreated the IPC service, and loaded the preserved
+  pre-demo break state. The break was then exited through the documented
+  emergency action, leaving a real 20-minute working schedule with demo mode
+  off, persistence unblocked, and no Look Elsewhere error or coredump.
 
 ## Corrupt-state recovery
 
