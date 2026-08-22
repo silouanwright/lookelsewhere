@@ -355,6 +355,7 @@ Panel {
           Button {
             id: pauseBreaksButton
             Layout.alignment: Qt.AlignHCenter
+            Layout.bottomMargin: root.keyboardHintsVisible ? Style.space(14) : 0
             text: root.manuallyPaused ? qsTr("Resume breaks") : qsTr("Pause breaks")
             enabled: root.service && !root.service.interrupting
             selected: root.manuallyPaused
@@ -382,6 +383,7 @@ Panel {
           Button {
             id: stopButton
             Layout.alignment: Qt.AlignHCenter
+            Layout.bottomMargin: root.keyboardHintsVisible ? Style.space(14) : 0
             text: qsTr("Stop Look Elsewhere")
             bordered: true
             hasCursor: root.keyboardHintsVisible
@@ -409,6 +411,7 @@ Panel {
           Button {
             id: editSettingsButton
             Layout.alignment: Qt.AlignHCenter
+            Layout.bottomMargin: root.keyboardHintsVisible ? Style.space(14) : 0
             text: qsTr("Edit settings file")
             bordered: true
             hasCursor: root.keyboardHintsVisible
@@ -459,6 +462,7 @@ Panel {
         Item {
           Layout.fillWidth: true
           Layout.preferredHeight: actionRow.implicitHeight * actionRow.fitScale
+            + (root.keyboardHintsVisible ? Style.space(14) : 0)
           Layout.topMargin: -Style.space(3)
           visible: root.page === "now"
 

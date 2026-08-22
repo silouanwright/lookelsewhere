@@ -9,10 +9,9 @@ Rectangle {
 
   readonly property real badgeSize: Style.space(12)
 
-  anchors.top: parent.top
-  anchors.right: parent.right
-  anchors.topMargin: 0
-  anchors.rightMargin: 0
+  anchors.top: parent.bottom
+  anchors.horizontalCenter: parent.horizontalCenter
+  anchors.topMargin: Style.space(2)
   implicitWidth: keyText.length === 1
     ? badgeSize
     : Math.max(badgeSize, label.implicitWidth + Style.space(5))
