@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Effects
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
@@ -74,22 +75,6 @@ Panel {
           Layout.fillWidth: true
           spacing: Style.space(8)
 
-          Rectangle {
-            Layout.preferredWidth: Style.space(28)
-            Layout.preferredHeight: Layout.preferredWidth
-            radius: width / 2
-            color: Qt.rgba(root.accent.r, root.accent.g, root.accent.b, 0.16)
-
-            Text {
-              anchors.centerIn: parent
-              text: "󰈉"
-              color: root.accent
-              font.family: root.fontFamily
-              font.pixelSize: Style.font.heading
-              Accessible.ignored: true
-            }
-          }
-
           Item {
             Layout.fillWidth: true
           }
@@ -141,10 +126,35 @@ Panel {
         ColumnLayout {
           Layout.fillWidth: true
           visible: root.page === "now"
-          spacing: Style.space(2)
+          spacing: Style.space(4)
+
+          Item {
+            Layout.alignment: Qt.AlignHCenter
+            Layout.preferredWidth: Style.space(34)
+            Layout.preferredHeight: Layout.preferredWidth
+            Accessible.ignored: true
+
+            Image {
+              id: breakIcon
+              anchors.fill: parent
+              source: Qt.resolvedUrl("assets/break.svg")
+              sourceSize: Qt.size(width, height)
+              fillMode: Image.PreserveAspectFit
+              smooth: true
+              visible: false
+            }
+
+            MultiEffect {
+              anchors.fill: breakIcon
+              source: breakIcon
+              colorization: 1
+              colorizationColor: root.accent
+            }
+          }
 
           Text {
             Layout.fillWidth: true
+            Layout.bottomMargin: -Style.space(5)
             text: qsTr("Break starts in")
             color: root.foreground
             font.family: root.fontFamily
