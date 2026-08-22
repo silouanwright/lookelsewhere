@@ -6,7 +6,7 @@ Status reflects inspected repository and installed-runtime evidence on 2026-08-2
 |---|---|---|
 | Active-use focus and break scheduling | Implemented | `Model.observe`, manifest settings, pure tests |
 | Timestamp persistence and restart recovery | Partial | Atomic state snapshot exists; suspend/clock-jump and corrupt-state acceptance tests remain |
-| Office hours, including overnight | Model only | Pure overnight test exists; configuration is not exposed or runtime-tested |
+| Office hours, including overnight | Implemented | Pure overnight test plus manifest-backed configuration; boundary/runtime schedule QA remains |
 | Manual pause/resume | Implemented | Service IPC and quick-panel pause action; resume UI/fixture coverage remains |
 | Idle detection | Implemented | Wayland idle monitor; runtime transition evidence remains |
 | Fullscreen detection | Implemented | Bounded `hyprctl activewindow -j` probe; availability/error state remains implicit |
@@ -17,12 +17,12 @@ Status reflects inspected repository and installed-runtime evidence on 2026-08-2
 | Bar and anchored quick panel | Implemented | Installed and exercised; state/action/accessibility matrix remains |
 | Warning, final chip, break overlay | Implemented | Deterministic fixtures and approved theme-aware break transition |
 | Multi-monitor single authority | Implemented | Focused-monitor authority in `Overlay.qml`; hotplug/action tests remain |
-| Gentle/Balanced/Focused enforcement | Partial | Action visibility differs; snooze budget, consequences UI, and emergency exit remain incomplete |
-| Full configuration experience | Missing | Only focus, duration, enforcement, and reduced-motion manifest rows exist; reduced motion is not wired |
-| Outcome totals | Partial | Prompted/completed/postponed/skipped/delayed persist; user-facing summary/reset absent |
+| Gentle/Balanced/Focused enforcement | Partial | Action visibility, snooze budget, and consequences UI exist; Focused emergency exit remains incomplete |
+| MVP configuration contract | Partial | Core typed manifest values are wired and README documents `omarchy bar set`; sound, output placement, and privacy-reset documentation remain |
+| Outcome totals | Partial | Prompted/completed/postponed/skipped/delayed persist and history reset exists; summary UI remains |
 | Privacy boundary | Implemented by design | No content capture/title persistence/network calls; release audit remains |
-| Deterministic fixtures | Partial | Due/protected/warning/final/break exist; paused/offline/recovery/enforcement variants missing |
-| Keyboard and accessibility | Partial | Native controls and break Escape path exist; focus order/names/reduced-motion tests remain |
+| Deterministic fixtures | Partial | Working/due/paused/postponed/protected/warning/final/break exist; offline/recovery/enforcement variants remain |
+| Keyboard and accessibility | Partial | Native controls, break Escape path, and reduced-motion behavior exist; focus-order/name tests remain |
 | Theme and bar-position QA | Partial | Native roles and anchored panel implemented; full contrasting-theme/bar-position matrix remains |
 | Automated tests and QML review | Partial | Pure model tests exist; test runner, component tests, lint/review gates remain |
 | Public packaging | Missing | Manifest validates; license, preview, release README, marketplace metadata, and clean install/remove proof remain |

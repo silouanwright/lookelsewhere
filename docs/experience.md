@@ -45,7 +45,7 @@ Order:
 3. Current routine summary
 4. Smart Context explanation when relevant
 5. Small today summary
-6. Pause and Open settings actions
+6. Pause action
 
 The panel must not contain full detector thresholds, routine construction, history charts, or onboarding.
 
@@ -80,16 +80,11 @@ The panel must not contain full detector thresholds, routine construction, histo
 
 The overlay exits cleanly, optionally plays a soft sound, records the local outcome, and resumes the next active-use interval. It does not demand a survey or celebratory modal.
 
-## Settings information architecture
+## Configuration for the competition MVP
 
-- Overview
-- Breaks
-- Smart Context
-- Enforcement
-- Experience
-- System and Privacy
+Configuration is declared by the typed manifest schema and stored by Omarchy in `shell.json`. The README documents safe `omarchy bar set` commands for common changes. The quick panel does not duplicate these settings.
 
-Presets write editable values. Advanced detector thresholds remain collapsed. Each setting includes units, bounds, and a plain-language consequence.
+A post-MVP graphical client may organize settings into Overview, Breaks, Smart Context, Enforcement, Experience, and System/Privacy. It must consume the same manifest-backed contract rather than introduce a second source of truth.
 
 ## Copy voice
 

@@ -15,7 +15,6 @@ Item {
   property var manifest: null
 
   readonly property bool visibleState: service && service.interrupting
-  readonly property bool settingsVisible: service && service.settingsOpen && !visibleState
   readonly property bool breaking: service && service.state === "breaking"
   readonly property bool finalCountdown: service && service.state === "final-countdown"
 
@@ -26,14 +25,13 @@ Item {
       id: window
       required property var modelData
       screen: modelData
-      visible: root.visibleState || root.settingsVisible
+      visible: root.visibleState
       anchors { top: true; bottom: true; left: true; right: true }
       color: "transparent"
       exclusionMode: ExclusionMode.Ignore
       mask: Region {
         item: !window.authoritative ? emptyHitArea
-          : (root.settingsVisible ? settingsCard
-            : (root.breaking ? fullScreenHitArea : (root.finalCountdown ? finalChip : warningCard)))
+          : (root.breaking ? fullScreenHitArea : (root.finalCountdown ? finalChip : warningCard))
       }
 
       readonly property bool authoritative: Hyprland.focusedMonitor && Hyprland.focusedMonitor.name === modelData.name
@@ -132,7 +130,7 @@ Item {
 
       WlrLayershell.namespace: "look-elsewhere"
       WlrLayershell.layer: WlrLayer.Overlay
-      WlrLayershell.keyboardFocus: (root.breaking || root.settingsVisible) && authoritative
+      WlrLayershell.keyboardFocus: root.breaking && authoritative
         ? WlrKeyboardFocus.Exclusive
         : WlrKeyboardFocus.None
 
@@ -143,24 +141,6 @@ Item {
         visible: root.breaking || window.backdropReveal > 0
         color: Color.lock.background
         opacity: Math.max(0, Math.min(1, window.backdropReveal))
-      }
-
-      BorderSurface {
-        id: settingsCard
-        visible: root.settingsVisible && window.authoritative
-        anchors.centerIn: parent
-        width: Math.min(parent.width - Style.space(48), Style.space(760))
-        height: Math.min(parent.height - Style.space(80), Style.space(840))
-        radius: Style.cornerRadius
-        color: Color.popups.background
-        borderSpec: Border.surfaceSpec("popups", "border", Color.popups.border, Math.max(1, Style.space(2)))
-
-        SettingsView {
-          anchors.fill: parent
-          anchors.margins: Style.space(20)
-          service: root.service
-          onCloseRequested: if (root.service) root.service.closeSettings()
-        }
       }
 
       Item {

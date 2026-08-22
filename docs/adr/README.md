@@ -13,6 +13,7 @@ ADRs use `Accepted`, `Proposed`, or `Superseded` status. Accepted decisions gove
 | [0007](0007-balanced-default-enforcement.md) | Default to Balanced enforcement | Accepted |
 | [0008](0008-progressive-interruption-surfaces.md) | Use progressive interruption surfaces | Accepted |
 | [0009](0009-single-interactive-monitor-authority.md) | Allow one interactive authority across outputs | Accepted |
-| [0010](0010-dedicated-settings-surface.md) | Keep deep settings out of the bar popup | Accepted |
+| [0010](0010-dedicated-settings-surface.md) | Keep deep settings out of the bar popup | Superseded by 0013 |
 | [0011](0011-deterministic-demo-and-fixtures.md) | Make every state deterministically stageable | Accepted |
 | [0012](0012-public-plugin-packaging.md) | Package as a public, dependency-light marketplace plugin | Accepted |
+| [0013](0013-config-first-competition-mvp.md) | Use manifest-backed configuration for the competition MVP | Accepted |

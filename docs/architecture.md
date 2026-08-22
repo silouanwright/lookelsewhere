@@ -13,7 +13,7 @@ Omarchy Shell / Quickshell process
     ├── BarWidget.qml
     │   └── bar presentation + quick-panel loader
     ├── Panel.qml
-    │   └── status, immediate actions, summary, settings entry
+    │   └── status, immediate actions, and summary
     ├── Overlay.qml
     │   └── top-center warning, final chip, and per-output break presentation
     ├── Model.js

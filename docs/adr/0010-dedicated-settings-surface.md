@@ -1,6 +1,6 @@
 # ADR 0010: Keep Deep Settings Out of the Bar Popup
 
-- Status: Accepted
+- Status: Superseded by ADR 0013
 - Date: 2026-08-22
 
 ## Context
