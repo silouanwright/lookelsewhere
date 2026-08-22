@@ -90,15 +90,8 @@ Panel {
             }
           }
 
-          Text {
+          Item {
             Layout.fillWidth: true
-            text: root.page === "stats" ? qsTr("Break history")
-              : (root.page === "options" ? qsTr("Options") : qsTr("Break starts in"))
-            color: root.foreground
-            font.family: root.fontFamily
-            font.pixelSize: Style.font.body
-            font.weight: Font.DemiBold
-            elide: Text.ElideRight
           }
 
           Button {
@@ -145,53 +138,54 @@ Panel {
           }
         }
 
-        RowLayout {
+        ColumnLayout {
           Layout.fillWidth: true
-          Layout.topMargin: Style.space(4)
-          Layout.bottomMargin: Style.space(4)
-          Layout.alignment: Qt.AlignHCenter
           visible: root.page === "now"
-          spacing: Style.space(7)
-          Accessible.role: Accessible.StaticText
-          Accessible.name: qsTr("Time remaining: %1").arg(root.service ? root.service.remainingText : qsTr("Starting"))
+          spacing: Style.space(2)
 
-          Row {
-            spacing: 0
-            RollingNumber {
-              value: root.remainingMinutesPart
-              color: root.foreground
-              fontFamily: root.fontFamily
-              fontSize: Style.font.display * 1.55
-              fontWeight: Font.DemiBold
-              reducedMotion: root.service && root.service.config.reducedMotion
-            }
-            Text {
-              text: qsTr("m")
-              color: root.foreground
-              font.family: root.fontFamily
-              font.pixelSize: Style.font.display * 1.55
-              font.weight: Font.DemiBold
-              Accessible.ignored: true
-            }
+          Text {
+            Layout.fillWidth: true
+            text: qsTr("Break starts in")
+            color: root.foreground
+            font.family: root.fontFamily
+            font.pixelSize: Style.font.body
+            font.weight: Font.DemiBold
+            horizontalAlignment: Text.AlignHCenter
           }
 
           Row {
-            spacing: 0
+            Layout.alignment: Qt.AlignHCenter
+            spacing: Style.space(2)
+            Accessible.role: Accessible.StaticText
+            Accessible.name: qsTr("Time remaining: %1").arg(root.service ? root.service.remainingText : qsTr("Starting"))
+
             RollingNumber {
-              value: root.remainingSecondsPart
+              value: root.remainingMinutesPart
+              minimumDigits: 2
               color: root.foreground
               fontFamily: root.fontFamily
               fontSize: Style.font.display * 1.55
               fontWeight: Font.DemiBold
               reducedMotion: root.service && root.service.config.reducedMotion
             }
+
             Text {
-              text: qsTr("s")
+              text: ":"
               color: root.foreground
               font.family: root.fontFamily
               font.pixelSize: Style.font.display * 1.55
               font.weight: Font.DemiBold
               Accessible.ignored: true
+            }
+
+            RollingNumber {
+              value: root.remainingSecondsPart
+              minimumDigits: 2
+              color: root.foreground
+              fontFamily: root.fontFamily
+              fontSize: Style.font.display * 1.55
+              fontWeight: Font.DemiBold
+              reducedMotion: root.service && root.service.config.reducedMotion
             }
           }
         }
@@ -200,6 +194,16 @@ Panel {
           Layout.fillWidth: true
           visible: root.page === "stats"
           spacing: Style.space(10)
+
+          Text {
+            Layout.fillWidth: true
+            text: qsTr("Break history")
+            color: root.foreground
+            font.family: root.fontFamily
+            font.pixelSize: Style.font.body
+            font.weight: Font.DemiBold
+            horizontalAlignment: Text.AlignHCenter
+          }
 
           Text {
             Layout.fillWidth: true
@@ -230,6 +234,16 @@ Panel {
           Layout.fillWidth: true
           visible: root.page === "options"
           spacing: Style.space(8)
+
+          Text {
+            Layout.fillWidth: true
+            text: qsTr("Options")
+            color: root.foreground
+            font.family: root.fontFamily
+            font.pixelSize: Style.font.body
+            font.weight: Font.DemiBold
+            horizontalAlignment: Text.AlignHCenter
+          }
 
           Button {
             id: pauseBreaksButton
