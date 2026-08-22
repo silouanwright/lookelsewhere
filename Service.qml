@@ -27,6 +27,8 @@ Item {
   property bool dictationAvailable: false
   property string recoveryWarning: ""
   property bool persistenceBlocked: false
+  property bool settingsOpen: false
+  property var settingWriteQueue: []
   property bool demoMode: false
   property var demoEvidence: []
   property var preDemoSnapshot: null
@@ -86,6 +88,7 @@ Item {
     snapshot = Model.observe(snapshot, {
       nowMs: Date.now(), active: !effectiveIdle, idle: effectiveIdle, evidence: evidence()
     }, config)
+    if (interrupting) settingsOpen = false
     if (!demoMode && snapshot.state !== beforeState) scheduleSave()
   }
 
@@ -238,6 +241,26 @@ Item {
     flushState()
   }
 
+  function openSettings() { settingsOpen = true }
+  function closeSettings() { settingsOpen = false }
+
+  function updateSetting(key, value) {
+    var incoming = {}
+    incoming[String(key)] = value
+    configure(incoming)
+    var queue = settingWriteQueue.slice()
+    queue.push({ key: String(key), value: value })
+    settingWriteQueue = queue
+    startNextSettingWrite()
+  }
+
+  function startNextSettingWrite() {
+    if (settingWriter.running || settingWriteQueue.length === 0) return
+    var item = settingWriteQueue[0]
+    settingWriter.command = ["omarchy", "bar", "set", pluginId, item.key, JSON.stringify(item.value), "--json"]
+    settingWriter.running = true
+  }
+
   PwObjectTracker {
     objects: Pipewire.defaultAudioSource ? [Pipewire.defaultAudioSource] : []
   }
@@ -335,6 +358,16 @@ Item {
     }
   }
 
+  Process {
+    id: settingWriter
+    onExited: function(exitCode) {
+      if (exitCode !== 0) console.warn("look-elsewhere: failed to persist setting", settingWriteQueue.length ? settingWriteQueue[0].key : "")
+      var queue = settingWriteQueue.slice(1)
+      settingWriteQueue = queue
+      startNextSettingWrite()
+    }
+  }
+
   Component.onCompleted: {
     ensureStateDir.running = true
     Qt.callLater(function() { stateFile.reload() })
@@ -353,6 +386,8 @@ Item {
     function skip(): string { service.skipBreak(); return service.state }
     function resetHistory(): string { service.resetHistory(); return "ok" }
     function resetLocalData(): string { service.resetLocalData(); return "ok" }
+    function openSettings(): string { service.openSettings(); return "ok" }
+    function closeSettings(): string { service.closeSettings(); return "ok" }
     function demo(state: string): string { service.setDemo(state); return service.state }
     function demoOff(): string { service.clearDemo(); return service.state }
   }

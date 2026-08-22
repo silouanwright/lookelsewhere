@@ -124,6 +124,20 @@ Panel {
         }
       }
 
+      Button {
+        Layout.fillWidth: true
+        text: qsTr("Settings")
+        bordered: true
+        focusable: true
+        foreground: root.foreground
+        accent: root.accent
+        fontFamily: root.fontFamily
+        onClicked: {
+          if (root.service) root.service.openSettings()
+          root.close()
+        }
+      }
+
       RowLayout {
         Layout.fillWidth: true
         Text {
