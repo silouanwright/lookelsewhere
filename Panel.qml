@@ -24,7 +24,9 @@ Panel {
   readonly property string fontFamily: bar ? bar.fontFamily : Style.font.family
   readonly property bool manuallyPaused: service && service.phase === "waiting-for-pause" && service.snapshot.pauseReason === "manual"
   readonly property bool idlePaused: service && service.idlePauseActive
-  readonly property bool delayActionsVisible: !manuallyPaused && service && service.canPostpone
+  readonly property bool delayActionsVisible: !manuallyPaused && service
+    && service.config.enforcement !== "focused"
+  readonly property bool delayActionsEnabled: delayActionsVisible && service.canPostpone
   readonly property int remainingSeconds: service ? Math.max(0, Math.ceil(service.remainingMs / 1000)) : 0
   readonly property int remainingMinutesPart: Math.floor(remainingSeconds / 60)
   readonly property int remainingSecondsPart: remainingSeconds % 60
@@ -45,7 +47,8 @@ Panel {
     close()
   }
   function postponeAndClose(minutes) {
-    if (service && delayActionsVisible) service.delayNextBreakMinutes(minutes)
+    if (!service || !delayActionsEnabled) return
+    service.delayNextBreakMinutes(minutes)
     close()
   }
   function toggleManualPause() {
@@ -59,9 +62,9 @@ Panel {
   // Window-local mnemonics complement native Tab/Backtab traversal. They are
   // intentionally inactive whenever the anchored panel is closed.
   Shortcut { sequence: "B"; context: Qt.ApplicationShortcut; enabled: root.opened; onActivated: root.takeBreakAndClose() }
-  Shortcut { sequence: "1"; context: Qt.ApplicationShortcut; enabled: root.opened && root.delayActionsVisible; onActivated: root.postponeAndClose(1) }
-  Shortcut { sequence: "2"; context: Qt.ApplicationShortcut; enabled: root.opened && root.delayActionsVisible; onActivated: root.postponeAndClose(5) }
-  Shortcut { sequence: "3"; context: Qt.ApplicationShortcut; enabled: root.opened && root.delayActionsVisible; onActivated: root.postponeAndClose(15) }
+  Shortcut { sequence: "1"; context: Qt.ApplicationShortcut; enabled: root.opened && root.delayActionsEnabled; onActivated: root.postponeAndClose(1) }
+  Shortcut { sequence: "2"; context: Qt.ApplicationShortcut; enabled: root.opened && root.delayActionsEnabled; onActivated: root.postponeAndClose(5) }
+  Shortcut { sequence: "3"; context: Qt.ApplicationShortcut; enabled: root.opened && root.delayActionsEnabled; onActivated: root.postponeAndClose(15) }
   Shortcut { sequence: "P"; context: Qt.ApplicationShortcut; enabled: root.opened && root.service && !root.service.interrupting; onActivated: root.toggleManualPause() }
   Shortcut { sequence: "H"; context: Qt.ApplicationShortcut; enabled: root.opened; onActivated: root.togglePage("stats") }
   Shortcut { sequence: "O"; context: Qt.ApplicationShortcut; enabled: root.opened; onActivated: root.togglePage("options") }
@@ -436,6 +439,7 @@ Panel {
           WeightedButton {
             id: postpone1Button
             visible: root.delayActionsVisible
+            enabled: root.delayActionsEnabled
             label: qsTr("+1m")
             bordered: true
             focusable: true
@@ -456,6 +460,7 @@ Panel {
           WeightedButton {
             id: postpone5Button
             visible: root.delayActionsVisible
+            enabled: root.delayActionsEnabled
             label: qsTr("+5m")
             bordered: true
             focusable: true
@@ -476,6 +481,7 @@ Panel {
             WeightedButton {
               id: postpone15Button
               visible: root.delayActionsVisible
+              enabled: root.delayActionsEnabled
               label: qsTr("+15m")
               bordered: true
               focusable: true
@@ -497,7 +503,7 @@ Panel {
 
         Item {
           Layout.fillWidth: true
-          Layout.preferredHeight: Style.space(4)
+          Layout.preferredHeight: Style.space(2)
         }
 
       }

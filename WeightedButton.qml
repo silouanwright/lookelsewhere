@@ -13,6 +13,9 @@ Button {
   radius: Math.min(height / 2, Style.cornerRadius + Style.space(2))
   implicitWidth: labelText.implicitWidth + horizontalPadding * 2 + Math.max(2, Style.normalBorderWidth * 2)
   implicitHeight: labelText.implicitHeight + verticalPadding * 2 + Math.max(2, Style.normalBorderWidth * 2)
+  opacity: enabled ? 1 : 0.42
+
+  Behavior on opacity { NumberAnimation { duration: 120 } }
 
   Text {
     id: labelText
