@@ -329,7 +329,7 @@ function resetTotals(snapshot) {
 
 function formatBarDuration(milliseconds) {
   var remaining = Math.max(0, Number(milliseconds || 0))
-  var seconds = Math.floor(remaining / 1000)
+  var seconds = Math.ceil(remaining / 1000)
   if (remaining < 60000) return seconds + "s"
   return Math.floor(remaining / 60000) + "m"
 }

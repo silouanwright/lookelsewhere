@@ -35,7 +35,7 @@ Panel {
     text: ":"
     font.family: root.fontFamily
     font.pixelSize: Style.font.display * 1.55
-    font.weight: Font.DemiBold
+    font.weight: Font.Bold
   }
 
   function syncSettings() { if (service) service.configure(settings) }
@@ -175,7 +175,7 @@ Panel {
               color: root.foreground
               fontFamily: root.fontFamily
               fontSize: Style.font.display * 1.55
-              fontWeight: Font.DemiBold
+              fontWeight: Font.Bold
               reducedMotion: root.service && root.service.config.reducedMotion
             }
 
@@ -184,7 +184,7 @@ Panel {
               color: root.foreground
               font.family: root.fontFamily
               font.pixelSize: Style.font.display * 1.55
-              font.weight: Font.DemiBold
+              font.weight: Font.Bold
               Accessible.ignored: true
             }
 
@@ -194,7 +194,7 @@ Panel {
               color: root.foreground
               fontFamily: root.fontFamily
               fontSize: Style.font.display * 1.55
-              fontWeight: Font.DemiBold
+              fontWeight: Font.Bold
               reducedMotion: root.service && root.service.config.reducedMotion
             }
           }
@@ -349,9 +349,10 @@ Panel {
           visible: root.page === "now"
           spacing: Style.space(5)
 
-          Button {
+          WeightedButton {
             id: breakNowButton
-            text: qsTr("Break now")
+            label: qsTr("Break now")
+            labelWeight: Font.Bold
             selected: true
             focusable: true
             foreground: root.foreground
@@ -363,15 +364,15 @@ Panel {
             KeyNavigation.backtab: settingsButton
             Keys.onEscapePressed: root.close()
             Accessible.role: Accessible.Button
-            Accessible.name: text
+            Accessible.name: label
             Accessible.onPressAction: clicked()
             onClicked: { if (root.service) root.service.takeBreak(); root.close() }
           }
 
-          Button {
+          WeightedButton {
             id: postpone1Button
             visible: root.delayActionsVisible
-            text: qsTr("+1m")
+            label: qsTr("+1m")
             tooltipText: qsTr("Snooze for 1 minute")
             bordered: true
             focusable: true
@@ -389,10 +390,10 @@ Panel {
             onClicked: { if (root.service) root.service.postponeMinutes(1); root.close() }
           }
 
-          Button {
+          WeightedButton {
             id: postpone5Button
             visible: root.delayActionsVisible
-            text: qsTr("+5m")
+            label: qsTr("+5m")
             tooltipText: qsTr("Snooze for 5 minutes")
             bordered: true
             focusable: true
@@ -410,10 +411,10 @@ Panel {
             onClicked: { if (root.service) root.service.postponeMinutes(5); root.close() }
           }
 
-          Button {
+          WeightedButton {
             id: postpone15Button
             visible: root.delayActionsVisible
-            text: qsTr("+15m")
+            label: qsTr("+15m")
             tooltipText: qsTr("Snooze for 15 minutes")
             bordered: true
             focusable: true
