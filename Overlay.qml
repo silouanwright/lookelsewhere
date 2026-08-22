@@ -4,6 +4,7 @@ import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Wayland
 import qs.Commons
+import qs.Ui
 
 Item {
   id: root
@@ -14,6 +15,7 @@ Item {
 
   readonly property bool visibleState: service && service.interrupting
   readonly property bool breaking: service && service.state === "breaking"
+  readonly property bool finalCountdown: service && service.state === "final-countdown"
 
   Variants {
     model: Quickshell.screens
@@ -24,9 +26,12 @@ Item {
       screen: modelData
       visible: root.visibleState
       anchors { top: true; bottom: true; left: true; right: true }
-      color: root.breaking ? Qt.rgba(Color.background.r, Color.background.g, Color.background.b, 0.94) : "transparent"
+      color: root.breaking ? Color.lock.background : "transparent"
       exclusionMode: ExclusionMode.Ignore
-      mask: Region { item: root.breaking ? fullScreenHitArea : warningCard }
+      mask: Region {
+        item: !window.authoritative ? emptyHitArea
+          : (root.breaking ? fullScreenHitArea : (root.finalCountdown ? finalChip : warningCard))
+      }
 
       readonly property bool authoritative: Hyprland.focusedMonitor && Hyprland.focusedMonitor.name === modelData.name
 
@@ -34,11 +39,14 @@ Item {
       WlrLayershell.layer: WlrLayer.Overlay
       WlrLayershell.keyboardFocus: root.breaking && authoritative ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
+      Item { id: emptyHitArea; width: 0; height: 0 }
+
       Item {
         id: fullScreenHitArea
         anchors.fill: parent
         visible: root.breaking
         enabled: root.breaking && window.authoritative
+        focus: enabled
 
         ColumnLayout {
           anchors.centerIn: parent
@@ -54,8 +62,8 @@ Item {
           }
           Text {
             Layout.alignment: Qt.AlignHCenter
-            text: "Look elsewhere"
-            color: Color.foreground
+            text: qsTr("Look elsewhere")
+            color: Color.lock.text
             font.family: Style.font.family
             font.pixelSize: Style.font.displayLarge
             font.weight: Font.DemiBold
@@ -63,8 +71,8 @@ Item {
           Text {
             Layout.fillWidth: true
             horizontalAlignment: Text.AlignHCenter
-            text: "Let your eyes settle on something distant. Breathe. The screen will still be here."
-            color: Color.muted
+            text: qsTr("Let your eyes settle on something distant. Breathe. The screen will still be here.")
+            color: Color.lock.placeholder
             font.family: Style.font.family
             font.pixelSize: Style.font.subtitle
             wrapMode: Text.WordWrap
@@ -72,23 +80,24 @@ Item {
           Text {
             Layout.alignment: Qt.AlignHCenter
             text: root.service ? root.service.remainingText : ""
-            color: Color.foreground
+            color: Color.lock.text
             font.family: Style.font.family
             font.pixelSize: Style.font.display
             font.weight: Font.DemiBold
           }
           RowLayout {
             Layout.alignment: Qt.AlignHCenter
+            visible: window.authoritative
             spacing: Style.space(10)
             OverlayButton {
-              text: "Skip break"
+              text: qsTr("Skip break")
               visible: root.service && root.service.config.enforcement !== "focused"
-              onActivated: if (root.service) root.service.skipBreak()
+              onClicked: if (root.service) root.service.skipBreak()
             }
             OverlayButton {
-              text: "+1 minute"
+              text: qsTr("+1 minute")
               visible: root.service && root.service.config.enforcement === "gentle"
-              onActivated: if (root.service) root.service.postponeMinutes(1)
+              onClicked: if (root.service) root.service.postponeMinutes(1)
             }
           }
         }
@@ -98,9 +107,9 @@ Item {
         }
       }
 
-      Rectangle {
+      BorderSurface {
         id: warningCard
-        visible: !root.breaking
+        visible: !root.breaking && !root.finalCountdown
         anchors.top: parent.top
         anchors.topMargin: Style.space(56)
         anchors.horizontalCenter: parent.horizontalCenter
@@ -108,8 +117,7 @@ Item {
         height: warningContent.implicitHeight + Style.space(28)
         radius: Style.cornerRadius
         color: Color.popups.background
-        border.width: 1
-        border.color: Color.popups.border
+        borderSpec: Border.surfaceSpec("popups", "border", Color.popups.border, Math.max(1, Style.space(2)))
 
         RowLayout {
           id: warningContent
@@ -127,14 +135,14 @@ Item {
             Layout.fillWidth: true
             spacing: Style.space(2)
             Text {
-              text: root.service && root.service.state === "final-countdown" ? "Starting break" : "Almost time"
-              color: Color.foreground
+              text: qsTr("Almost time")
+              color: Color.popups.text
               font.family: Style.font.family
               font.pixelSize: Style.font.heading
               font.weight: Font.DemiBold
             }
             Text {
-              text: "Your eyes will appreciate this."
+              text: qsTr("Your eyes will appreciate this.")
               color: Color.muted
               font.family: Style.font.family
               font.pixelSize: Style.font.body
@@ -142,51 +150,74 @@ Item {
           }
           Text {
             text: root.service ? root.service.remainingText : ""
-            color: Color.foreground
+            color: Color.popups.text
             font.family: Style.font.family
             font.pixelSize: Style.font.heading
             font.weight: Font.DemiBold
           }
           OverlayButton {
-            text: "+5m"
+            text: qsTr("+5m")
             visible: window.authoritative
-            onActivated: if (root.service) root.service.postponeMinutes(5)
+            onClicked: if (root.service) root.service.postponeMinutes(5)
           }
           OverlayButton {
-            text: "Now"
+            text: qsTr("Now")
             primary: true
             visible: window.authoritative
-            onActivated: if (root.service) root.service.takeBreak()
+            onClicked: if (root.service) root.service.takeBreak()
+          }
+        }
+      }
+
+      BorderSurface {
+        id: finalChip
+        visible: root.finalCountdown
+        anchors.top: parent.top
+        anchors.topMargin: Style.space(56)
+        anchors.horizontalCenter: parent.horizontalCenter
+        width: finalRow.implicitWidth + Style.space(28)
+        height: Style.space(48)
+        radius: height / 2
+        color: Color.popups.background
+        borderSpec: Border.surfaceSpec("popups", "border", Color.popups.border, Math.max(1, Style.space(2)))
+
+        RowLayout {
+          id: finalRow
+          anchors.centerIn: parent
+          spacing: Style.space(10)
+          Text {
+            text: "󰈉"
+            color: Color.accent
+            font.family: Style.font.family
+            font.pixelSize: Style.font.heading
+          }
+          Text {
+            text: qsTr("Starting break in")
+            color: Color.muted
+            font.family: Style.font.family
+            font.pixelSize: Style.font.body
+          }
+          Text {
+            text: root.service ? root.service.remainingText : ""
+            color: Color.popups.text
+            font.family: Style.font.family
+            font.pixelSize: Style.font.heading
+            font.weight: Font.DemiBold
           }
         }
       }
     }
   }
 
-  component OverlayButton: Rectangle {
-    id: button
-    property string text: ""
+  component OverlayButton: Button {
     property bool primary: false
-    signal activated()
-    implicitWidth: label.implicitWidth + Style.space(24)
-    implicitHeight: Style.space(36)
-    radius: height / 2
-    color: primary ? Color.accent : Qt.rgba(Color.foreground.r, Color.foreground.g, Color.foreground.b, mouse.containsMouse ? 0.14 : 0.08)
-    Text {
-      id: label
-      anchors.centerIn: parent
-      text: button.text
-      color: button.primary ? Color.background : Color.foreground
-      font.family: Style.font.family
-      font.pixelSize: Style.font.body
-      font.weight: Font.DemiBold
-    }
-    MouseArea {
-      id: mouse
-      anchors.fill: parent
-      hoverEnabled: true
-      cursorShape: Qt.PointingHandCursor
-      onClicked: button.activated()
-    }
+    selected: primary
+    bordered: !primary
+    focusable: root.breaking
+    foreground: root.breaking ? Color.lock.text : Color.popups.text
+    accent: Color.accent
+    fontFamily: Style.font.family
+    horizontalPadding: Style.space(12)
+    verticalPadding: Style.space(8)
   }
 }

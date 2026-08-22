@@ -25,6 +25,7 @@ Item {
   property bool dictationActive: false
   property bool demoMode: false
   property var demoEvidence: []
+  property var preDemoSnapshot: null
 
   readonly property var players: Mpris.players ? Mpris.players.values : []
   readonly property var pipewireNodes: Pipewire.nodes ? Pipewire.nodes.values : []
@@ -74,11 +75,11 @@ Item {
   }
 
   function observe() {
-    var before = JSON.stringify(snapshot)
+    var beforeState = snapshot.state
     snapshot = Model.observe(snapshot, {
       nowMs: Date.now(), active: !idle, idle: idle, evidence: evidence()
     }, config)
-    if (JSON.stringify(snapshot) !== before) scheduleSave()
+    if (!demoMode && snapshot.state !== beforeState) scheduleSave()
   }
 
   function configure(values) {
@@ -130,6 +131,7 @@ Item {
   }
 
   function setDemo(name) {
+    if (!demoMode) preDemoSnapshot = JSON.parse(JSON.stringify(snapshot))
     demoMode = true
     demoEvidence = []
     var now = Date.now()
@@ -150,12 +152,13 @@ Item {
   function clearDemo() {
     demoMode = false
     demoEvidence = []
-    snapshot = Model.defaultSnapshot(Date.now())
-    scheduleSave()
+    snapshot = preDemoSnapshot || Model.defaultSnapshot(Date.now())
+    snapshot.lastObservedAtMs = Date.now()
+    preDemoSnapshot = null
   }
 
   function scheduleSave() {
-    if (stateLoaded) saveTimer.restart()
+    if (stateLoaded && !demoMode) saveTimer.restart()
   }
 
   function loadState(raw) {
@@ -214,6 +217,13 @@ Item {
     running: service.stateLoaded
     triggeredOnStart: true
     onTriggered: service.observe()
+  }
+
+  Timer {
+    interval: 30000
+    repeat: true
+    running: service.stateLoaded && !service.demoMode
+    onTriggered: service.flushState()
   }
 
   Timer {
