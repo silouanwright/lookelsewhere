@@ -177,7 +177,7 @@ bar state → native quick panel → top-center warning → final countdown chip
 - No reliance on color or pointer hover alone
 - Configurable timing and postponement within policy
 - Reduced-motion support
-- Strong enforcement with disclosed consequences and emergency exit
+- Explicit opt-in strong enforcement with disclosed, unskippable consequences
 - Exactly one interactive authority across multiple monitors
 
 See the [design system](archive/design-system.md), [configuration specification](archive/configuration-spec.md), and [Omarchy MVP design](archive/omarchy-mvp-design.md).

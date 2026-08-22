@@ -21,7 +21,7 @@ The primary user spends long periods coding, writing, reading, designing, gaming
 - **Judge interruption quality, not user virtue.** The product should improve timing rather than reward streak manipulation.
 - **Explain delays.** Say “Waiting until your meeting ends,” not “Smart Pause active.”
 - **Stay quiet until useful.** The bar is glanceable; deep configuration does not live in a popup.
-- **Respect agency.** Balanced enforcement is firm but not coercive, and every strong mode has an emergency exit.
+- **Respect agency.** Balanced remains the default; Focused lockout is an explicit configuration choice with disclosed consequences.
 - **Inherit Omarchy.** Personality comes from information design, language, and one recognizable symbol—not fixed custom chrome.
 - **Minimize observation.** Context categories are transient; titles, URLs, meeting names, transcripts, and content are neither stored nor displayed by default.
 

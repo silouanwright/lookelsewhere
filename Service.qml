@@ -71,6 +71,7 @@ Item {
     : ""
   readonly property bool interrupting: phase === Model.State.Warning || phase === Model.State.Final || phase === Model.State.Breaking
   readonly property bool canPostpone: Model.canPostpone(snapshot, config)
+  readonly property bool canSkipBreak: phase === Model.State.Breaking && Model.canSkipBreak(config)
   readonly property int remainingMs: {
     var now = Date.now()
     if (phase === Model.State.Breaking) return Math.max(0, Number(snapshot.breakEndsAtMs || 0) - now)
@@ -170,15 +171,12 @@ Item {
   }
 
   function skipBreak() {
+    if (!canSkipBreak) return
     var next = Model.completeBreak(snapshot, Date.now())
     next.totals.completed = Math.max(0, next.totals.completed - 1)
     next.totals.skipped++
     snapshot = next
     scheduleSave()
-  }
-
-  function emergencyExit() {
-    if (phase === Model.State.Breaking) skipBreak()
   }
 
   function playBreakSound() {
@@ -413,7 +411,6 @@ Item {
     function togglePause(): string { service.togglePause(); return service.phase }
     function resume(): string { service.resume(); return service.phase }
     function skip(): string { service.skipBreak(); return service.phase }
-    function emergencyExit(): string { service.emergencyExit(); return service.phase }
     function resetHistory(): string { service.resetHistory(); return "ok" }
     function resetLocalData(): string { service.resetLocalData(); return "ok" }
     function demo(state: string): string { service.setDemo(state); return service.phase }

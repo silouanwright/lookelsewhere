@@ -86,7 +86,7 @@ omarchy-shell look-elsewhere resetLocalData
 
 `resetLocalData` removes the local schedule and aggregate outcome history on the next atomic state write. It does not change Omarchy configuration.
 
-Enforcement behavior is explicit: Gentle permits snoozing and ordinary skipping, Balanced keeps snoozing bounded, and Focused hides ordinary exits. Focused mode always retains `Ctrl+Shift+Esc` as a documented emergency exit.
+Enforcement behavior is explicit: Gentle permits snoozing and ordinary skipping, Balanced keeps snoozing bounded, and Focused cannot be skipped. In Focused mode the full-screen break ends only when its timer completes.
 
 ## Keyboard control
 

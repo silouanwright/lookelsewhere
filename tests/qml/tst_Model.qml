@@ -302,6 +302,12 @@ TestCase {
     verify(Model.canPostpone(s, config({ snoozeBudget: 2, enforcement: "balanced" })))
   }
 
+  function test_focusedEnforcementCannotSkipBreak() {
+    verify(Model.canSkipBreak(config({ enforcement: "gentle" })))
+    verify(Model.canSkipBreak(config({ enforcement: "balanced" })))
+    verify(!Model.canSkipBreak(config({ enforcement: "focused" })))
+  }
+
   function test_resetTotalsPreservesSchedule() {
     var s = Model.defaultSnapshot(1000)
     s.accumulatedActiveMs = 5000

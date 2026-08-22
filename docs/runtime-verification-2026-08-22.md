@@ -32,8 +32,10 @@ one focused `HDMI-A-2` output at 3840×2160 with scale 2.
   bounded one-minute postponed state. Clearing demo mode restored the exact
   real schedule.
 - Escape dismisses the panel without invoking either action.
-- Focused enforcement's documented `Ctrl+Shift+Esc` emergency exit returned
-  the service to `working` during a live break fixture.
+- The earlier Focused emergency-exit behavior was intentionally superseded:
+  Focused is now unskippable through pointer, keyboard, and IPC until natural
+  completion. Final installed-runtime acceptance of that stronger contract is
+  pending without changing the user's active configuration.
 - The shell journal contained no Look Elsewhere QML errors during the checks.
 
 ## Rolling countdown continuity

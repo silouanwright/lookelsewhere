@@ -341,6 +341,11 @@ function canPostpone(snapshot, config) {
   return Number(snapshot && snapshot.snoozesUsed || 0) < cfg.snoozeBudget
 }
 
+function canSkipBreak(config) {
+  var cfg = config && config.version === 1 ? config : normalizeConfig(config)
+  return cfg.enforcement !== "focused"
+}
+
 function resetTotals(snapshot) {
   var next = copySnapshot(snapshot)
   next.totals = { prompted: 0, completed: 0, postponed: 0, skipped: 0, delayed: 0 }

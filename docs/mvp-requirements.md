@@ -37,7 +37,7 @@
 - Provide Gentle, Balanced, and Focused presets.
 - Default to Balanced.
 - Make preset consequences explicit before selection.
-- Preserve an emergency exit in the strongest mode.
+- Make Focused breaks unskippable until their timer completes.
 - Track prompted, completed, postponed, skipped, and context-delayed outcomes locally.
 
 ### Configuration
