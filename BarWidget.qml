@@ -80,6 +80,7 @@ BarWidget {
       }
 
       Text {
+        id: countdown
         visible: root.showTime
         width: timeMetrics.stableWidth
         text: root.compactTime
@@ -93,7 +94,9 @@ BarWidget {
 
         FontMetrics {
           id: timeMetrics
-          font: parent.font
+          font.family: countdown.font.family
+          font.pixelSize: countdown.font.pixelSize
+          font.weight: countdown.font.weight
           // Stable width prevents final-minute updates from shifting the bar.
           readonly property real stableWidth: Math.max(advanceWidth("00s"), advanceWidth("00m"))
         }
