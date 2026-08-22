@@ -81,20 +81,13 @@ Panel {
         width: panelScroll.width
         spacing: Style.space(6)
 
-        Item {
-          Layout.fillWidth: true
-          Layout.preferredHeight: toolbarRow.implicitHeight
-
-          RowLayout {
-            id: toolbarRow
-            anchors.top: parent.top
-            anchors.left: parent.left
-            anchors.right: parent.right
-            spacing: Style.space(8)
-
-          Item {
-            Layout.fillWidth: true
-          }
+        Row {
+          id: toolbarRow
+          parent: panelScroll
+          anchors.top: parent.top
+          anchors.right: parent.right
+          spacing: Style.space(8)
+          z: 1
 
           PhosphorIconButton {
             id: statsButton
@@ -133,7 +126,6 @@ Panel {
             Accessible.name: tooltipText
             Accessible.onPressAction: clicked()
             onClicked: root.page = root.page === "options" ? "now" : "options"
-          }
           }
         }
 
