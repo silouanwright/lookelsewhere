@@ -79,10 +79,11 @@ Panel {
       ColumnLayout {
         id: content
         width: panelScroll.width
-        spacing: Style.space(16)
+        spacing: Style.space(6)
 
         RowLayout {
           Layout.fillWidth: true
+          Layout.bottomMargin: Style.space(10)
           spacing: Style.space(8)
 
           Item {
@@ -371,7 +372,6 @@ Panel {
         RowLayout {
           Layout.fillWidth: true
           Layout.alignment: Qt.AlignHCenter
-          Layout.topMargin: -Style.space(6)
           visible: root.page === "now"
           spacing: Style.space(5)
 
