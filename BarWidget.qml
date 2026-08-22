@@ -89,13 +89,11 @@ BarWidget {
       anchors.centerIn: parent
       spacing: root.showIcon && root.showTime ? Style.space(5) : 0
 
-      Text {
+      BarBreakIcon {
         visible: root.showIcon
-        text: root.service && root.service.idlePauseActive ? "󰏤" : (root.service && root.service.phase === "breaking" ? "󰈈" : "󰈉")
+        width: Style.bar.iconFont
+        height: width
         color: button.active && button.useActiveColor ? button.activeColor : button.foreground
-        font.family: button.fontFamily
-        font.pixelSize: Style.bar.iconFont
-        renderType: Text.NativeRendering
         anchors.verticalCenter: parent.verticalCenter
       }
 
