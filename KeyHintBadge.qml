@@ -17,15 +17,15 @@ Rectangle {
     : Math.max(badgeSize, label.implicitWidth + Style.space(5))
   implicitHeight: badgeSize
   radius: height / 2
-  color: Color.accent
-  opacity: available ? 1 : 0.45
+  color: Color.popups.text
+  opacity: available ? 1 : 0.6
   z: 20
 
   Text {
     id: label
     anchors.centerIn: parent
     text: root.keyText
-    color: Style.selectedStateColor(Color.popups.text, Color.accent)
+    color: Color.popups.background
     font.family: Style.font.family
     font.pixelSize: Style.font.caption
     font.weight: Font.Bold

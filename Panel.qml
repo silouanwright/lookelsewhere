@@ -383,7 +383,7 @@ Panel {
           Button {
             id: stopButton
             Layout.alignment: Qt.AlignHCenter
-            text: qsTr("Stop Look Elsewhere")
+            text: qsTr("Stop LookElsewhere")
             bordered: true
             hasCursor: root.keyboardHintsVisible
             focusable: true
@@ -394,7 +394,7 @@ Panel {
             KeyNavigation.backtab: pauseBreaksButton
             Keys.onEscapePressed: root.dismissHintsOrClose()
             Accessible.role: Accessible.Button
-            Accessible.name: qsTr("Stop and disable Look Elsewhere")
+            Accessible.name: qsTr("Stop and disable LookElsewhere")
             Accessible.onPressAction: clicked()
             onClicked: {
               root.close()
