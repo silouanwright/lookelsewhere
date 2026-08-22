@@ -59,9 +59,9 @@ one focused `HDMI-A-2` output at 3840×2160 with scale 2.
 - Transition tests prove that scheduler and manual break entry select the start
   cue, natural completion selects the return cue, and unrelated transitions
   remain silent. Demo and restoration paths are explicitly suppressed.
-- The return cue is armed once during the final 1.5 seconds so its onset lands
-  before the break surface dismisses; the state transition retains a guarded
-  fallback if a delayed scheduler tick misses that lead window.
+- A lightweight timer runs only during a break and arms the return cue once in
+  the final 400 milliseconds, keeping its onset close to visual dismissal. The
+  state transition retains a guarded fallback without double-playing.
 - The master switch, independent cue switches, 0–100 app volume, bundled
   defaults, and optional absolute or `~/` custom paths are manifest-backed.
 

@@ -104,7 +104,6 @@ Item {
   function observe() {
     var beforeState = snapshot.state
     var effectiveIdle = config.detectors.idle && idle
-    if (Model.shouldLeadCompletionCue(beforeState, remainingMs, 1500)) playCompletionCue()
     snapshot = Model.observe(snapshot, {
       nowMs: Date.now(),
       active: !effectiveIdle,
@@ -389,6 +388,17 @@ Item {
     running: service.stateLoaded
     triggeredOnStart: true
     onTriggered: service.observe()
+  }
+
+  Timer {
+    interval: 50
+    repeat: true
+    running: service.stateLoaded && !service.demoMode
+      && service.phase === Model.State.Breaking && !service.completionCuePlayed
+    onTriggered: {
+      if (Model.shouldLeadCompletionCue(service.phase, service.remainingMs, 400))
+        service.playCompletionCue()
+    }
   }
 
   Timer {
