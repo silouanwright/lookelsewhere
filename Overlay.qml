@@ -203,6 +203,7 @@ Item {
           }
           Text {
             Layout.fillWidth: true
+            Layout.topMargin: -Style.space(8)
             horizontalAlignment: Text.AlignHCenter
             text: qsTr("Let your eyes settle on something distant. Breathe. The screen will still be here.")
             color: Color.lock.placeholder
