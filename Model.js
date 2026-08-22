@@ -149,11 +149,34 @@ function strongestEvidence(evidence, config) {
 }
 
 function copySnapshot(snapshot) {
-  return JSON.parse(JSON.stringify(snapshot))
+  var value = snapshot || defaultSnapshot(0)
+  var totals = value.totals || {}
+  return {
+    version: Number(value.version || 1),
+    state: String(value.state || State.Working),
+    accumulatedActiveMs: Number(value.accumulatedActiveMs || 0),
+    stateEnteredAtMs: Number(value.stateEnteredAtMs || 0),
+    lastObservedAtMs: Number(value.lastObservedAtMs || 0),
+    dueAtMs: Number(value.dueAtMs || 0),
+    postponedUntilMs: Number(value.postponedUntilMs || 0),
+    cooldownUntilMs: Number(value.cooldownUntilMs || 0),
+    warningEndsAtMs: Number(value.warningEndsAtMs || 0),
+    breakEndsAtMs: Number(value.breakEndsAtMs || 0),
+    protectedCategory: String(value.protectedCategory || ""),
+    pauseReason: String(value.pauseReason || ""),
+    snoozesUsed: Number(value.snoozesUsed || 0),
+    totals: {
+      prompted: Number(totals.prompted || 0),
+      completed: Number(totals.completed || 0),
+      postponed: Number(totals.postponed || 0),
+      skipped: Number(totals.skipped || 0),
+      delayed: Number(totals.delayed || 0)
+    }
+  }
 }
 
 function observe(snapshot, input, config) {
-  var cfg = normalizeConfig(config)
+  var cfg = config && config.version === 1 ? config : normalizeConfig(config)
   var next = copySnapshot(snapshot || defaultSnapshot(input.nowMs))
   var now = Number(input.nowMs)
   var previous = Number(next.lastObservedAtMs || now)
@@ -268,7 +291,7 @@ function postpone(snapshot, nowMs, durationMs, config) {
 }
 
 function canPostpone(snapshot, config) {
-  var cfg = normalizeConfig(config)
+  var cfg = config && config.version === 1 ? config : normalizeConfig(config)
   if (cfg.enforcement === "focused") return false
   return Number(snapshot && snapshot.snoozesUsed || 0) < cfg.snoozeBudget
 }
@@ -281,9 +304,9 @@ function resetTotals(snapshot) {
 
 function formatBarDuration(milliseconds) {
   var remaining = Math.max(0, Number(milliseconds || 0))
-  var seconds = Math.ceil(remaining / 1000)
+  var seconds = Math.floor(remaining / 1000)
   if (remaining < 60000) return seconds + "s"
-  return Math.ceil(seconds / 60) + "m"
+  return Math.floor(remaining / 60000) + "m"
 }
 
 function formatDuration(milliseconds) {

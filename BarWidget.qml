@@ -16,7 +16,7 @@ BarWidget {
   }
   readonly property bool showIcon: displayMode !== "time" || (bar && bar.vertical)
   readonly property bool showTime: displayMode !== "icon" && (!bar || !bar.vertical)
-  readonly property string compactTime: service ? Model.formatBarDuration(service.remainingMs) : "—"
+  readonly property string compactTime: service ? (service.idlePauseActive ? qsTr("Paused") : Model.formatBarDuration(service.remainingMs)) : "—"
 
   function injectPanel() {
     var target = root.panelItem
@@ -61,7 +61,7 @@ BarWidget {
     labelVisible: false
     hasVisualContent: true
     fixedWidth: vertical ? -1 : Math.max(Style.bar.iconSlot, barContent.implicitWidth + scaledHorizontalMargin * 2)
-    active: root.service && (root.service.state === "due-soon" || root.service.interrupting)
+    active: root.service && (root.service.phase === "due-soon" || root.service.interrupting)
     tooltipText: root.service ? qsTr("%1 · %2").arg(root.service.label).arg(root.service.remainingText) : qsTr("Look Elsewhere")
 
     Row {
@@ -71,7 +71,7 @@ BarWidget {
 
       Text {
         visible: root.showIcon
-        text: root.service && root.service.state === "breaking" ? "󰈈" : "󰈉"
+        text: root.service && root.service.idlePauseActive ? "󰏤" : (root.service && root.service.phase === "breaking" ? "󰈈" : "󰈉")
         color: button.active && button.useActiveColor ? button.activeColor : button.foreground
         font.family: button.fontFamily
         font.pixelSize: Style.bar.iconFont

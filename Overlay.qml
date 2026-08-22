@@ -15,8 +15,8 @@ Item {
   property var manifest: null
 
   readonly property bool visibleState: service && service.interrupting
-  readonly property bool breaking: service && service.state === "breaking"
-  readonly property bool finalCountdown: service && service.state === "final-countdown"
+  readonly property bool breaking: service && service.phase === "breaking"
+  readonly property bool finalCountdown: service && service.phase === "final-countdown"
 
   Variants {
     model: Quickshell.screens
@@ -60,6 +60,10 @@ Item {
         contentOpacityAnimation.start()
         contentMotionAnimation.start()
         contentBlurAnimation.start()
+      }
+
+      Component.onCompleted: {
+        if (root.breaking) Qt.callLater(window.beginBreakReveal)
       }
 
       Connections {
@@ -248,52 +252,62 @@ Item {
         color: Color.popups.background
         borderSpec: Border.surfaceSpec("popups", "border", Color.popups.border, Math.max(1, Style.space(2)))
 
-        RowLayout {
+        ColumnLayout {
           id: warningContent
           anchors.fill: parent
           anchors.margins: Style.space(14)
-          spacing: Style.space(12)
+          spacing: Style.space(8)
 
-          Text {
-            text: "󰈉"
-            color: Color.accent
-            font.family: Style.font.family
-            font.pixelSize: Style.font.display
-          }
-          ColumnLayout {
+          RowLayout {
             Layout.fillWidth: true
-            spacing: Style.space(2)
+            spacing: Style.space(12)
             Text {
-              text: qsTr("Almost time")
+              text: "󰈉"
+              color: Color.accent
+              font.family: Style.font.family
+              font.pixelSize: Style.font.display
+            }
+            ColumnLayout {
+              Layout.fillWidth: true
+              spacing: Style.space(2)
+              Text {
+                text: qsTr("Almost time")
+                color: Color.popups.text
+                font.family: Style.font.family
+                font.pixelSize: Style.font.heading
+                font.weight: Font.DemiBold
+              }
+              Text {
+                Layout.fillWidth: true
+                text: qsTr("Your eyes will appreciate this.")
+                color: Color.muted
+                font.family: Style.font.family
+                font.pixelSize: Style.font.body
+                wrapMode: Text.WordWrap
+              }
+            }
+            Text {
+              text: root.service ? root.service.remainingText : ""
               color: Color.popups.text
               font.family: Style.font.family
               font.pixelSize: Style.font.heading
               font.weight: Font.DemiBold
             }
-            Text {
-              text: qsTr("Your eyes will appreciate this.")
-              color: Color.muted
-              font.family: Style.font.family
-              font.pixelSize: Style.font.body
-            }
           }
-          Text {
-            text: root.service ? root.service.remainingText : ""
-            color: Color.popups.text
-            font.family: Style.font.family
-            font.pixelSize: Style.font.heading
-            font.weight: Font.DemiBold
-          }
-          OverlayButton {
-            text: qsTr("+5m")
-            visible: window.authoritative && root.service && root.service.canPostpone
-            onClicked: if (root.service) root.service.postponeMinutes(5)
-          }
-          OverlayButton {
-            text: qsTr("Now")
-            primary: true
+          RowLayout {
+            Layout.alignment: Qt.AlignRight
             visible: window.authoritative
-            onClicked: if (root.service) root.service.takeBreak()
+            spacing: Style.space(8)
+            OverlayButton {
+              text: qsTr("+5m")
+              visible: root.service && root.service.canPostpone
+              onClicked: if (root.service) root.service.postponeMinutes(5)
+            }
+            OverlayButton {
+              text: qsTr("Now")
+              primary: true
+              onClicked: if (root.service) root.service.takeBreak()
+            }
           }
         }
       }
@@ -304,7 +318,7 @@ Item {
         anchors.top: parent.top
         anchors.topMargin: Style.space(56)
         anchors.horizontalCenter: parent.horizontalCenter
-        width: finalRow.implicitWidth + Style.space(28)
+        width: Math.min(parent.width - Style.space(32), finalRow.implicitWidth + Style.space(28))
         height: Style.space(48)
         radius: height / 2
         color: Color.popups.background
@@ -312,7 +326,8 @@ Item {
 
         RowLayout {
           id: finalRow
-          anchors.centerIn: parent
+          anchors.fill: parent
+          anchors.margins: Style.space(14)
           spacing: Style.space(10)
           Text {
             text: "󰈉"
@@ -321,10 +336,12 @@ Item {
             font.pixelSize: Style.font.heading
           }
           Text {
+            Layout.fillWidth: true
             text: qsTr("Starting break in")
             color: Color.muted
             font.family: Style.font.family
             font.pixelSize: Style.font.body
+            elide: Text.ElideRight
           }
           Text {
             text: root.service ? root.service.remainingText : ""

@@ -28,6 +28,8 @@ With the plugin installed and enabled:
 
 ```bash
 omarchy-shell look-elsewhere demo protected
+omarchy-shell look-elsewhere demo idle
+omarchy-shell look-elsewhere demo flow
 omarchy-shell look-elsewhere demo warning
 omarchy-shell look-elsewhere demo final
 omarchy-shell look-elsewhere demo break

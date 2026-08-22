@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Controls
 import QtQuick.Layouts
 import qs.Commons
 import qs.Ui
@@ -17,7 +18,7 @@ Panel {
   readonly property color muted: Color.muted
   readonly property color accent: Color.accent
   readonly property string fontFamily: bar ? bar.fontFamily : Style.font.family
-  readonly property bool manuallyPaused: service && service.state === "waiting-for-pause" && service.snapshot.pauseReason === "manual"
+  readonly property bool manuallyPaused: service && service.phase === "waiting-for-pause" && service.snapshot.pauseReason === "manual"
 
   function syncSettings() { if (service) service.configure(settings) }
   onSettingsChanged: syncSettings()
@@ -35,12 +36,23 @@ Panel {
     contentWidth: popup.fittedContentWidth(Style.space(390))
     contentHeight: popup.fittedContentHeight(content.implicitHeight)
 
-    ColumnLayout {
-      id: content
+    Flickable {
+      id: panelScroll
       anchors.fill: parent
-      spacing: Style.space(14)
+      contentWidth: width
+      contentHeight: content.implicitHeight
+      clip: true
+      boundsBehavior: Flickable.StopAtBounds
+      flickableDirection: Flickable.VerticalFlick
+      interactive: contentHeight > height
+      ScrollBar.vertical: ScrollBar { policy: ScrollBar.AsNeeded }
 
-      RowLayout {
+      ColumnLayout {
+        id: content
+        width: panelScroll.width
+        spacing: Style.space(14)
+
+        RowLayout {
         Layout.fillWidth: true
         spacing: Style.space(12)
 
@@ -171,6 +183,7 @@ Panel {
           color: root.muted
           font.family: root.fontFamily
           font.pixelSize: Style.font.bodySmall
+        }
         }
       }
     }

@@ -28,6 +28,7 @@ Item {
   property string recoveryWarning: ""
   property bool persistenceBlocked: false
   property bool demoMode: false
+  property bool demoIdle: false
   property var demoEvidence: []
   property var preDemoSnapshot: null
   property var preDemoConfig: null
@@ -50,24 +51,26 @@ Item {
     }
     return false
   }
-  readonly property bool idle: idleMonitor.isIdle
-  readonly property string state: snapshot.state || Model.State.Working
-  readonly property string label: Model.stateLabel(snapshot)
+  property int dictationRetryTicks: 0
+  readonly property bool idle: demoMode ? demoIdle : idleMonitor.isIdle
+  readonly property bool idlePauseActive: config.detectors.idle && idle
+  readonly property string phase: snapshot.state || Model.State.Working
+  readonly property string label: idlePauseActive ? "Paused while you’re away" : Model.stateLabel(snapshot)
   readonly property string remainingText: Model.formatDuration(remainingMs)
   readonly property real progress: {
-    if (state === Model.State.Breaking) return config.breakMs > 0 ? 1 - remainingMs / config.breakMs : 1
+    if (phase === Model.State.Breaking) return config.breakMs > 0 ? 1 - remainingMs / config.breakMs : 1
     return config.focusMs > 0 ? Math.max(0, Math.min(1, Number(snapshot.accumulatedActiveMs || 0) / config.focusMs)) : 0
   }
-  readonly property string protectedSummary: state === Model.State.Protected
+  readonly property string protectedSummary: phase === Model.State.Protected
     ? Model.protectedExplanation(snapshot.protectedCategory)
     : ""
-  readonly property bool interrupting: state === Model.State.Warning || state === Model.State.Final || state === Model.State.Breaking
+  readonly property bool interrupting: phase === Model.State.Warning || phase === Model.State.Final || phase === Model.State.Breaking
   readonly property bool canPostpone: Model.canPostpone(snapshot, config)
   readonly property int remainingMs: {
     var now = Date.now()
-    if (state === Model.State.Breaking) return Math.max(0, Number(snapshot.breakEndsAtMs || 0) - now)
-    if (state === Model.State.Warning || state === Model.State.Final) return Math.max(0, Number(snapshot.warningEndsAtMs || 0) - now)
-    if (state === Model.State.Waiting && snapshot.postponedUntilMs > now) return snapshot.postponedUntilMs - now
+    if (phase === Model.State.Breaking) return Math.max(0, Number(snapshot.breakEndsAtMs || 0) - now)
+    if (phase === Model.State.Warning || phase === Model.State.Final) return Math.max(0, Number(snapshot.warningEndsAtMs || 0) - now)
+    if (phase === Model.State.Waiting && snapshot.postponedUntilMs > now) return snapshot.postponedUntilMs - now
     return Math.max(0, config.focusMs - Number(snapshot.accumulatedActiveMs || 0))
   }
 
@@ -92,7 +95,9 @@ Item {
   }
 
   function configure(values) {
-    config = Model.configFromSettings(values)
+    var authoritative = Model.configFromSettings(values)
+    if (demoMode) preDemoConfig = authoritative
+    config = authoritative
   }
 
   function takeBreak() {
@@ -139,7 +144,7 @@ Item {
   }
 
   function emergencyExit() {
-    if (state === Model.State.Breaking) skipBreak()
+    if (phase === Model.State.Breaking) skipBreak()
   }
 
   function setDemo(name) {
@@ -150,12 +155,24 @@ Item {
       preDemoPersistenceBlocked = persistenceBlocked
     }
     demoMode = true
+    demoIdle = false
     demoEvidence = []
     recoveryWarning = ""
     persistenceBlocked = false
     var now = Date.now()
     var next = Model.defaultSnapshot(now)
     if (name === "working") next.accumulatedActiveMs = config.focusMs * 0.35
+    else if (name === "idle") {
+      next.accumulatedActiveMs = config.focusMs * 0.35
+      demoIdle = true
+    } else if (name === "flow") {
+      var flowConfig = JSON.parse(JSON.stringify(config))
+      flowConfig.warningMs = 8000
+      flowConfig.finalMs = 3000
+      flowConfig.breakMs = 10000
+      config = Model.normalizeConfig(flowConfig)
+      next.accumulatedActiveMs = config.focusMs
+    }
     else if (name === "due") next.accumulatedActiveMs = config.focusMs - 30000
     else if (name === "paused") {
       next.state = Model.State.Waiting
@@ -190,6 +207,7 @@ Item {
 
   function clearDemo() {
     demoMode = false
+    demoIdle = false
     demoEvidence = []
     snapshot = preDemoSnapshot || Model.defaultSnapshot(Date.now())
     config = preDemoConfig || config
@@ -291,8 +309,19 @@ Item {
     running: !service.demoMode
     triggeredOnStart: true
     onTriggered: {
-      if (!fullscreenProbe.running) fullscreenProbe.running = true
-      if (!dictationProbe.running) dictationProbe.running = true
+      if (service.config.detectors.fullscreen) {
+        if (!fullscreenProbe.running) fullscreenProbe.running = true
+      } else {
+        service.fullscreenActive = false
+      }
+      if (!service.config.detectors.dictation) {
+        service.dictationActive = false
+      } else if (service.dictationAvailable || service.dictationRetryTicks <= 0) {
+        if (!dictationProbe.running) dictationProbe.running = true
+        service.dictationRetryTicks = 30
+      } else {
+        service.dictationRetryTicks--
+      }
     }
   }
 
@@ -342,18 +371,18 @@ Item {
   IpcHandler {
     target: "look-elsewhere"
 
-    function status(): string { return JSON.stringify({ state: service.state, remainingMs: service.remainingMs, evidence: service.evidence(), demo: service.demoMode, recoveryWarning: service.recoveryWarning }) }
+    function status(): string { return JSON.stringify({ state: service.phase, remainingMs: service.remainingMs, evidence: service.evidence(), demo: service.demoMode, idlePaused: service.idlePauseActive, recoveryWarning: service.recoveryWarning }) }
     function configuration(): string { return JSON.stringify(service.config) }
     function diagnostics(): string { return JSON.stringify({ fullscreen: service.fullscreenAvailable, dictation: service.dictationAvailable, mpris: true, pipewire: true, idle: true, persistenceBlocked: service.persistenceBlocked }) }
-    function takeBreak(): string { service.takeBreak(); return service.state }
-    function postpone(minutes: int): string { service.postponeMinutes(minutes); return service.state }
-    function pause(minutes: int): string { service.pauseMinutes(minutes); return service.state }
-    function resume(): string { service.resume(); return service.state }
-    function skip(): string { service.skipBreak(); return service.state }
-    function emergencyExit(): string { service.emergencyExit(); return service.state }
+    function takeBreak(): string { service.takeBreak(); return service.phase }
+    function postpone(minutes: int): string { service.postponeMinutes(minutes); return service.phase }
+    function pause(minutes: int): string { service.pauseMinutes(minutes); return service.phase }
+    function resume(): string { service.resume(); return service.phase }
+    function skip(): string { service.skipBreak(); return service.phase }
+    function emergencyExit(): string { service.emergencyExit(); return service.phase }
     function resetHistory(): string { service.resetHistory(); return "ok" }
     function resetLocalData(): string { service.resetLocalData(); return "ok" }
-    function demo(state: string): string { service.setDemo(state); return service.state }
-    function demoOff(): string { service.clearDemo(); return service.state }
+    function demo(state: string): string { service.setDemo(state); return service.phase }
+    function demoOff(): string { service.clearDemo(); return service.phase }
   }
 }
