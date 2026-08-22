@@ -79,11 +79,10 @@ Panel {
       ColumnLayout {
         id: content
         width: panelScroll.width
-        spacing: Style.space(6)
+        spacing: Style.space(16)
 
         RowLayout {
           Layout.fillWidth: true
-          Layout.bottomMargin: Style.space(10)
           spacing: Style.space(8)
 
           Item {
@@ -162,10 +161,7 @@ Panel {
           Item {
             Layout.alignment: Qt.AlignHCenter
             Layout.preferredWidth: Math.max(clockRow.implicitWidth, idleClock.implicitWidth)
-            // Display fonts reserve substantial invisible descent below the
-            // visible glyphs. Trim that optical whitespace so the related
-            // action rail sits with the clock rather than its line box.
-            Layout.preferredHeight: Math.max(clockRow.implicitHeight, idleClock.implicitHeight) - Style.space(8)
+            Layout.preferredHeight: Math.max(clockRow.implicitHeight, idleClock.implicitHeight)
             Accessible.role: Accessible.StaticText
             Accessible.name: root.idlePaused
               ? qsTr("Idle; focus timer paused")
