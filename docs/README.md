@@ -17,6 +17,7 @@ on a particular workstation or chat history.
 - [Privacy and trust](privacy.md)
 - [Competition delivery plan](competition.md)
 - [Marketplace submission draft](marketplace-submission.md)
+- [Marketplace parser and security preflight](marketplace-preflight-2026-08-22.md)
 - [Final submission checklist](submission-checklist.md)
 - [Verification strategy](verification.md)
 - [QML review and remediations](qml-review-2026-08-22.md)

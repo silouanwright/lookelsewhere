@@ -25,6 +25,9 @@ submission.
 - [x] Deterministic lint and system `qmllint` findings are reviewed against the
   documented Omarchy import limitations.
 - [x] The exact runtime source passes the focused QML semantic review.
+- [x] The official marketplace V3 static analysis passes with no findings or
+  review capabilities, and the drafted issue body passes the current official
+  submission parser when its deferred public-repository checkbox is checked.
 
 ## Installed-runtime gate
 
