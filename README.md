@@ -124,6 +124,9 @@ closes the panel. Direct panel keys keep common actions immediate:
 | `p` | Pause or resume scheduled breaks |
 | `h` | Toggle break history |
 | `o` | Toggle options |
+| `e` | Edit settings while Options is open |
+| `Shift+d` | Stop and disable Look Elsewhere while Options is open |
+| `?` | Toggle visible key hints for every action |
 | `q` or `Esc` | Close the panel |
 
 Look Elsewhere does not silently claim global keys. On a stock Omarchy install,
