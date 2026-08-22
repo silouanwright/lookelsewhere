@@ -131,6 +131,7 @@ Panel {
 
         ColumnLayout {
           Layout.fillWidth: true
+          Layout.topMargin: Style.space(8)
           visible: root.page === "now"
           spacing: Style.space(4)
 
@@ -227,6 +228,7 @@ Panel {
 
         ColumnLayout {
           Layout.fillWidth: true
+          Layout.topMargin: Style.space(8)
           visible: root.page === "stats"
           spacing: Style.space(10)
 
@@ -267,6 +269,7 @@ Panel {
 
         ColumnLayout {
           Layout.fillWidth: true
+          Layout.topMargin: Style.space(8)
           visible: root.page === "options"
           spacing: Style.space(8)
 
