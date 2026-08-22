@@ -202,6 +202,10 @@ function observe(snapshot, input, config) {
     next.state = State.Working
     next.pauseReason = ""
     next.stateEnteredAtMs = now
+    // The interval since the last paused observation belongs to the closed
+    // schedule. Begin active accounting at the reopening observation rather
+    // than crediting paused time after a delayed tick, suspend, or restart.
+    elapsed = 0
   }
 
   if (next.state === State.Breaking) {

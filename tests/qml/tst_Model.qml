@@ -18,6 +18,19 @@ TestCase {
     verify(!Model.inOfficeHours(new Date(2026, 7, 22, 12, 0), hours))
   }
 
+  function test_officeHourBoundaries() {
+    var daytime = { enabled: true, startMinute: 8 * 60, endMinute: 18 * 60 }
+    verify(!Model.inOfficeHours(new Date(2026, 7, 22, 7, 59), daytime))
+    verify(Model.inOfficeHours(new Date(2026, 7, 22, 8, 0), daytime))
+    verify(Model.inOfficeHours(new Date(2026, 7, 22, 17, 59), daytime))
+    verify(!Model.inOfficeHours(new Date(2026, 7, 22, 18, 0), daytime))
+
+    // Equal bounds intentionally mean an all-day schedule rather than a
+    // zero-length schedule.
+    var allDay = { enabled: true, startMinute: 0, endMinute: 0 }
+    verify(Model.inOfficeHours(new Date(2026, 7, 22, 12, 0), allDay))
+  }
+
   function test_settingsRebuildFromDefaults() {
     var customized = Model.configFromSettings({
       focusMinutes: 25,
@@ -96,6 +109,31 @@ TestCase {
     compare(s.accumulatedActiveMs, 5000)
   }
 
+  function test_longSuspendDoesNotCountAsActiveUse() {
+    var c = config({ focusMs: 60 * 60 * 1000 })
+    var s = Model.defaultSnapshot(1000)
+    s = Model.observe(s, { nowMs: 8 * 60 * 60 * 1000, active: true, idle: false, evidence: [] }, c)
+    // A missing observation is capped so suspend, hibernate, and clock jumps
+    // cannot manufacture an entire focus session.
+    compare(s.accumulatedActiveMs, 5 * 60 * 1000)
+  }
+
+  function test_outsideOfficeHoursPausesAndReentersCleanly() {
+    var c = config({ officeHours: { enabled: true, startMinute: 8 * 60, endMinute: 18 * 60 } })
+    var beforeOpen = new Date(2026, 7, 22, 7, 59).getTime()
+    var atOpen = new Date(2026, 7, 22, 8, 0).getTime()
+    var s = Model.defaultSnapshot(beforeOpen - 1000)
+    s.accumulatedActiveMs = 10000
+    s = Model.observe(s, { nowMs: beforeOpen, active: true, idle: false, evidence: [] }, c)
+    compare(s.state, Model.State.Paused)
+    compare(s.pauseReason, "outside-office-hours")
+    compare(s.accumulatedActiveMs, 10000)
+    s = Model.observe(s, { nowMs: atOpen, active: true, idle: false, evidence: [] }, c)
+    compare(s.state, Model.State.Working)
+    compare(s.pauseReason, "")
+    compare(s.accumulatedActiveMs, 10000)
+  }
+
   function test_warningFinalBreakCompletion() {
     var c = config()
     var s = Model.defaultSnapshot(0)
@@ -111,6 +149,44 @@ TestCase {
     compare(s.totals.completed, 1)
   }
 
+  function test_restartReconcilesExpiredBreakWithoutDuplication() {
+    var c = config()
+    var persisted = Model.defaultSnapshot(1000)
+    persisted.state = Model.State.Breaking
+    persisted.breakEndsAtMs = 5000
+    persisted.totals.prompted = 1
+
+    var recovered = Model.observe(Model.copySnapshot(persisted), {
+      nowMs: 10000, active: false, idle: false, evidence: []
+    }, c)
+    compare(recovered.state, Model.State.Working)
+    compare(recovered.totals.completed, 1)
+
+    // Re-observing the recovered snapshot must not duplicate the outcome.
+    recovered = Model.observe(recovered, {
+      nowMs: 11000, active: false, idle: false, evidence: []
+    }, c)
+    compare(recovered.totals.completed, 1)
+  }
+
+  function test_restartAdvancesExpiredWarningDeterministically() {
+    var c = config()
+    var persisted = Model.defaultSnapshot(1000)
+    persisted.state = Model.State.Warning
+    persisted.warningEndsAtMs = 5000
+    persisted.totals.prompted = 1
+
+    var recovered = Model.observe(persisted, {
+      nowMs: 10000, active: false, idle: false, evidence: []
+    }, c)
+    compare(recovered.state, Model.State.Final)
+    recovered = Model.observe(recovered, {
+      nowMs: 10001, active: false, idle: false, evidence: []
+    }, c)
+    compare(recovered.state, Model.State.Breaking)
+    compare(recovered.totals.prompted, 1)
+  }
+
   function test_postpone() {
     var s = Model.defaultSnapshot(0)
     s.state = Model.State.Warning
@@ -119,6 +195,19 @@ TestCase {
     compare(s.postponedUntilMs, 61000)
     compare(s.snoozesUsed, 1)
     compare(s.totals.postponed, 1)
+  }
+
+  function test_postponeExpiryReturnsToWarning() {
+    var c = config()
+    var s = Model.defaultSnapshot(0)
+    s.accumulatedActiveMs = c.focusMs
+    s.dueAtMs = 1000
+    s = Model.postpone(s, 1000, 5000, c)
+    s = Model.observe(s, { nowMs: 5999, active: true, idle: false, evidence: [] }, c)
+    compare(s.state, Model.State.Waiting)
+    s = Model.observe(s, { nowMs: 6000, active: true, idle: false, evidence: [] }, c)
+    compare(s.state, Model.State.Warning)
+    compare(s.totals.prompted, 1)
   }
 
   function test_postponeBudgetAndFocusedEnforcement() {
