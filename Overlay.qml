@@ -84,39 +84,39 @@ Item {
 
       SequentialAnimation {
         id: contentOpacityAnimation
-        PauseAnimation { duration: 250 }
+        PauseAnimation { duration: 60 }
         NumberAnimation {
           target: window
           property: "contentOpacity"
           from: 0.28
           to: 1
-          duration: 820
+          duration: 450
           easing.type: Easing.InOutSine
         }
       }
 
       SequentialAnimation {
         id: contentMotionAnimation
-        PauseAnimation { duration: 220 }
+        PauseAnimation { duration: 0 }
         NumberAnimation {
           target: window
           property: "contentOffset"
           from: Style.space(32)
           to: 0
-          duration: 900
+          duration: 450
           easing.type: Easing.InOutSine
         }
       }
 
       SequentialAnimation {
         id: contentBlurAnimation
-        PauseAnimation { duration: 250 }
+        PauseAnimation { duration: 110 }
         NumberAnimation {
           target: window
           property: "contentBlur"
           from: 0.08
           to: 0
-          duration: 760
+          duration: 450
           easing.type: Easing.InOutSine
         }
       }
