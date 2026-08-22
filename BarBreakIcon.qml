@@ -14,6 +14,8 @@ Item {
     height: 256
     anchors.centerIn: parent
     scale: Math.min(root.width, root.height) / 256
+    // Preserve analytic curves when this 256-unit path is reduced to bar
+    // scale. GeometryRenderer tessellation made the rounded end less stable.
     preferredRendererType: Shape.CurveRenderer
 
     ShapePath {

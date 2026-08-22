@@ -91,6 +91,9 @@ BarWidget {
 
       BarBreakIcon {
         visible: root.showIcon
+        // Keep the compact 256-unit SVG on a clean 1/16 scale. Using the
+        // nearby font-derived ~18px size makes the rounded bed corner land on
+        // an isolated antialiased pixel that reads as a rendering defect.
         width: Style.space(16)
         height: width
         color: button.active && button.useActiveColor ? button.activeColor : button.foreground

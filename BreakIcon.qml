@@ -14,6 +14,8 @@ Item {
     height: 256
     anchors.centerIn: parent
     scale: Math.min(root.width, root.height) / 256
+    // This icon is animated through the overlay's blur/scale layer. Keeping
+    // the SVG curves analytic avoids visible tessellation changes in motion.
     preferredRendererType: Shape.CurveRenderer
 
     ShapePath {
