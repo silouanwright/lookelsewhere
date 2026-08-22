@@ -26,6 +26,11 @@ one focused `HDMI-A-2` output at 3840×2160 with scale 2.
   options, pause/resume, and close were exercised in the installed shell.
 - Optional global binding examples use currently unclaimed `Super+Alt` chords;
   they remain opt-in so installation never overwrites a user's Hyprland keys.
+- The installed panel's `1` mnemonic was exercised in both an ordinary
+  working fixture and an active warning. During ordinary focus it added one
+  minute while remaining in `working`; during the warning it entered the
+  bounded one-minute postponed state. Clearing demo mode restored the exact
+  real schedule.
 - Escape dismisses the panel without invoking either action.
 - Focused enforcement's documented `Ctrl+Shift+Esc` emergency exit returned
   the service to `working` during a live break fixture.
