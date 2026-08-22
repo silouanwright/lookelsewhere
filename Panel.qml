@@ -28,7 +28,6 @@ Panel {
   readonly property int remainingSeconds: service ? Math.max(0, Math.ceil(service.remainingMs / 1000)) : 0
   readonly property int remainingMinutesPart: Math.floor(remainingSeconds / 60)
   readonly property int remainingSecondsPart: remainingSeconds % 60
-  readonly property int toolbarGapTrim: Style.space(10)
   readonly property real clockSeparatorOverlap: Math.max(0,
     (clockColonMetrics.advanceWidth - clockColonMetrics.tightBoundingRect.width) / 2)
 
@@ -80,11 +79,11 @@ Panel {
       ColumnLayout {
         id: content
         width: panelScroll.width
-        spacing: Style.space(16)
+        spacing: Style.space(6)
 
         Item {
           Layout.fillWidth: true
-          Layout.preferredHeight: Math.max(0, toolbarRow.implicitHeight - root.toolbarGapTrim)
+          Layout.preferredHeight: toolbarRow.implicitHeight
 
           RowLayout {
             id: toolbarRow
@@ -379,13 +378,13 @@ Panel {
 
         Item {
           Layout.fillWidth: true
-          Layout.preferredHeight: Math.max(0, actionRow.implicitHeight - Style.space(6))
+          Layout.preferredHeight: actionRow.implicitHeight
+          Layout.topMargin: Style.space(4)
           visible: root.page === "now"
 
           RowLayout {
             id: actionRow
             anchors.horizontalCenter: parent.horizontalCenter
-            y: -Style.space(6)
             spacing: Style.space(5)
 
           WeightedButton {

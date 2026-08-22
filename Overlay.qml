@@ -180,7 +180,7 @@ Item {
           }
           Text {
             Layout.alignment: Qt.AlignHCenter
-            text: qsTr("LookElsewhere")
+            text: qsTr("Look Elsewhere")
             color: Color.lock.text
             font.family: Style.font.family
             font.pixelSize: Style.font.displayLarge
