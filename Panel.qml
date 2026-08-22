@@ -25,13 +25,16 @@ Panel {
   readonly property bool manuallyPaused: service && service.phase === "waiting-for-pause" && service.snapshot.pauseReason === "manual"
   readonly property bool idlePaused: service && service.idlePauseActive
   readonly property bool delayActionsVisible: !manuallyPaused && service
-    && service.config.enforcement !== "focused"
   readonly property bool delayActionsEnabled: delayActionsVisible && service.canPostpone
   readonly property string snoozeBudgetSummary: service
     ? qsTr("%1 of %2 snoozes used")
         .arg(Number(service.snapshot.snoozesUsed || 0))
         .arg(Number(service.config.snoozeBudget || 0))
     : ""
+  readonly property string snoozeUnavailableSummary: service
+    && service.config.enforcement === "focused"
+      ? qsTr("Snoozing is unavailable in Focused mode")
+      : snoozeBudgetSummary
   readonly property int remainingSeconds: service ? Math.max(0, Math.ceil(service.remainingMs / 1000)) : 0
   readonly property int remainingMinutesPart: Math.floor(remainingSeconds / 60)
   readonly property int remainingSecondsPart: remainingSeconds % 60
@@ -446,7 +449,7 @@ Panel {
             visible: root.delayActionsVisible
             actionEnabled: root.delayActionsEnabled
             tooltipText: root.delayActionsEnabled ? root.snoozeBudgetSummary : ""
-            disabledTooltipText: root.delayActionsEnabled ? "" : root.snoozeBudgetSummary
+            disabledTooltipText: root.delayActionsEnabled ? "" : root.snoozeUnavailableSummary
             label: qsTr("+1m")
             bordered: true
             focusable: root.delayActionsEnabled
@@ -461,7 +464,7 @@ Panel {
             Accessible.role: Accessible.Button
             Accessible.name: root.delayActionsEnabled
               ? qsTr("Snooze next break for 1 minute")
-              : qsTr("Snooze unavailable; %1").arg(root.snoozeBudgetSummary)
+              : qsTr("Snooze unavailable; %1").arg(root.snoozeUnavailableSummary)
             Accessible.onPressAction: clicked()
             onClicked: root.postponeAndClose(1)
           }
@@ -471,7 +474,7 @@ Panel {
             visible: root.delayActionsVisible
             actionEnabled: root.delayActionsEnabled
             tooltipText: root.delayActionsEnabled ? root.snoozeBudgetSummary : ""
-            disabledTooltipText: root.delayActionsEnabled ? "" : root.snoozeBudgetSummary
+            disabledTooltipText: root.delayActionsEnabled ? "" : root.snoozeUnavailableSummary
             label: qsTr("+5m")
             bordered: true
             focusable: root.delayActionsEnabled
@@ -486,7 +489,7 @@ Panel {
             Accessible.role: Accessible.Button
             Accessible.name: root.delayActionsEnabled
               ? qsTr("Snooze next break for 5 minutes")
-              : qsTr("Snooze unavailable; %1").arg(root.snoozeBudgetSummary)
+              : qsTr("Snooze unavailable; %1").arg(root.snoozeUnavailableSummary)
             Accessible.onPressAction: clicked()
             onClicked: root.postponeAndClose(5)
           }
@@ -496,7 +499,7 @@ Panel {
               visible: root.delayActionsVisible
               actionEnabled: root.delayActionsEnabled
               tooltipText: root.delayActionsEnabled ? root.snoozeBudgetSummary : ""
-              disabledTooltipText: root.delayActionsEnabled ? "" : root.snoozeBudgetSummary
+              disabledTooltipText: root.delayActionsEnabled ? "" : root.snoozeUnavailableSummary
               label: qsTr("+15m")
               bordered: true
               focusable: root.delayActionsEnabled
@@ -511,7 +514,7 @@ Panel {
               Accessible.role: Accessible.Button
               Accessible.name: root.delayActionsEnabled
                 ? qsTr("Snooze next break for 15 minutes")
-                : qsTr("Snooze unavailable; %1").arg(root.snoozeBudgetSummary)
+                : qsTr("Snooze unavailable; %1").arg(root.snoozeUnavailableSummary)
               Accessible.onPressAction: clicked()
               onClicked: root.postponeAndClose(15)
             }
