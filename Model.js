@@ -28,6 +28,8 @@ function defaultConfig() {
     cooldownMs: 60 * 1000,
     maximumDelayMs: 15 * 60 * 1000,
     enforcement: "balanced",
+    snoozeBudget: 3,
+    reducedMotion: false,
     officeHours: { enabled: false, startMinute: 8 * 60, endMinute: 18 * 60 },
     detectors: { idle: true, fullscreen: true, media: true, microphone: true, dictation: true }
   }
@@ -45,6 +47,8 @@ function normalizeConfig(input) {
   base.cooldownMs = clamp(value.cooldownMs === undefined ? base.cooldownMs : value.cooldownMs, 0, 60 * 60 * 1000)
   base.maximumDelayMs = clamp(value.maximumDelayMs === undefined ? base.maximumDelayMs : value.maximumDelayMs, 0, 12 * 60 * 60 * 1000)
   base.enforcement = ["gentle", "balanced", "focused"].indexOf(value.enforcement) >= 0 ? value.enforcement : base.enforcement
+  base.snoozeBudget = Math.round(clamp(value.snoozeBudget === undefined ? base.snoozeBudget : value.snoozeBudget, 0, 20))
+  base.reducedMotion = value.reducedMotion === true
   if (value.officeHours) {
     base.officeHours.enabled = value.officeHours.enabled === true
     base.officeHours.startMinute = clamp(value.officeHours.startMinute === undefined ? base.officeHours.startMinute : value.officeHours.startMinute, 0, 1439)
@@ -214,7 +218,8 @@ function completeBreak(snapshot, nowMs) {
   return next
 }
 
-function postpone(snapshot, nowMs, durationMs) {
+function postpone(snapshot, nowMs, durationMs, config) {
+  if (!canPostpone(snapshot, config)) return copySnapshot(snapshot)
   var next = copySnapshot(snapshot)
   next.state = State.Waiting
   next.stateEnteredAtMs = nowMs
@@ -222,6 +227,18 @@ function postpone(snapshot, nowMs, durationMs) {
   next.warningEndsAtMs = 0
   next.snoozesUsed++
   next.totals.postponed++
+  return next
+}
+
+function canPostpone(snapshot, config) {
+  var cfg = normalizeConfig(config)
+  if (cfg.enforcement === "focused") return false
+  return Number(snapshot && snapshot.snoozesUsed || 0) < cfg.snoozeBudget
+}
+
+function resetTotals(snapshot) {
+  var next = copySnapshot(snapshot)
+  next.totals = { prompted: 0, completed: 0, postponed: 0, skipped: 0, delayed: 0 }
   return next
 }
 

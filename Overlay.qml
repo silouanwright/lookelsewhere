@@ -49,6 +49,13 @@ Item {
         contentOffset = Style.space(24)
         contentOpacity = 0.28
         contentBlur = 0.08
+        if (root.service && root.service.config.reducedMotion) {
+          backdropReveal = 1
+          contentOffset = 0
+          contentOpacity = 1
+          contentBlur = 0
+          return
+        }
         backdropAnimation.start()
         contentOpacityAnimation.start()
         contentMotionAnimation.start()
@@ -200,7 +207,7 @@ Item {
             }
             OverlayButton {
               text: qsTr("+1 minute")
-              visible: root.service && root.service.config.enforcement === "gentle"
+              visible: root.service && root.service.config.enforcement === "gentle" && root.service.canPostpone
               onClicked: if (root.service) root.service.postponeMinutes(1)
             }
           }
@@ -261,7 +268,7 @@ Item {
           }
           OverlayButton {
             text: qsTr("+5m")
-            visible: window.authoritative
+            visible: window.authoritative && root.service && root.service.canPostpone
             onClicked: if (root.service) root.service.postponeMinutes(5)
           }
           OverlayButton {

@@ -25,13 +25,33 @@
       "focusMinutes": 20,
       "breakSeconds": 20,
       "enforcement": "balanced",
+      "maximumDelayMinutes": 15,
+      "snoozeBudget": 3,
+      "officeHoursEnabled": false,
+      "officeStart": "08:00",
+      "officeEnd": "18:00",
+      "idleDetection": true,
+      "fullscreenDetection": true,
+      "mediaDetection": true,
+      "microphoneDetection": true,
+      "dictationDetection": true,
       "reducedMotion": false
     },
     "schema": [
       { "key": "focusMinutes", "type": "integer", "label": "Focus interval (minutes)", "min": 1, "max": 180, "step": 1, "defaultValue": 20 },
       { "key": "breakSeconds", "type": "integer", "label": "Break duration (seconds)", "min": 5, "max": 600, "step": 5, "defaultValue": 20 },
       { "key": "enforcement", "type": "enum", "label": "Enforcement", "options": ["gentle", "balanced", "focused"], "defaultValue": "balanced" },
-      { "key": "reducedMotion", "type": "boolean", "label": "Reduce motion", "defaultValue": false }
+      { "key": "maximumDelayMinutes", "type": "integer", "label": "Maximum smart delay (minutes)", "min": 0, "max": 180, "step": 5, "defaultValue": 15, "description": "Start the break after this limit even when protected context continues." },
+      { "key": "snoozeBudget", "type": "integer", "label": "Snoozes allowed per cycle", "min": 0, "max": 10, "step": 1, "defaultValue": 3 },
+      { "key": "officeHoursEnabled", "type": "boolean", "label": "Use office hours", "defaultValue": false },
+      { "key": "officeStart", "type": "string", "label": "Office hours start", "defaultValue": "08:00", "description": "24-hour time in HH:MM format." },
+      { "key": "officeEnd", "type": "string", "label": "Office hours end", "defaultValue": "18:00", "description": "24-hour time in HH:MM format. Overnight schedules are supported." },
+      { "key": "idleDetection", "type": "boolean", "label": "Pause while idle", "defaultValue": true },
+      { "key": "fullscreenDetection", "type": "boolean", "label": "Delay during fullscreen work", "defaultValue": true },
+      { "key": "mediaDetection", "type": "boolean", "label": "Delay during media playback", "defaultValue": true },
+      { "key": "microphoneDetection", "type": "boolean", "label": "Delay while the microphone is active", "defaultValue": true, "description": "Uses PipeWire stream state. Look Elsewhere never records audio." },
+      { "key": "dictationDetection", "type": "boolean", "label": "Delay during Omarchy dictation", "defaultValue": true },
+      { "key": "reducedMotion", "type": "boolean", "label": "Reduce motion", "defaultValue": false, "description": "Show the break surface without animated movement or soft focus." }
     ]
   }
 }

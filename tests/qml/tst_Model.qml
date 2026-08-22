@@ -6,7 +6,7 @@ TestCase {
   name: "LookElsewhereModel"
 
   function config(overrides) {
-    var value = { focusMs: 10000, breakMs: 5000, dueSoonMs: 2000, warningMs: 4000, finalMs: 1000, cooldownMs: 2000, maximumDelayMs: 10000 }
+    var value = { focusMs: 60000, breakMs: 5000, dueSoonMs: 2000, warningMs: 4000, finalMs: 1000, cooldownMs: 2000, maximumDelayMs: 10000 }
     for (var key in (overrides || {})) value[key] = overrides[key]
     return Model.normalizeConfig(value)
   }
@@ -30,12 +30,12 @@ TestCase {
   function test_dueFlowAndProtection() {
     var c = config()
     var s = Model.defaultSnapshot(1000)
-    s = Model.observe(s, { nowMs: 11000, active: true, idle: false, evidence: [{ category: "meeting", active: true, confidence: 0.9 }] }, c)
+    s = Model.observe(s, { nowMs: 61000, active: true, idle: false, evidence: [{ category: "meeting", active: true, confidence: 0.9 }] }, c)
     compare(s.state, Model.State.Protected)
     compare(s.protectedCategory, "meeting")
-    s = Model.observe(s, { nowMs: 12000, active: true, idle: false, evidence: [] }, c)
+    s = Model.observe(s, { nowMs: 62000, active: true, idle: false, evidence: [] }, c)
     compare(s.state, Model.State.Waiting)
-    s = Model.observe(s, { nowMs: 15000, active: true, idle: false, evidence: [] }, c)
+    s = Model.observe(s, { nowMs: 65000, active: true, idle: false, evidence: [] }, c)
     compare(s.state, Model.State.Warning)
   }
 
@@ -57,11 +57,30 @@ TestCase {
   function test_postpone() {
     var s = Model.defaultSnapshot(0)
     s.state = Model.State.Warning
-    s = Model.postpone(s, 1000, 60000)
+    s = Model.postpone(s, 1000, 60000, config())
     compare(s.state, Model.State.Waiting)
     compare(s.postponedUntilMs, 61000)
     compare(s.snoozesUsed, 1)
     compare(s.totals.postponed, 1)
+  }
+
+  function test_postponeBudgetAndFocusedEnforcement() {
+    var s = Model.defaultSnapshot(0)
+    s.state = Model.State.Warning
+    s.snoozesUsed = 1
+    verify(!Model.canPostpone(s, config({ snoozeBudget: 1 })))
+    verify(!Model.canPostpone(s, config({ enforcement: "focused" })))
+    verify(Model.canPostpone(s, config({ snoozeBudget: 2, enforcement: "balanced" })))
+  }
+
+  function test_resetTotalsPreservesSchedule() {
+    var s = Model.defaultSnapshot(1000)
+    s.accumulatedActiveMs = 5000
+    s.totals = { prompted: 2, completed: 1, postponed: 3, skipped: 4, delayed: 5 }
+    var reset = Model.resetTotals(s)
+    compare(reset.accumulatedActiveMs, 5000)
+    compare(reset.totals.completed, 0)
+    compare(reset.totals.delayed, 0)
   }
 
   function test_evidenceThresholdAndDetectorToggle() {

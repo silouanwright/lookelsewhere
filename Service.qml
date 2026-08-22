@@ -55,6 +55,7 @@ Item {
     ? "Held quietly while " + (snapshot.protectedCategory || "protected work") + " is active."
     : ""
   readonly property bool interrupting: state === Model.State.Warning || state === Model.State.Final || state === Model.State.Breaking
+  readonly property bool canPostpone: Model.canPostpone(snapshot, config)
   readonly property int remainingMs: {
     var now = Date.now()
     if (state === Model.State.Breaking) return Math.max(0, Number(snapshot.breakEndsAtMs || 0) - now)
@@ -76,21 +77,41 @@ Item {
 
   function observe() {
     var beforeState = snapshot.state
+    var effectiveIdle = config.detectors.idle && idle
     snapshot = Model.observe(snapshot, {
-      nowMs: Date.now(), active: !idle, idle: idle, evidence: evidence()
+      nowMs: Date.now(), active: !effectiveIdle, idle: effectiveIdle, evidence: evidence()
     }, config)
     if (!demoMode && snapshot.state !== beforeState) scheduleSave()
   }
 
   function configure(values) {
     var incoming = values || {}
-    var next = {}
-    for (var key in config) next[key] = config[key]
+    var next = JSON.parse(JSON.stringify(config))
     if (incoming.focusMinutes !== undefined) next.focusMs = Number(incoming.focusMinutes) * 60000
     if (incoming.breakSeconds !== undefined) next.breakMs = Number(incoming.breakSeconds) * 1000
     if (incoming.enforcement !== undefined) next.enforcement = String(incoming.enforcement)
+    if (incoming.maximumDelayMinutes !== undefined) next.maximumDelayMs = Number(incoming.maximumDelayMinutes) * 60000
+    if (incoming.snoozeBudget !== undefined) next.snoozeBudget = Number(incoming.snoozeBudget)
+    if (incoming.reducedMotion !== undefined) next.reducedMotion = incoming.reducedMotion === true
+    if (incoming.officeHoursEnabled !== undefined) next.officeHours.enabled = incoming.officeHoursEnabled === true
+    if (incoming.officeStart !== undefined) next.officeHours.startMinute = parseClockMinute(incoming.officeStart, next.officeHours.startMinute)
+    if (incoming.officeEnd !== undefined) next.officeHours.endMinute = parseClockMinute(incoming.officeEnd, next.officeHours.endMinute)
+    var detectorKeys = ["idle", "fullscreen", "media", "microphone", "dictation"]
+    for (var i = 0; i < detectorKeys.length; i++) {
+      var detector = detectorKeys[i]
+      var settingKey = detector + "Detection"
+      if (incoming[settingKey] !== undefined) next.detectors[detector] = incoming[settingKey] === true
+    }
     config = Model.normalizeConfig(next)
     scheduleSave()
+  }
+
+  function parseClockMinute(value, fallback) {
+    var match = /^(\d{1,2}):(\d{2})$/.exec(String(value || "").trim())
+    if (!match) return fallback
+    var hour = Number(match[1])
+    var minute = Number(match[2])
+    return hour >= 0 && hour <= 23 && minute >= 0 && minute <= 59 ? hour * 60 + minute : fallback
   }
 
   function takeBreak() {
@@ -99,7 +120,13 @@ Item {
   }
 
   function postponeMinutes(minutes) {
-    snapshot = Model.postpone(snapshot, Date.now(), Math.max(1, Number(minutes || 1)) * 60000)
+    if (!canPostpone) return
+    snapshot = Model.postpone(snapshot, Date.now(), Math.max(1, Number(minutes || 1)) * 60000, config)
+    scheduleSave()
+  }
+
+  function resetHistory() {
+    snapshot = Model.resetTotals(snapshot)
     scheduleSave()
   }
 
@@ -278,6 +305,7 @@ Item {
     function pause(minutes: int): string { service.pauseMinutes(minutes); return service.state }
     function resume(): string { service.resume(); return service.state }
     function skip(): string { service.skipBreak(); return service.state }
+    function resetHistory(): string { service.resetHistory(); return "ok" }
     function demo(state: string): string { service.setDemo(state); return service.state }
     function demoOff(): string { service.clearDemo(); return service.state }
   }
