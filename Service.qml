@@ -400,12 +400,12 @@ Item {
   }
 
   Timer {
-    interval: 50
+    interval: 10
     repeat: true
     running: service.stateLoaded && !service.demoMode
       && service.phase === Model.State.Breaking && !service.completionCuePlayed
     onTriggered: {
-      if (Model.shouldLeadCompletionCue(service.phase, service.remainingMs, 100))
+      if (Model.shouldLeadCompletionCue(service.phase, service.remainingMs, 25))
         service.playCompletionCue()
     }
   }

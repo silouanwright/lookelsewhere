@@ -363,11 +363,11 @@ TestCase {
   }
 
   function test_completionCueLeadsBreakDismissal() {
-    verify(!Model.shouldLeadCompletionCue(Model.State.Breaking, 101, 100))
-    verify(Model.shouldLeadCompletionCue(Model.State.Breaking, 100, 100))
-    verify(Model.shouldLeadCompletionCue(Model.State.Breaking, 1, 100))
-    verify(!Model.shouldLeadCompletionCue(Model.State.Breaking, 0, 100))
-    verify(!Model.shouldLeadCompletionCue(Model.State.Working, 50, 100))
+    verify(!Model.shouldLeadCompletionCue(Model.State.Breaking, 26, 25))
+    verify(Model.shouldLeadCompletionCue(Model.State.Breaking, 25, 25))
+    verify(Model.shouldLeadCompletionCue(Model.State.Breaking, 1, 25))
+    verify(!Model.shouldLeadCompletionCue(Model.State.Breaking, 0, 25))
+    verify(!Model.shouldLeadCompletionCue(Model.State.Working, 10, 25))
   }
 
   function test_resetTotalsPreservesSchedule() {
