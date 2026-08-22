@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "io.github.silouanwright.look-elsewhere",
+  "name": "Look Elsewhere",
+  "version": "0.1.0",
+  "author": "Silouan Wright",
+  "license": "MIT",
+  "homepage": "https://github.com/silouanwright/look-elsewhere",
+  "description": "A context-aware break coach built for Omarchy.",
+  "kinds": ["service", "bar-widget", "overlay"],
+  "keepLoaded": true,
+  "entryPoints": {
+    "service": "Service.qml",
+    "barWidget": "BarWidget.qml",
+    "overlay": "Overlay.qml"
+  },
+  "barWidget": {
+    "displayName": "Look Elsewhere",
+    "description": "Context-aware active-use breaks with native warnings and overlays.",
+    "category": "Wellbeing",
+    "aliases": ["break", "eyes", "20-20-20", "wellbeing"],
+    "allowMultiple": false,
+    "defaultSection": "right",
+    "defaults": {
+      "focusMinutes": 20,
+      "breakSeconds": 20,
+      "enforcement": "balanced",
+      "reducedMotion": false
+    },
+    "schema": [
+      { "key": "focusMinutes", "type": "integer", "label": "Focus interval (minutes)", "min": 1, "max": 180, "step": 1, "defaultValue": 20 },
+      { "key": "breakSeconds", "type": "integer", "label": "Break duration (seconds)", "min": 5, "max": 600, "step": 5, "defaultValue": 20 },
+      { "key": "enforcement", "type": "enum", "label": "Enforcement", "options": ["gentle", "balanced", "focused"], "defaultValue": "balanced" },
+      { "key": "reducedMotion", "type": "boolean", "label": "Reduce motion", "defaultValue": false }
+    ]
+  }
+}
