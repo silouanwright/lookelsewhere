@@ -381,13 +381,16 @@ Panel {
 
         Item {
           Layout.fillWidth: true
-          Layout.preferredHeight: actionRow.implicitHeight
+          Layout.preferredHeight: actionRow.implicitHeight * actionRow.fitScale
           Layout.topMargin: -Style.space(3)
           visible: root.page === "now"
 
           RowLayout {
             id: actionRow
+            readonly property real fitScale: Math.min(1,
+              (parent.width - Style.space(4)) / Math.max(1, implicitWidth))
             anchors.horizontalCenter: parent.horizontalCenter
+            scale: fitScale
             spacing: Style.space(5)
 
           WeightedButton {

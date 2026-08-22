@@ -1,3 +1,5 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Effects
 import QtQuick.Layouts
@@ -161,7 +163,9 @@ Item {
           width: Math.min(parent.width - Style.space(48), Style.space(520))
           spacing: Style.space(18)
           opacity: Math.max(0, Math.min(1, window.contentOpacity))
-          scale: 1 - 0.008 * Math.min(1, Math.max(0, window.contentOffset / Style.space(24)))
+          scale: Math.min(1, Math.max(0.1,
+            (parent.height - Style.space(48)) / Math.max(1, implicitHeight)))
+            * (1 - 0.008 * Math.min(1, Math.max(0, window.contentOffset / Style.space(24))))
           layer.enabled: window.contentBlur > 0.001
           layer.smooth: true
           layer.effect: MultiEffect {
