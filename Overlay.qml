@@ -198,8 +198,8 @@ Item {
             text: qsTr("Look Elsewhere")
             color: Color.lock.text
             font.family: Style.font.family
-            font.pixelSize: Style.font.displayLarge * 1.1
-            font.weight: Font.Black
+            font.pixelSize: Style.font.displayLarge * 1.2
+            font.weight: Font.Bold
           }
           Text {
             Layout.fillWidth: true
