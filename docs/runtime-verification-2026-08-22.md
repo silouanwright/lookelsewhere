@@ -94,9 +94,21 @@ one focused `HDMI-A-2` output at 3840×2160 with scale 2.
   mode was cleared, and the service returned to its preserved working schedule
   without a coredump.
 
+## Constrained output
+
+- A second transient output was configured through Hyprland's current Lua
+  evaluation API at 800×600 logical pixels and focused for fixture capture.
+- The top-centered warning remained within safe horizontal margins with
+  readable wrapped copy and countdown; the full break surface remained
+  centered, legible, and unclipped at the short output height.
+- After both captures, demo mode was cleared and the output removed. The real
+  schedule resumed, the physical output regained focus, and `hyprctl
+  configerrors` remained empty.
+
 ## Current limitations
 
-- Only one physical output is connected. Compositor-level creation and removal
-  during an active break is verified with a transient headless output, but
-  physical multi-monitor focus handoff and mixed-scale presentation remain
-  candidates for future hardware acceptance.
+- Only one physical output is connected. Compositor-level creation, removal,
+  800×600 constrained presentation, and creation during an active break are
+  verified with transient headless outputs, but physical multi-monitor focus
+  handoff and mixed-scale presentation remain candidates for future hardware
+  acceptance.

@@ -6,43 +6,43 @@ submission.
 
 ## Repository gate
 
-- [ ] `git status --short` is empty.
-- [ ] `manifest.json` identifies `io.github.silouanwright.look-elsewhere`,
+- [x] `git status --short` is empty.
+- [x] `manifest.json` identifies `io.github.silouanwright.look-elsewhere`,
   version `0.1.0`, author Silouan Wright, and MIT licensing.
-- [ ] The plugin ID is still absent from the public marketplace registry.
-- [ ] README installation and removal commands match the current Omarchy CLI.
-- [ ] `LICENSE` and `THIRD_PARTY_NOTICES.md` cover the shipped code and icons.
-- [ ] Root `preview.png` and every README asset are original Look Elsewhere
+- [x] The plugin ID is still absent from the public marketplace registry.
+- [x] README installation and removal commands match the current Omarchy CLI.
+- [x] `LICENSE` and `THIRD_PARTY_NOTICES.md` cover the shipped code and icons.
+- [x] Root `preview.png` and every README asset are original Look Elsewhere
   captures from the exact release UI.
-- [ ] No secrets, raw personal context, generated state, or machine-specific
+- [x] No secrets, raw personal context, generated state, or machine-specific
   paths are tracked.
 
 ## Automated gate
 
-- [ ] `git diff --check` passes.
-- [ ] All Qt Quick model tests pass offscreen.
-- [ ] `omarchy plugin validate .` passes.
-- [ ] Deterministic lint and system `qmllint` findings are reviewed against the
+- [x] `git diff --check` passes.
+- [x] All Qt Quick model tests pass offscreen.
+- [x] `omarchy plugin validate .` passes.
+- [x] Deterministic lint and system `qmllint` findings are reviewed against the
   documented Omarchy import limitations.
-- [ ] The exact commit passes the focused QML semantic review.
+- [x] The exact runtime source passes the focused QML semantic review.
 
 ## Installed-runtime gate
 
-- [ ] Clean add, enable, disable, and remove paths work without an install hook,
+- [x] Clean add, enable, disable, and remove paths work without an install hook,
   privilege escalation, orphaned process, or user-config overwrite.
-- [ ] Real scheduling survives shell restart with demo mode off.
-- [ ] Invalid persisted JSON is preserved, writes remain blocked, the recovery
+- [x] Real scheduling survives shell restart with demo mode off.
+- [x] Invalid persisted JSON is preserved, writes remain blocked, the recovery
   message is visible, and exact restoration resumes normal persistence.
-- [ ] Idle state visibly pauses the bar and panel countdown.
-- [ ] Warning begins before focus reaches zero, final countdown follows, and
+- [x] Idle state visibly pauses the bar and panel countdown.
+- [x] Warning begins before focus reaches zero, final countdown follows, and
   the break starts at the original zero without a second warning cycle.
-- [ ] Gentle, Balanced, and Focused exits match their documented policy;
+- [x] Gentle, Balanced, and Focused exits match their documented policy;
   `Ctrl+Shift+Esc` remains available in Focused mode.
-- [ ] Keyboard traversal, Escape dismissal, accessible roles/names, and reduced
+- [x] Keyboard traversal, Escape dismissal, accessible roles/names, and reduced
   motion are verified.
-- [ ] Dark and light themes, supported bar edges, scaled/narrow layouts, shell
+- [x] Dark and light themes, supported bar edges, scaled/narrow layouts, shell
   reload, and available multi-monitor behavior are recorded honestly.
-- [ ] The final run leaves the real schedule restored and produces no new shell
+- [x] The final run leaves the real schedule restored and produces no new shell
   QML errors or coredumps.
 
 ## Public-release gate

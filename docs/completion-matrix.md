@@ -25,12 +25,12 @@ Status reflects inspected repository and installed-runtime evidence on 2026-08-2
 | Keyboard and accessibility | Implemented | Native button roles/names/actions, deterministic Tab/Backtab order, Escape dismissal, Focused emergency exit, and reduced-motion behavior; live focus screenshots and clean runtime logs recorded |
 | Theme and bar-position QA | Implemented | Osaka Jade and Catppuccin Latte plus top/bottom/left/right were exercised live and restored; transient panel IPC lifecycle issue found and fixed |
 | Automated tests and QML review | Implemented | 38 passing model/component tests, manifest validation, system qmllint, two six-pass semantic reviews, remediations, live flow proof, hotplug proof, and keyboard acceptance evidence exist |
-| Public packaging | Partial | Manifest, MIT license, release README, current original root preview, panel/warning stills, 21-second deterministic demo, marketplace draft, isolated add/validate/remove proof, and live panel-owned disable/re-enable proof exist; final verified-commit audit remains |
+| Public packaging | Implemented | Manifest, rights notices, release README, current original root preview, panel/warning stills, 21-second deterministic demo, marketplace draft, clean provenance audit, isolated add/validate/remove proof, and live panel-owned disable/re-enable proof exist |
 | Competition submission | Missing | External publication and marketplace submission require final authorization |
 
 ## Immediate release sequence
 
-1. Complete the remaining runtime acceptance matrix, including the feasible
-   scaled/narrow-output and keyboard-focus checks.
-2. Produce the final original preview/demo assets and finish the release README.
-3. Audit the exact distributable commit, then request publication and submission approval.
+1. Re-run automated and source gates against the final documentation commit.
+2. Present the exact distributable commit for publication approval.
+3. After approval, create the public repository, verify installation from its
+   URL, and request final approval of the marketplace issue body.
