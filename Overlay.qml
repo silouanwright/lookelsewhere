@@ -103,8 +103,8 @@ Item {
           property: "contentOffset"
           from: Style.space(32)
           to: 0
-          duration: 450
-          easing.type: Easing.InOutSine
+          duration: 650
+          easing.type: Easing.OutCubic
         }
       }
 
