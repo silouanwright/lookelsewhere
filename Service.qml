@@ -411,9 +411,9 @@ Item {
   }
 
   Timer {
-    // Bound visible rollback near a due break without writing every scheduler
-    // tick throughout the entire work interval.
-    interval: service.interrupting || service.remainingMs <= 60000 ? 5000 : 30000
+    // Quickshell has no shutdown callback reliable enough to flush during a
+    // shell restart, so keep any visible countdown rollback below five seconds.
+    interval: 5000
     repeat: true
     running: service.stateLoaded && !service.demoMode
     onTriggered: service.flushState()
