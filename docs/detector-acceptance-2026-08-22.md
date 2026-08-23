@@ -5,7 +5,7 @@ preserved. Media was returned to paused after testing.
 
 | Signal | Result | Evidence |
 |---|---|---|
-| Focused-app MPRIS playback | Partial live acceptance | The original broad detector emitted real Chromium playback evidence. After adding focused-app matching, playing Chromium behind a fullscreen Steam game correctly emitted no playback evidence. The focused-browser half remains to be rerun after the game releases exclusive focus. |
+| Focused-app MPRIS playback | Passed | Playing Chromium behind a fullscreen Steam game correctly emitted no playback evidence. After the game released focus, focused Chromium with MPRIS `Playing` emitted `media` evidence at confidence `0.8` and the `Video` context label; pausing cleared both. |
 | Hyprland fullscreen | Passed | A focused native window emitted and cleared fullscreen evidence. A live XWayland Steam game also reported mode `2` through focus-triggered reconciliation. |
 | Protected application | Passed | The focused `steam_app_1868140` game matched the default `steam` policy and emitted `application` evidence at confidence `1`, producing the `Focus` bar state. |
 | Final-ten-second input hold | Passed | Modifier-only input through the real Wayland input path produced `Typing..` and repeatedly held the deadline at 10,000 ms; after input stopped, the hold cleared and the countdown resumed. |

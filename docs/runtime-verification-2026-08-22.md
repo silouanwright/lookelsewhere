@@ -21,9 +21,11 @@ one focused `HDMI-A-2` output at 3840×2160 with scale 2.
 
 ## Live detector acceptance
 
-- Chromium MPRIS playback originally produced real `media` evidence at
-  confidence `0.8`. After narrowing the policy, playing Chromium behind the
-  focused fullscreen Steam game correctly produced no playback evidence.
+- Chromium MPRIS playback was exercised both behind a fullscreen Steam game
+  and while Chromium itself was focused. Background playback correctly emitted
+  no evidence. Focused playback emitted `media` evidence at confidence `0.8`
+  with the `Video` context label, and pausing cleared both on the next
+  observation.
 - The focused `steam_app_1868140` XWayland game produced high-confidence
   protected-application evidence and the subdued `Focus` bar status. Its
   fullscreen mode `2` was reconciled without continuous polling.

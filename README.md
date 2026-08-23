@@ -27,7 +27,7 @@ explains the longer countdown without rewriting the user-configured guidance.
 
 ![Look Elsewhere long-break overlay](docs/assets/long-break.png)
 
-[Watch the 21-second deterministic warning-to-break demo](docs/assets/demo.mp4).
+[Watch the 23-second deterministic warning-to-break demo](docs/assets/demo.mp4).
 The capture uses synthetic fixture state, does not inspect private context, and
 returns the real schedule unchanged when it ends.
 

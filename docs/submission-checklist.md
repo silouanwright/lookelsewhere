@@ -12,9 +12,8 @@ submission.
 - [x] The plugin ID is still absent from the public marketplace registry.
 - [x] README installation and removal commands match the current Omarchy CLI.
 - [x] `LICENSE` and `THIRD_PARTY_NOTICES.md` cover the shipped code and icons.
-- [ ] Root `preview.png` and every README asset are original Look Elsewhere
-  captures from the exact release UI. The current originals predate the final
-  focused-application and panel refinements and must be recaptured.
+- [x] Root `preview.png` and every README asset are original Look Elsewhere
+  captures from the exact release UI.
 - [x] No secrets, raw personal context, generated state, or machine-specific
   paths are tracked.
 
