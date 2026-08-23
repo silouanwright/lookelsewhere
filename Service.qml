@@ -73,6 +73,9 @@ Item {
   }
   readonly property bool idle: demoMode ? demoIdle : idleMonitor.isIdle
   readonly property bool naturalPauseReady: demoMode ? demoNaturalPause : naturalPauseMonitor.isIdle
+  // Must exceed the one-second scheduler interval so recent input cannot
+  // expire between adjacent observations. Keep explicit for live calibration.
+  readonly property int typingQuietSeconds: 2
   readonly property bool typingHoldActive: (!demoMode || demoTypingProbe)
     && (phase === Model.State.Warning || phase === Model.State.Final)
     && remainingMs <= 10000
@@ -451,7 +454,7 @@ Item {
     enabled: service.stateLoaded && (!service.demoMode || service.demoTypingProbe)
       && (service.phase === Model.State.Warning || service.phase === Model.State.Final)
       && service.remainingMs <= 11000
-    timeout: 1
+    timeout: service.typingQuietSeconds
     respectInhibitors: false
   }
 

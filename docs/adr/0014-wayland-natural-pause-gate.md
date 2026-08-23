@@ -20,11 +20,18 @@ media, microphone, and dictation policy are evaluated separately by Smart
 Context. Once a break is due, the engine waits until this short monitor reports
 quiet input, then begins the warning.
 
-During the final ten seconds, a one-second monitor also holds the countdown at
+During the final ten seconds, a two-second monitor also holds the countdown at
 ten seconds while keyboard or pointer activity continues. The bar reports this
-privacy-preserving approximation as `Typing..`; after one quiet second the
+privacy-preserving approximation as `Typing..`; after two quiet seconds the
 countdown resumes. Wayland does not expose typed keys or pointer coordinates to
 the plugin.
+
+The recent-input window deliberately exceeds the one-second scheduler interval.
+A one-second window can expire immediately before an observation, intermittently
+missing sparse input depending on clock phase. `Service.typingQuietSeconds`
+keeps that runtime calibration explicit: raise it only if real input is still
+missed, and lower it only if quiet users are held too long. The visible policy
+remains unchanged: activity holds the countdown at ten seconds.
 
 The existing maximum smart-delay bound applies to this wait. Continuous input
 therefore cannot suppress a break indefinitely. The ordinary 60-second idle

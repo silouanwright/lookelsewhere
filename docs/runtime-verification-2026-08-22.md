@@ -55,8 +55,9 @@ one focused `HDMI-A-2` output at 3840×2160 with scale 2.
   suppressed persistence and sounds.
 - Repeated modifier-only input changed the bar to `Typing..` and held the
   warning deadline at exactly 10,000 ms.
-- After input stopped, one quiet second released the hold; the observed
-  countdown reached 8,000 ms two seconds later.
+- After input stopped, the two-second recent-input window released the hold.
+  It intentionally exceeds one scheduler interval so sparse input cannot
+  expire immediately before it is sampled.
 - Clearing the fixture restored the exact real schedule with no recovery
   warning.
 
