@@ -220,7 +220,7 @@ Item {
           }
           BorderSurface {
             Layout.alignment: Qt.AlignHCenter
-            Layout.topMargin: -Style.space(6)
+            Layout.topMargin: 0
             Layout.bottomMargin: -Style.space(12)
             visible: root.service && root.service.snapshot.activeBreakIsLong
             implicitWidth: longBreakLabel.implicitWidth + Style.space(14)
