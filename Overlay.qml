@@ -221,13 +221,13 @@ Item {
           BorderSurface {
             Layout.alignment: Qt.AlignHCenter
             Layout.topMargin: -Style.space(6)
-            Layout.bottomMargin: -Style.space(6)
+            Layout.bottomMargin: -Style.space(12)
             visible: root.service && root.service.snapshot.activeBreakIsLong
             implicitWidth: longBreakLabel.implicitWidth + Style.space(14)
             implicitHeight: longBreakLabel.implicitHeight + Style.space(6)
             color: Style.hoverFillFor(Color.lock.text, Color.accent)
             borderSpec: Border.controlSpec("normal", Color.lock.text, Color.accent)
-            radius: Style.cornerRadius
+            radius: height / 2
 
             Text {
               id: longBreakLabel
