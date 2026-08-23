@@ -27,6 +27,7 @@ Item {
   property string probedActiveAppId: ""
   property bool probedFullscreenActive: false
   property bool probedActiveWindowAvailable: false
+  property int activeWindowGeneration: 0
   property bool startSoundAvailable: true
   property bool completionSoundAvailable: true
   property bool completionCuePlayed: false
@@ -141,7 +142,13 @@ Item {
     if (!demoMode && snapshot.state !== beforeState) scheduleSave()
   }
 
-  onActiveToplevelChanged: activeWindowRefresh.restart()
+  onActiveToplevelChanged: {
+    activeWindowGeneration++
+    probedActiveAppId = ""
+    probedFullscreenActive = false
+    probedActiveWindowAvailable = false
+    activeWindowRefresh.restart()
+  }
 
   function configure(values) {
     var authoritative = Model.configFromSettings(values)
@@ -396,22 +403,29 @@ Item {
     repeat: false
     onTriggered: {
       if (activeWindowProbe.running) activeWindowRefresh.restart()
-      else activeWindowProbe.running = true
+      else {
+        activeWindowProbe.generation = service.activeWindowGeneration
+        activeWindowProbe.running = true
+      }
     }
   }
 
   Process {
     id: activeWindowProbe
+    property int generation: 0
     command: ["hyprctl", "activewindow", "-j"]
     stdout: StdioCollector {
       waitForEnd: true
       onStreamFinished: {
+        if (activeWindowProbe.generation !== service.activeWindowGeneration) return
         try {
           var active = JSON.parse(text || "{}")
           service.probedActiveAppId = String(active.class || active.initialClass || "")
           service.probedFullscreenActive = Number(active.fullscreen || 0) !== 0
           service.probedActiveWindowAvailable = service.probedActiveAppId !== ""
         } catch (error) {
+          service.probedActiveAppId = ""
+          service.probedFullscreenActive = false
           service.probedActiveWindowAvailable = false
         }
       }

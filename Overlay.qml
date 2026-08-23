@@ -41,7 +41,7 @@ Item {
       id: window
       required property var modelData
       screen: modelData
-      visible: root.visibleState && (!root.service || root.service.config.outputMode !== "focused" || window.authoritative)
+      visible: root.visibleState && shouldPresent
       anchors { top: true; bottom: true; left: true; right: true }
       color: "transparent"
       exclusionMode: ExclusionMode.Ignore
@@ -51,12 +51,25 @@ Item {
       }
 
       readonly property bool authoritative: Hyprland.focusedMonitor && Hyprland.focusedMonitor.name === modelData.name
+      readonly property bool shouldPresent: !root.service
+        || root.service.config.outputMode !== "focused" || authoritative
       property real backdropReveal: 0
       property real contentOpacity: 0
       property real contentOffset: 0
       property real contentBlur: 0
       readonly property int backdropDuration: 495
       readonly property int contentRevealDelay: 200
+
+      function settleBreakReveal() {
+        backdropAnimation.stop()
+        contentOpacityAnimation.stop()
+        contentMotionAnimation.stop()
+        contentBlurAnimation.stop()
+        backdropReveal = 1
+        contentOffset = 0
+        contentOpacity = 1
+        contentBlur = 0
+      }
 
       function beginBreakReveal() {
         backdropAnimation.stop()
@@ -67,6 +80,10 @@ Item {
         contentOffset = Style.space(24)
         contentOpacity = 0
         contentBlur = 0.08
+        if (!shouldPresent) {
+          settleBreakReveal()
+          return
+        }
         if (root.service && root.service.config.reducedMotion) {
           backdropReveal = 1
           contentOffset = 0
@@ -82,6 +99,12 @@ Item {
 
       Component.onCompleted: {
         if (root.breaking) Qt.callLater(window.beginBreakReveal)
+      }
+
+      onShouldPresentChanged: {
+        if (!root.breaking) return
+        if (shouldPresent) beginBreakReveal()
+        else settleBreakReveal()
       }
 
       Connections {

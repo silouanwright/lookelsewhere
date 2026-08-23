@@ -496,6 +496,7 @@ Panel {
             readonly property real fitScale: Math.min(1,
               (parent.width - Style.space(4)) / Math.max(1, implicitWidth))
             anchors.horizontalCenter: parent.horizontalCenter
+            transformOrigin: Item.Top
             scale: fitScale
             spacing: Style.space(5)
 
