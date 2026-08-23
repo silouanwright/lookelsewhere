@@ -222,7 +222,7 @@ Item {
           Text {
             Layout.fillWidth: true
             Layout.topMargin: -Style.space(4)
-            text: root.service ? root.service.config.breakTitle : qsTr("Look Elsewhere")
+            text: root.service ? root.service.config.breakTitle : qsTr("Look elsewhere")
             color: Color.lock.text
             font.family: Style.font.family
             font.pixelSize: Style.font.displayLarge * 1.35

@@ -31,7 +31,7 @@ function defaultConfig() {
     maximumDelayMs: 15 * 60 * 1000,
     enforcement: "balanced",
     snoozeBudget: 3,
-    breakTitle: "Look Elsewhere",
+    breakTitle: "Look elsewhere",
     breakSubtitle: "Let your eyes settle on something distant. Breathe. The screen will still be here.",
     reducedMotion: false,
     soundEnabled: true,
