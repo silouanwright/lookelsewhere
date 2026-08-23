@@ -101,7 +101,8 @@ omarchy bar set io.github.silouanwright.look-elsewhere shortcutBreakNow '"Ctrl+K
 `displayMode` accepts `icon`, `time`, or `icon-and-time`. The compact countdown shows minutes, then switches to seconds during the final minute. Vertical bars use the icon so the widget remains legible.
 
 `protectedApps` accepts comma-separated Wayland application IDs. A due break is
-held while a listed application is focused; `steam` is included by default.
+held while a listed application is focused; `steam` and its `steam_app_<id>`
+game windows are included by default.
 Inspect `hyprctl activewindow -j` when an application's ID is unclear.
 
 Look Elsewhere enables two bundled piano cues by default: an ascending phrase

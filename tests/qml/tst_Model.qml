@@ -475,6 +475,7 @@ TestCase {
     var defaults = Model.configFromSettings({})
     compare(defaults.protectedApps.join(","), "steam")
     verify(Model.matchesProtectedApp("steam", defaults.protectedApps))
+    verify(Model.matchesProtectedApp("steam_app_1868140", defaults.protectedApps))
     verify(!Model.matchesProtectedApp("chromium", defaults.protectedApps))
 
     var customized = Model.configFromSettings({ protectedApps: "code, org.gnome.Builder.desktop" })

@@ -568,7 +568,11 @@ function appIdsMatch(left, right) {
 }
 
 function matchesProtectedApp(appId, protectedApps) {
-  for (var i = 0; i < (protectedApps || []).length; i++)
-    if (appIdsMatch(appId, protectedApps[i])) return true
+  var active = String(appId || "").toLowerCase().replace(/\.desktop$/, "")
+  for (var i = 0; i < (protectedApps || []).length; i++) {
+    var configured = String(protectedApps[i] || "").toLowerCase().replace(/\.desktop$/, "")
+    if (appIdsMatch(active, configured)) return true
+    if (configured === "steam" && /^steam_app_[0-9]+$/.test(active)) return true
+  }
   return false
 }
