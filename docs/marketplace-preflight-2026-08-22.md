@@ -1,15 +1,17 @@
 # Marketplace Preflight — 2026-08-22
 
-This preflight used the current `main` branch of the official
+This preflight was rechecked against the current `main` branch of the official
 `HANCORE-linux/omarchy-plugin-marketplace` repository at commit
-`bf2ede0927040a96a6401a85d38770692cb0fd41`. It does not publish or submit
-Look Elsewhere.
+`efa8117a78c21e9318079c5525a01525f5b21328`. The submission contract and
+security-scanner sources are unchanged from the earlier reviewed revision. It
+does not publish or submit Look Elsewhere.
 
 ## Automated Security Baseline
 
-The marketplace's dependency-free V3 analysis was run locally against the
-same root README and runtime files its snapshot scanner selects, including all
-three manifest entry points. The result was:
+The marketplace's dependency-free V3 analysis was rerun locally against Look
+Elsewhere commit `1d66210`, using the same root README and 12 runtime files its
+snapshot scanner selects, including all three manifest entry points. The
+result was:
 
 - outcome: `passed`
 - enforcement mode: `selective`
