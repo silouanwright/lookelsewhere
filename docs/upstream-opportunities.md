@@ -17,6 +17,7 @@ heuristics, local hardware failures, and features that belong in this plugin.
 | P1 | Stable anchored-popover controller | Omarchy Shell |
 | P1 | Standard meeting, sharing, and recording state | XDG portals / desktop ecosystem |
 | P2 | Public lock-service action | Omarchy Shell |
+| P2 | Space-key selection in open dropdowns | Omarchy Shell |
 | P2 | Richer Voxtype status and audio discovery | Voxtype / Omarchy |
 | Research | Privacy-safe recent-input categories | Wayland compositors / protocol ecosystem |
 
@@ -252,4 +253,3 @@ Local absence of an audio input node and lack of physical mixed-scale monitors
 are validation-environment constraints, not upstream defects. Browser extensions
 and player-specific adapters remain appropriate when a portable standard cannot
 provide exact application semantics.
-

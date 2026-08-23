@@ -78,8 +78,8 @@ uses the default declared by the plugin manifest.
 | `soundVolume` | `65` | Integer `0–100` | LookElsewhere cue volume; system output volume remains the final ceiling. |
 | `startSoundEnabled` | `true` | Boolean | Play a cue when a break begins. |
 | `completionSoundEnabled` | `true` | Boolean | Play a cue just before a break finishes. |
-| `startSoundPath` | `""` | Absolute path, `~/` path, or empty | Custom start cue; empty uses the bundled piano phrase. |
-| `completionSoundPath` | `""` | Absolute path, `~/` path, or empty | Custom completion cue; empty uses the bundled piano phrase. |
+| `startSoundPath` | `""` | Absolute path, `~/` path, or empty | Custom start cue; empty uses the bundled cue. |
+| `completionSoundPath` | `""` | Absolute path, `~/` path, or empty | Custom completion cue; empty uses the bundled cue. |
 
 ## Panel shortcuts
 
@@ -98,7 +98,10 @@ conventions.
 | `shortcutHistory` | `"H"` | Open break history. |
 | `shortcutOptions` | `"O"` | Open options. |
 | `shortcutEdit` | `"E"` | Open the configuration file from Options. |
-| `shortcutDisable` | `"Shift+D"` | Stop and disable LookElsewhere from Options. |
+| `shortcutGeneralTab` | `"G"` | Open General settings. |
+| `shortcutBreaksTab` | `"R"` | Open Breaks settings. |
+| `shortcutContextTab` | `"C"` | Open Context settings. |
+| `shortcutExperienceTab` | `"X"` | Open Experience settings. |
 | `shortcutClose` | `"Q"` | Close the panel. |
 | `shortcutHints` | `"?"` | Toggle visible shortcut badges. |
 
@@ -158,7 +161,10 @@ the complete default value set in one copyable shape:
   "shortcutHistory": "H",
   "shortcutOptions": "O",
   "shortcutEdit": "E",
-  "shortcutDisable": "Shift+D",
+  "shortcutGeneralTab": "G",
+  "shortcutBreaksTab": "R",
+  "shortcutContextTab": "C",
+  "shortcutExperienceTab": "X",
   "shortcutClose": "Q",
   "shortcutHints": "?"
 }

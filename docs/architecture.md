@@ -1,5 +1,10 @@
 # Architecture
 
+Reusable presentation controls live in the internal `Ui/` QML module and are
+imported as `LookUi.*`. The module composes Omarchy primitives rather than
+forking the shell design system; product-specific scheduling, overlays, and
+break visuals remain outside it. See `Ui/README.md` for the ownership boundary.
+
 ## Competition architecture
 
 ```text
@@ -42,6 +47,18 @@ The prototype must validate whether the overlay is best owned by the resident se
 - Manifest-backed user settings and sole configuration authority: Omarchy Shell `shell.json`
 - Scheduler state, timestamps, and aggregate history: `${XDG_STATE_HOME:-~/.local/state}/look-elsewhere/state.json`
 
+The Options page does not keep a private settings copy. A control change calls
+Omarchy Shell's `updateEntryInline()`, which rewrites the LookElsewhere entry in
+`~/.config/omarchy/shell.json`. Omarchy injects that updated entry back into the
+widget, `Model.configFromSettings()` rebuilds a complete normalized
+configuration from manifest defaults plus the stored overrides, and `Service`
+applies it immediately.
+
+`manifest.json` defines machine-readable defaults and field metadata.
+`CONFIGURATION.md` is the human-readable reference for every supported option.
+Neither is runtime state, and the scheduler state file never stores user
+configuration.
+
 The state document contains no configuration, is versioned, and is written atomically. Legacy documents containing a `config` field remain readable, but that field is ignored. Before release, corrupt/unsupported-state recovery must retain diagnostic evidence rather than silently replacing the original.
 
 ## External integrations
@@ -53,3 +70,19 @@ The state document contains no configuration, is versioned, and is written atomi
 - Quickshell IPC for control, inspection, and fixture staging
 
 No integration may require screen capture, audio recording, accessibility-style content scraping, or persistent application-title collection.
+
+## Popup keyboard ownership
+
+The anchored panel uses Omarchy's `KeyboardPanel`, which is a layer-shell
+window. Its mnemonic `Shortcut` objects live inside that window's item tree and
+use `Qt.WindowShortcut`. This is necessary for both halves of the keyboard
+contract:
+
+- shortcuts such as `?`, `B`, `1`, `H`, and `O` work while LookElsewhere owns
+  keyboard focus;
+- those shortcuts stop immediately when another Omarchy panel takes focus.
+
+Do not move the shortcuts back to the outer `Panel` object. A window-local
+shortcut outside the popup tree has no window association and never fires.
+Do not replace `Qt.WindowShortcut` with `Qt.ApplicationShortcut`; that allows an
+open LookElsewhere instance to intercept keys intended for another shell panel.

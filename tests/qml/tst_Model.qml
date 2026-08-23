@@ -90,18 +90,18 @@ TestCase {
   function test_panelShortcutConfiguration() {
     var defaults = Model.panelShortcuts({})
     compare(defaults.breakNow, "B")
-    compare(defaults.disable, "Shift+D")
+    compare(defaults.generalTab, "G")
+    compare(defaults.breaksTab, "R")
     compare(defaults.hints, "?")
 
     var customized = Model.panelShortcuts({
       shortcutBreakNow: "ctrl + k",
-      shortcutDisable: "super+x",
+      shortcutGeneralTab: "F2",
       shortcutHints: "F1"
     })
     compare(customized.breakNow, "Ctrl+K")
-    compare(customized.disable, "Meta+X")
+    compare(customized.generalTab, "F2")
     compare(customized.hints, "F1")
-    compare(Model.panelShortcutLabel("Shift+D"), "⬆D")
     compare(Model.panelShortcutLabel("Ctrl+K"), "Ctrl+K")
 
     var invalid = Model.panelShortcuts({ shortcutBreakNow: "Escape", shortcutPause: "" })
@@ -422,6 +422,13 @@ TestCase {
     verify(Model.canSkipBreak(config({ enforcement: "casual" })))
     verify(Model.canSkipBreak(config({ enforcement: "balanced" })))
     verify(!Model.canSkipBreak(config({ enforcement: "hardcore" })))
+  }
+
+  function test_pausePolicyAllowsCountdownButNotActiveBreak() {
+    verify(Model.canTogglePause(Model.State.Working))
+    verify(Model.canTogglePause(Model.State.Warning))
+    verify(Model.canTogglePause(Model.State.Final))
+    verify(!Model.canTogglePause(Model.State.Breaking))
   }
 
   function test_legacyEnforcementNamesMigrate() {

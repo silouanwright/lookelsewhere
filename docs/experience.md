@@ -82,7 +82,7 @@ The overlay exits cleanly, optionally plays a soft sound, records the local outc
 
 ## Configuration for the competition MVP
 
-Configuration is declared by the typed manifest schema and stored by Omarchy in `shell.json`. The README documents safe `omarchy bar set` commands for common changes. The quick panel does not duplicate these settings.
+Configuration is declared by the typed manifest schema and stored by Omarchy in `shell.json`. The README documents safe `omarchy bar set` commands for common changes. The quick panel exposes a small set of frequent settings and writes them through Omarchy's own persistence API, so it does not create a second source of truth.
 
 A post-MVP graphical client may organize settings into Overview, Breaks, Smart Context, Enforcement, Experience, and System/Privacy. It must consume the same manifest-backed contract rather than introduce a second source of truth.
 

@@ -25,19 +25,26 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-## Versilian Community Sample Library
+## Omarchy Dropdown
+
+`Ui/SettingDropdown.qml` is derived from Omarchy Shell's `Ui/Dropdown.qml` with
+Space-key selection added for an open list. Omarchy is released under the MIT
+License reproduced above.
+
+Copyright (c) David Heinemeier Hansson
+
+## GUI Sound Effects by Lokif
 
 The bundled `assets/sounds/break-start.ogg` and
-`assets/sounds/break-complete.ogg` cues were created from the Grand Piano K
-samples in the [Versilian Community Sample Library Keys](https://versilian-studios.com/vcsl-keys/).
-VCSL Keys is released under Creative Commons Zero (CC0 1.0) and may be used,
+`assets/sounds/break-complete.ogg` cues were created from `load.wav` in
+[GUI Sound Effects by Lokif](https://opengameart.org/content/gui-sound-effects).
+The pack is released under Creative Commons Zero (CC0 1.0) and may be used,
 modified, and redistributed without restriction.
 
-LookElsewhere uses the G-sharp 3 and C4, velocity-layer 4 sustain recordings.
-The cues trim and fade the source notes, stagger and mix them into ascending
-and descending two-note phrases, loudness-normalize the results, and encode
-them as 48 kHz stereo Ogg Vorbis files. This notice is retained as provenance
-even though attribution is not required by CC0.
+The start cue is the source encoded as Ogg Vorbis. The completion cue is
+pitched up one semitone and given a smooth tail fade before encoding. This
+notice is retained as provenance even though attribution is not required by
+CC0.
 
 ## Comparative product screenshots
 

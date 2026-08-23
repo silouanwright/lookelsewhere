@@ -214,7 +214,7 @@ Item {
 
   function togglePause() {
     // A convenience binding must not become an alternate enforcement exit.
-    if (interrupting) return
+    if (!Model.canTogglePause(phase)) return
     if (phase === Model.State.Waiting && snapshot.pauseReason === "manual") resume()
     else pauseBreaks()
   }

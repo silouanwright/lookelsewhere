@@ -8,6 +8,7 @@ import Quickshell.Hyprland
 import Quickshell.Wayland
 import qs.Commons
 import qs.Ui
+import "Ui" as LookUi
 
 Item {
   id: root
@@ -462,7 +463,7 @@ Item {
     }
   }
 
-  component OverlayButton: WeightedButton {
+  component OverlayButton: LookUi.WeightedButton {
     id: actionButton
     property bool primary: false
     label: text

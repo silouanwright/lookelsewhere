@@ -141,6 +141,14 @@ omarchy plugin add https://github.com/silouanwright/lookelsewhere.git --enable
 LookElsewhere requires Omarchy Quattro with Omarchy Shell. It has no installer
 hook, privileged operation, external daemon, account, or network dependency.
 
+Pause reminders from the Options page. To disable or later restore the entire
+plugin, use Omarchy's plugin manager or:
+
+```bash
+omarchy plugin disable io.github.silouanwright.look-elsewhere
+omarchy plugin enable io.github.silouanwright.look-elsewhere right
+```
+
 To remove it:
 
 ```bash

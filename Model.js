@@ -415,6 +415,10 @@ function canSkipBreak(config) {
   return cfg.enforcement !== "hardcore"
 }
 
+function canTogglePause(state) {
+  return state !== State.Breaking
+}
+
 function soundCueForTransition(beforeState, afterState) {
   if (beforeState !== State.Breaking && afterState === State.Breaking) return "start"
   if (beforeState === State.Breaking && afterState === State.Working) return "complete"
@@ -436,7 +440,10 @@ function panelShortcutDefinitions() {
     { action: "history", setting: "shortcutHistory", fallback: "H" },
     { action: "options", setting: "shortcutOptions", fallback: "O" },
     { action: "edit", setting: "shortcutEdit", fallback: "E" },
-    { action: "disable", setting: "shortcutDisable", fallback: "Shift+D" },
+    { action: "generalTab", setting: "shortcutGeneralTab", fallback: "G" },
+    { action: "breaksTab", setting: "shortcutBreaksTab", fallback: "R" },
+    { action: "contextTab", setting: "shortcutContextTab", fallback: "C" },
+    { action: "experienceTab", setting: "shortcutExperienceTab", fallback: "X" },
     { action: "close", setting: "shortcutClose", fallback: "Q" },
     { action: "hints", setting: "shortcutHints", fallback: "?" }
   ]

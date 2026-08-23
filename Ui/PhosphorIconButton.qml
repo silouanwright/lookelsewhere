@@ -7,6 +7,7 @@ Button {
   id: root
 
   required property string iconPath
+  property string displayIconPath: iconPath
   property color idleForeground: Color.muted
 
   text: ""
@@ -34,7 +35,7 @@ Button {
     ShapePath {
       strokeWidth: -1
       fillColor: root.glyphColor
-      PathSvg { path: root.iconPath }
+      PathSvg { path: root.displayIconPath }
 
       Behavior on fillColor { ColorAnimation { duration: 120 } }
     }
