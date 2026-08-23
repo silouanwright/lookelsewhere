@@ -230,6 +230,9 @@ could be added later, after the MPRIS field is standardized. Until then, a
 browser extension that inspects the active tab's playing media element is the
 most accurate browser-specific integration.
 
+The broader set of platform patches uncovered during development is maintained
+in [Upstream Opportunities](docs/upstream-opportunities.md).
+
 References: [MPRIS Player interface](https://specifications.freedesktop.org/mpris/latest/Player_Interface.html),
 [MPRIS metadata map](https://specifications.freedesktop.org/mpris/latest/Track_List_Interface.html),
 [Chromium MPRIS implementation](https://chromium.googlesource.com/chromium/src/+/b9c645c0b167a38b8f93b6c9e9f5a6a2f3e854ae/ui/base/mpris/mpris_service_impl.cc),
