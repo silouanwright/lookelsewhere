@@ -1,7 +1,6 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import QtQuick.Controls as Controls
 import QtQuick.Effects
 import QtQuick.Layouts
 import Quickshell
@@ -212,14 +211,33 @@ Item {
             Layout.fillWidth: true
             Layout.topMargin: -Style.space(12)
             horizontalAlignment: Text.AlignHCenter
-            text: root.service && root.service.snapshot.activeBreakIsLong
-              ? qsTr("Long break · %1").arg(root.service.config.breakSubtitle)
-              : root.service ? root.service.config.breakSubtitle
+            text: root.service ? root.service.config.breakSubtitle
               : qsTr("Let your eyes settle on something distant. Breathe. The screen will still be here.")
             color: Color.lock.placeholder
             font.family: Style.font.family
             font.pixelSize: Style.font.subtitle
             wrapMode: Text.WordWrap
+          }
+          BorderSurface {
+            Layout.alignment: Qt.AlignHCenter
+            Layout.topMargin: -Style.space(6)
+            Layout.bottomMargin: -Style.space(6)
+            visible: root.service && root.service.snapshot.activeBreakIsLong
+            implicitWidth: longBreakLabel.implicitWidth + Style.space(14)
+            implicitHeight: longBreakLabel.implicitHeight + Style.space(6)
+            color: Style.hoverFillFor(Color.lock.text, Color.accent)
+            borderSpec: Border.controlSpec("normal", Color.lock.text, Color.accent)
+            radius: Style.cornerRadius
+
+            Text {
+              id: longBreakLabel
+              anchors.centerIn: parent
+              text: qsTr("Long break")
+              color: Color.lock.text
+              font.family: Style.font.family
+              font.pixelSize: Style.font.bodySmall
+              font.weight: Font.Bold
+            }
           }
           Row {
             Layout.alignment: Qt.AlignHCenter
@@ -400,15 +418,14 @@ Item {
     }
   }
 
-  component OverlayButton: Button {
+  component OverlayButton: WeightedButton {
     id: actionButton
     property bool primary: false
-    property bool actionEnabled: true
-    property string disabledTooltipText: ""
+    label: text
+    labelWeight: Font.Bold
     selected: primary
     bordered: !primary
     focusable: root.breaking && actionEnabled
-    opacity: actionEnabled ? 1 : 0.42
     foreground: root.breaking ? Color.lock.text : Color.popups.text
     accent: Color.accent
     // Give the full-screen escape action a visible resting affordance. Use
@@ -426,22 +443,5 @@ Item {
       : qsTr("%1 unavailable; %2").arg(text).arg(disabledTooltipText)
     Accessible.onPressAction: if (actionEnabled) clicked()
 
-    Behavior on opacity { NumberAnimation { duration: 120 } }
-
-    MouseArea {
-      id: disabledHover
-      anchors.fill: parent
-      z: 2
-      visible: !actionButton.actionEnabled
-      hoverEnabled: true
-      cursorShape: Qt.ArrowCursor
-    }
-
-    Controls.ToolTip {
-      visible: !actionButton.actionEnabled && actionButton.disabledTooltipText !== ""
-        && disabledHover.containsMouse
-      text: actionButton.disabledTooltipText
-      delay: 350
-    }
   }
 }
