@@ -26,6 +26,7 @@ one focused `HDMI-A-2` output at 3840×2160 with scale 2.
   no evidence. Focused playback emitted `media` evidence at confidence `0.8`
   with the `Video` context label, and pausing cleared both on the next
   observation.
+
 - The focused `steam_app_1868140` XWayland game produced high-confidence
   protected-application evidence and the subdued `Focus` bar status. Its
   fullscreen mode `2` was reconciled without continuous polling.
@@ -36,6 +37,17 @@ one focused `HDMI-A-2` output at 3840×2160 with scale 2.
   failure, while PipeWire reported no target input node.
 - The detailed results and current accounting contract are recorded in
   [`detector-acceptance-2026-08-22.md`](detector-acceptance-2026-08-22.md).
+
+## Final release media
+
+- Root preview, quick panel, progressive warning, long-break still, and the
+  23-second warning-to-break demo were recaptured from the final installed
+  runtime on an empty workspace at native compositor scale.
+- The stills were losslessly resized to 2048×1152 for repository delivery. The
+  video is a silent 3840×2160 H.264 capture with cursor capture disabled.
+- Frame inspection covered the warning, final chip, break reveal, active break,
+  and clean return to the preserved real schedule. No private application
+  content appears in the committed media.
 
 ## Typing protection
 

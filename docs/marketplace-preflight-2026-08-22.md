@@ -9,9 +9,10 @@ does not publish or submit Look Elsewhere.
 ## Automated Security Baseline
 
 The marketplace's dependency-free V3 analysis was rerun locally against Look
-Elsewhere commit `1d66210`, using the same root README and 12 runtime files its
-snapshot scanner selects, including all three manifest entry points. The
-result was:
+Elsewhere's final runtime and README tree at commit
+`cb32c9f17a7ec2351073cd702b680ff14fb2d51d`, using the same root README and 12
+runtime files its snapshot scanner selects, including all three manifest entry
+points. The result was:
 
 - outcome: `passed`
 - enforcement mode: `selective`
