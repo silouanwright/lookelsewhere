@@ -4,12 +4,13 @@
 **Files reviewed:** `BarWidget.qml`, `Panel.qml`, `Overlay.qml`, `Service.qml`, rolling-number components, and QML tests
 **Method:** deterministic Qt/QML lint, system `qmllint`, and six semantic passes covering bindings, layout, lifecycle, delegates, states, and performance
 
-The final animation-and-chip refinement in commit `543b668` received a third,
-diff-scoped six-pass review. All six passes reported zero confirmed findings
+The final long-break and overlay refinements through commit `bebc87b` received
+a diff-scoped six-pass review. All six passes reported zero confirmed findings
 and zero investigation targets. The deterministic linter introduced no new
-changed-line finding; standalone `qmllint` again reported only the documented
-runtime-root import-resolution limitations. The exact QML test suite now passes
-47 checks with zero failures, including long-break cadence and policy migration.
+actionable changed-line finding; standalone `qmllint` again reported only the
+documented runtime-root import-resolution limitations. The exact QML test suite
+now passes 48 checks with zero failures, including configurable shortcut
+validation, long-break cadence, and policy migration.
 
 ## Confirmed findings and disposition
 
@@ -37,7 +38,7 @@ runtime-root import-resolution limitations. The exact QML test suite now passes
 - Component tests cover inactive snapping, active animation, reduced motion,
   digit-boundary changes, minimum digit count, sequential recovery from a
   small missed countdown sample, and immediate handling of a true reset. The
-  complete suite passes 47 tests with zero failures.
+  complete suite passes 48 tests with zero failures.
 
 ## Environmental lint limitations
 

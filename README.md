@@ -22,6 +22,11 @@ to a small final countdown and then a calm, theme-aware break surface.
 |---|---|
 | ![Look Elsewhere anchored quick panel](docs/assets/quick-panel.png) | ![Look Elsewhere top-centered warning](docs/assets/progressive-warning.png) |
 
+Periodic long breaks use the same calm surface, with a compact status pill that
+explains the longer countdown without rewriting the user-configured guidance.
+
+![Look Elsewhere long-break overlay](docs/assets/long-break.png)
+
 [Watch the 21-second deterministic warning-to-break demo](docs/assets/demo.mp4).
 The capture uses synthetic fixture state, does not inspect private context, and
 returns the real schedule unchanged when it ends.

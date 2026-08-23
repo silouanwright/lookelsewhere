@@ -15,6 +15,9 @@ one focused `HDMI-A-2` output at 3840×2160 with scale 2.
 - The timer-driven `flow` fixture traversed warning, final countdown, and
   breaking through the real one-second scheduler rather than direct fixture
   replacement.
+- An ordinary shell restart reproduced a 20-second countdown rollback with the
+  previous 30-second checkpoint. The final five-second checkpoint bounds that
+  visible rollback without counting suspend or idle time as active use.
 
 ## Keyboard and accessibility
 
@@ -31,6 +34,9 @@ one focused `HDMI-A-2` output at 3840×2160 with scale 2.
   minute while remaining in `working`; during the warning it entered the
   bounded one-minute postponed state. Clearing demo mode restored the exact
   real schedule.
+- Manifest-backed custom shortcut values and conflict fallback pass model
+  acceptance. Opening the native clock panel closed LookElsewhere through the
+  shared bar-popout coordinator; LookElsewhere mnemonics then remained inactive.
 - Escape dismisses the panel without invoking either action.
 - The earlier Hardcore emergency-exit behavior was intentionally superseded.
   Installed Casual and Balanced fixtures accepted IPC skip immediately.
@@ -49,7 +55,7 @@ one focused `HDMI-A-2` output at 3840×2160 with scale 2.
   from (for example) `6` directly to `4`.
 - Large changes, including fixture changes and schedule resets, snap to the new
   authoritative value rather than animating through stale seconds.
-- Component acceptance covers both behaviors and the complete suite passes 47
+- Component acceptance covers both behaviors and the complete suite passes 48
   tests with zero failures.
 
 ## Break sounds
@@ -60,7 +66,7 @@ one focused `HDMI-A-2` output at 3840×2160 with scale 2.
   cue, natural completion selects the return cue, and unrelated transitions
   remain silent. Demo and restoration paths are explicitly suppressed.
 - A lightweight timer runs only during a break and arms the return cue once in
-  the final 100 milliseconds, keeping its onset aligned with visual dismissal. The
+  the final 25 milliseconds, keeping its onset aligned with visual dismissal. The
   state transition retains a guarded fallback without double-playing.
 - The master switch, independent cue switches, 0–100 app volume, bundled
   defaults, and optional absolute or `~/` custom paths are manifest-backed.
