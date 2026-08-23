@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Controls as Controls
 import qs.Commons
 import qs.Ui
 
@@ -41,10 +40,10 @@ Button {
     cursorShape: Qt.ArrowCursor
   }
 
-  Controls.ToolTip {
+  PanelToolTip {
     visible: !root.actionEnabled && root.disabledTooltipText !== ""
       && disabledHover.containsMouse
     text: root.disabledTooltipText
-    delay: 350
+    fontFamily: root.fontFamily
   }
 }
