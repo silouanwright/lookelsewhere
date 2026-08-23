@@ -58,6 +58,7 @@ omarchy-shell look-elsewhere demo media
 omarchy-shell look-elsewhere demo fullscreen
 omarchy-shell look-elsewhere demo dictation
 omarchy-shell look-elsewhere demo idle
+omarchy-shell look-elsewhere demo typing
 omarchy-shell look-elsewhere demo flow
 omarchy-shell look-elsewhere demo long-break
 omarchy-shell look-elsewhere demo warning

@@ -35,6 +35,7 @@ Item {
   property bool demoMode: false
   property bool demoIdle: false
   property bool demoNaturalPause: true
+  property bool demoTypingProbe: false
   property var demoEvidence: []
   property var preDemoSnapshot: null
   property var preDemoConfig: null
@@ -71,7 +72,7 @@ Item {
   }
   readonly property bool idle: demoMode ? demoIdle : idleMonitor.isIdle
   readonly property bool naturalPauseReady: demoMode ? demoNaturalPause : naturalPauseMonitor.isIdle
-  readonly property bool typingHoldActive: !demoMode
+  readonly property bool typingHoldActive: (!demoMode || demoTypingProbe)
     && (phase === Model.State.Warning || phase === Model.State.Final)
     && remainingMs <= 10000
     && !typingPauseMonitor.isIdle
@@ -255,6 +256,7 @@ Item {
     demoMode = true
     demoIdle = false
     demoNaturalPause = true
+    demoTypingProbe = false
     demoEvidence = []
     recoveryWarning = ""
     persistenceBlocked = false
@@ -271,6 +273,15 @@ Item {
       flowConfig.breakMs = 10000
       config = Model.normalizeConfig(flowConfig)
       next.accumulatedActiveMs = config.focusMs
+    }
+    else if (name === "typing") {
+      var typingConfig = JSON.parse(JSON.stringify(config))
+      typingConfig.warningMs = 12000
+      typingConfig.finalMs = 3000
+      typingConfig.maximumDelayMs = 30000
+      config = Model.normalizeConfig(typingConfig)
+      demoTypingProbe = true
+      next = Model.startWarning(next, now, config, 12000)
     }
     else if (name === "due") next.accumulatedActiveMs = config.focusMs - 30000
     else if (name === "long-break") {
@@ -318,6 +329,7 @@ Item {
     demoMode = false
     demoIdle = false
     demoNaturalPause = true
+    demoTypingProbe = false
     demoEvidence = []
     snapshot = preDemoSnapshot || Model.defaultSnapshot(Date.now())
     config = preDemoConfig || config
@@ -422,7 +434,7 @@ Item {
   // reading or storing input content.
   IdleMonitor {
     id: typingPauseMonitor
-    enabled: service.stateLoaded && !service.demoMode
+    enabled: service.stateLoaded && (!service.demoMode || service.demoTypingProbe)
       && (service.phase === Model.State.Warning || service.phase === Model.State.Final)
       && service.remainingMs <= 11000
     timeout: 1
@@ -535,7 +547,7 @@ Item {
   IpcHandler {
     target: "look-elsewhere"
 
-    function status(): string { return JSON.stringify({ state: service.phase, remainingMs: service.remainingMs, evidence: service.evidence(), demo: service.demoMode, idlePaused: service.idlePauseActive, naturalPauseReady: service.naturalPauseReady, recoveryWarning: service.recoveryWarning }) }
+    function status(): string { return JSON.stringify({ state: service.phase, remainingMs: service.remainingMs, evidence: service.evidence(), demo: service.demoMode, idlePaused: service.idlePauseActive, naturalPauseReady: service.naturalPauseReady, typingHoldActive: service.typingHoldActive, contextLabel: service.contextLabel, recoveryWarning: service.recoveryWarning }) }
     function configuration(): string { return JSON.stringify(service.config) }
     function diagnostics(): string { return JSON.stringify({ fullscreen: service.fullscreenAvailable, dictation: service.dictationAvailable, mpris: true, pipewire: true, idle: true, sound: service.soundAvailable, persistenceBlocked: service.persistenceBlocked }) }
     function takeBreak(): string { service.takeBreak(); return service.phase }
