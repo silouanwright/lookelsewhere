@@ -103,6 +103,7 @@ BarWidget {
         width: Style.space(16)
         height: width
         color: button.active && button.useActiveColor ? button.activeColor : button.foreground
+        opacity: root.showingStatus ? 0.62 : 1
         anchors.verticalCenter: parent.verticalCenter
       }
 
