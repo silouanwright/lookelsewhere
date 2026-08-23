@@ -249,7 +249,9 @@ Panel {
           Text {
             Layout.fillWidth: true
             Layout.bottomMargin: -Style.space(10)
-            text: root.idlePaused ? qsTr("LookElsewhere is paused") : qsTr("Break starts in")
+            text: root.idlePaused ? qsTr("LookElsewhere is paused")
+              : root.service && root.service.nextBreakIsLong ? qsTr("Long break starts in")
+              : qsTr("Break starts in")
             color: root.foreground
             font.family: root.fontFamily
             font.pixelSize: Style.font.body

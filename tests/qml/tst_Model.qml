@@ -251,6 +251,7 @@ TestCase {
     var c = config({ breakMs: 5000, longBreakEvery: 4, longBreakMs: 180000 })
     var s = Model.defaultSnapshot(1000)
     s.breaksSinceLong = 3
+    verify(Model.isNextBreakLong(s, c))
     s = Model.startBreak(s, 1000, c)
     compare(s.activeBreakDurationMs, 180000)
     verify(s.activeBreakIsLong)
@@ -260,6 +261,7 @@ TestCase {
 
     s = Model.defaultSnapshot(1000)
     s.breaksSinceLong = 1
+    verify(!Model.isNextBreakLong(s, c))
     s = Model.startBreak(s, 1000, c)
     compare(s.activeBreakDurationMs, 5000)
     verify(!s.activeBreakIsLong)

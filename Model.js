@@ -317,8 +317,7 @@ function startWarning(snapshot, nowMs, config, durationMs) {
 
 function startBreak(snapshot, nowMs, config) {
   var next = copySnapshot(snapshot)
-  var ordinal = next.breaksSinceLong + 1
-  var longBreak = config.longBreakEvery > 0 && ordinal >= config.longBreakEvery
+  var longBreak = isNextBreakLong(next, config)
   var duration = longBreak ? config.longBreakMs : config.breakMs
   next.state = State.Breaking
   next.stateEnteredAtMs = nowMs
@@ -326,6 +325,11 @@ function startBreak(snapshot, nowMs, config) {
   next.activeBreakIsLong = longBreak
   next.breakEndsAtMs = nowMs + duration
   return next
+}
+
+function isNextBreakLong(snapshot, config) {
+  return config.longBreakEvery > 0
+    && Number((snapshot || {}).breaksSinceLong || 0) + 1 >= config.longBreakEvery
 }
 
 function completeBreak(snapshot, nowMs) {

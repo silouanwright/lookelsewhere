@@ -77,6 +77,7 @@ Item {
   readonly property bool interrupting: phase === Model.State.Warning || phase === Model.State.Final || phase === Model.State.Breaking
   readonly property bool canPostpone: Model.canPostpone(snapshot, config)
   readonly property bool canSkipBreak: phase === Model.State.Breaking && Model.canSkipBreak(config)
+  readonly property bool nextBreakIsLong: Model.isNextBreakLong(snapshot, config)
   readonly property bool soundAvailable: startSoundAvailable && completionSoundAvailable
   readonly property string soundVolumeDb: {
     var level = Math.max(0, Math.min(100, Number(config.soundVolume || 0)))

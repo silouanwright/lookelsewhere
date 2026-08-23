@@ -212,7 +212,9 @@ Item {
             Layout.fillWidth: true
             Layout.topMargin: -Style.space(12)
             horizontalAlignment: Text.AlignHCenter
-            text: root.service ? root.service.config.breakSubtitle
+            text: root.service && root.service.snapshot.activeBreakIsLong
+              ? qsTr("Long break · %1").arg(root.service.config.breakSubtitle)
+              : root.service ? root.service.config.breakSubtitle
               : qsTr("Let your eyes settle on something distant. Breathe. The screen will still be here.")
             color: Color.lock.placeholder
             font.family: Style.font.family
