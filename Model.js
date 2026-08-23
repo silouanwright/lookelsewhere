@@ -248,6 +248,16 @@ function observe(snapshot, input, config) {
     if (now >= next.breakEndsAtMs) return completeBreak(next, now)
     return next
   }
+  if ((next.state === State.Warning || next.state === State.Final)
+      && input.typingActive === true
+      && now >= next.warningEndsAtMs - 10000) {
+    if (!next.dueAtMs) next.dueAtMs = next.warningEndsAtMs
+    if (now - next.dueAtMs < cfg.maximumDelayMs) {
+      next.warningEndsAtMs = now + 10000
+      next.state = State.Warning
+      return next
+    }
+  }
   if (next.state === State.Final) {
     if (now >= next.warningEndsAtMs) return startBreak(next, now, cfg)
     return next

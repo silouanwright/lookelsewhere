@@ -60,10 +60,14 @@ Item {
   }
   readonly property bool idle: demoMode ? demoIdle : idleMonitor.isIdle
   readonly property bool naturalPauseReady: demoMode ? demoNaturalPause : naturalPauseMonitor.isIdle
+  readonly property bool typingHoldActive: !demoMode
+    && (phase === Model.State.Warning || phase === Model.State.Final)
+    && remainingMs <= 10000
+    && !typingPauseMonitor.isIdle
   readonly property bool idlePauseActive: config.detectors.idle && idle
   readonly property var currentProtection: Model.strongestEvidence(evidence(), config)
-  readonly property string contextLabel: currentProtection
-    ? Model.contextShortLabel(currentProtection.category) : ""
+  readonly property string contextLabel: typingHoldActive ? "Typing.."
+    : currentProtection ? Model.contextShortLabel(currentProtection.category) : ""
   readonly property string phase: snapshot.state || Model.State.Working
   readonly property string label: idlePauseActive ? "Paused while you’re away" : Model.stateLabel(snapshot)
   readonly property string remainingText: Model.formatDuration(remainingMs)
@@ -116,6 +120,7 @@ Item {
       active: !effectiveIdle,
       idle: effectiveIdle,
       naturalPause: naturalPauseReady,
+      typingActive: typingHoldActive,
       evidence: evidence()
     }, config)
     playTransitionSound(beforeState, snapshot.state)
@@ -364,6 +369,18 @@ Item {
     id: naturalPauseMonitor
     enabled: service.stateLoaded && !service.demoMode
     timeout: 5
+    respectInhibitors: false
+  }
+
+  // Wayland deliberately does not expose other apps' keystrokes. A short
+  // idle-notify window detects recent keyboard or pointer work without
+  // reading or storing input content.
+  IdleMonitor {
+    id: typingPauseMonitor
+    enabled: service.stateLoaded && !service.demoMode
+      && (service.phase === Model.State.Warning || service.phase === Model.State.Final)
+      && service.remainingMs <= 11000
+    timeout: 1
     respectInhibitors: false
   }
 

@@ -156,6 +156,25 @@ TestCase {
     compare(s.totals.prompted, 1)
   }
 
+  function test_typingHoldsFinalTenSeconds() {
+    var c = config({ focusMs: 60000, warningMs: 25000, finalMs: 3000, maximumDelayMs: 30000 })
+    var s = Model.defaultSnapshot(1000)
+    s.accumulatedActiveMs = 35000
+    s = Model.observe(s, { nowMs: 1000, active: true, idle: false, evidence: [] }, c)
+    compare(s.warningEndsAtMs, 26000)
+
+    s = Model.observe(s, { nowMs: 17000, typingActive: true, active: true, idle: false, evidence: [] }, c)
+    compare(s.state, Model.State.Warning)
+    compare(s.warningEndsAtMs, 27000)
+
+    s = Model.observe(s, { nowMs: 18000, typingActive: false, active: true, idle: false, evidence: [] }, c)
+    compare(s.warningEndsAtMs, 27000)
+    s = Model.observe(s, { nowMs: 27000, typingActive: false, active: true, idle: false, evidence: [] }, c)
+    compare(s.state, Model.State.Final)
+    s = Model.observe(s, { nowMs: 27001, typingActive: false, active: true, idle: false, evidence: [] }, c)
+    compare(s.state, Model.State.Breaking)
+  }
+
   function test_dueBreakWaitsForNaturalPause() {
     var c = config({ maximumDelayMs: 10000 })
     var s = Model.defaultSnapshot(0)
