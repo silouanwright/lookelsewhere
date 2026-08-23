@@ -26,7 +26,7 @@ Status reflects inspected repository and installed-runtime evidence on 2026-08-2
 | Keyboard and accessibility | Implemented | Native button roles/names/actions, deterministic Tab/Backtab order, Escape dismissal, panel-local mnemonic actions, optional conflict-checked global Omarchy bindings, Hardcore lockout, and reduced-motion behavior; live keyboard evidence and clean runtime logs recorded |
 | Theme and bar-position QA | Implemented | Osaka Jade and Catppuccin Latte plus top/bottom/left/right were exercised live and restored; transient panel IPC lifecycle issue found and fixed |
 | Automated tests and QML review | Implemented | 52 passing model/component tests, including protected applications, focused-player matching, typing holds, protected-context bar labels, configurable shortcuts, missed-tick sequencing, long-break cadence, policy migration, Hardcore skip policy, and lead-timed sound transitions; final diff review remains in the release sequence |
-| Public packaging | Implemented | Manifest, rights notices, release README, current original root preview, panel/warning stills, 21-second deterministic demo, marketplace draft, clean provenance audit, isolated add/validate/remove proof, and live panel-owned disable/re-enable proof exist |
+| Public packaging | In final verification | Manifest, rights notices, release README, marketplace draft, clean provenance audit, isolated add/validate/remove proof, and live panel-owned disable/re-enable proof exist; original preview/demo assets must be recaptured from the exact final UI |
 | Competition submission | Missing | External publication and marketplace submission require final authorization |
 
 ## Immediate release sequence
