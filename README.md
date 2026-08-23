@@ -65,7 +65,9 @@ end of the idea. The next things I want to explore are:
   meeting, video, and per-app focus signals as Wayland and upstream APIs make
   them reliably available.
 - **More break modalities:** lightweight blink reminders, posture and wellness
-  reminders, and more flexible short- and long-break routines.
+  reminders, optional glanceable break ideas, and more flexible short- and
+  long-break routines. Prompts should help people leave the screen rather than
+  turn the break surface into something else to read.
 - **More personal control:** additional sound packs and previews, optional
   start/end hooks, and eventually a polished graphical settings experience for
   people who do not want to edit configuration.
