@@ -78,7 +78,10 @@ The public audit uncovered many “do not annoy me” behaviors whose combined e
 
 These edge cases were promoted ahead of analytics, gamification, website tracking, and decorative content.
 
-See the [public audit](archive/lookaway-public-audit.md), [screenshot observations](archive/lookaway-observations.md), and preserved [warning](reference-screenshots/lookaway-warning.png) and [settings](reference-screenshots/lookaway-settings.png) references.
+See the [public audit](archive/lookaway-public-audit.md), [screenshot
+observations](archive/lookaway-observations.md), and the
+[LookAway documentation](https://lookaway.com/docs/). Third-party screenshots
+used during local research are intentionally not redistributed.
 
 ## Detection feasibility
 

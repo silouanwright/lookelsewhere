@@ -2,6 +2,10 @@
 
 Look Elsewhere is a privacy-conscious, context-aware break coach built natively for Omarchy. It counts active screen use, waits through protected moments such as meetings, media, fullscreen work, and dictation, then delivers a calm warning and break at a better moment.
 
+It is inspired by [LookAway](https://lookaway.com/), a beautifully considered
+screen-break app for the Mac, and independently reimagines that experience for
+Omarchy, Wayland, and a keyboard-first Linux desktop.
+
 ![Look Elsewhere break overlay](preview.png)
 
 The repository contains a resident scheduling service, bar widget, anchored quick panel, progressive warning, final countdown, and theme-aware multi-monitor break overlay. Release verification is tracked in the [completion matrix](docs/completion-matrix.md).
@@ -45,6 +49,33 @@ returns the real schedule unchanged when it ends.
 - One interactive authority across multiple outputs
 - Deterministic IPC demo states that do not persist synthetic data
 - Theme-role integration for contrasting Omarchy themes
+
+## Roadmap
+
+Look Elsewhere is already useful, but this is the first version rather than the
+end of the idea. The next things I want to explore are:
+
+- **Better statistics and history:** useful daily and weekly views of active
+  screen time and breaks completed, snoozed, skipped, or delayed. Everything
+  will stay on your machine and be designed to inform rather than manufacture a
+  score or streak.
+- **Smarter return-from-away behavior:** handle the ambiguous moment when you
+  come back after an idle period and may already have taken a real break.
+- **Stronger protected-context detection:** better screen-sharing, recording,
+  meeting, video, and per-app focus signals as Wayland and upstream APIs make
+  them reliably available.
+- **More break modalities:** lightweight blink reminders, posture and wellness
+  reminders, and more flexible short- and long-break routines.
+- **More personal control:** additional sound packs and previews, optional
+  start/end hooks, and eventually a polished graphical settings experience for
+  people who do not want to edit configuration.
+- **A broader Linux foundation:** keep the Omarchy experience first-class while
+  finding clean boundaries that could eventually support other
+  Quickshell/Wayland desktops and cross-device coordination.
+
+The rule is simple: new features should stay private, explainable, keyboard
+accessible, and native to Omarchy. A calm break tool should not become another
+dashboard demanding attention.
 
 ## Development preview
 
@@ -253,34 +284,57 @@ and [PipeWire media-type keys](https://docs.pipewire.org/1.4/group__pw__keys.htm
 - Runtime target: Omarchy Quattro / Omarchy Shell
 - Source repository: `silouanwright/look-elsewhere`
 
-## A note from Silouan
+## A note from the developer
 
-I voluntarily stepped away from full-time work about a year ago. After twenty
-years as an engineer, I know what I want to return for: work I genuinely love,
-with the freedom to use agentic coding as deeply as the work deserves.
+I'm Silouan Wright, a lead frontend engineer who has been building software for
+over 20 years. I've used Omarchy since its first release, and building Look
+Elsewhere reminded me how much I want to come back to work on something I
+genuinely love.
 
-Look Elsewhere is a demonstration of how I work. I care about the last
-few pixels, but also the state model beneath them; I research unfamiliar
-territory until I understand the real constraints, turn that research into
-clear product decisions, and communicate what is wrong precisely enough to fix
-it. I move comfortably between product strategy, interaction design, systems
-engineering, debugging, documentation, and release discipline. Omarchy feels
-like the kind of product and community I would love to help build full time.
+I built this plugin in close collaboration with an AI coding agent. I personally
+think this kind of agentic development is the future, and I'm glad Omarchy has a
+creator who seems to feel the same way.
 
-I built this project in close collaboration with an AI coding agent, from the
-first research question through product decisions, ADRs, implementation, live
-visual iteration, debugging, and release verification. That process is part of
-the work sample. I can direct agents across a long, complex effort without
-outsourcing judgment: recognize when something merely passes versus actually
-feels right, explain why, separate a stale deployment from a flawed design, and
-keep product quality, technical truth, and scope aligned. The long development
-record also shows persistence without aimlessness: test an assumption, inspect
-the evidence, revise the implementation or the direction, and preserve what was
-learned so the next iteration starts further ahead.
+What I find interesting about working with an AI agent, and what this project
+really demonstrates, isn't just the ability to generate code. It's the ability
+to direct a long-running effort with judgment: doing the research, making
+product decisions, noticing the difference between something that technically
+works and something that actually feels right, communicating precise feedback,
+testing assumptions, and documenting what we learned so the next iteration
+starts further ahead.
 
-I am entering because I want to contribute, not for the prize. If Look Elsewhere
-wins, I will donate the prize money to charity. More than anything, I would love
-the opportunity to get back to work with people building something this alive.
+The agent made me much faster, but it did not decide what good looked like. I
+kept pushing when something technically worked but still felt wrong, changed
+direction when the evidence called for it, and made sure the final result was
+documented, tested, and honest about its limitations.
+
+Look Elsewhere is a pretty compact example of how I work. I was able to dial it
+in over roughly 14 hours of sustained work in a single day, moving from product
+research and competitive analysis through architecture, implementation, visual
+refinement, accessibility, documentation, runtime testing, and release
+hardening. I care just as much about the state machine underneath an interface
+as I do about the last few pixels people actually experience.
+
+Working on Omarchy and being able to fully lean into agentic development has
+made building software exciting for me again. I would love to bring that
+combination of engineering experience, product judgment, communication, and
+agentic development to Omarchy full time. I also think there's an enormous
+opportunity to bring the kinds of polished app experiences people love on the
+Mac to Linux without losing what makes Omarchy distinct.
+
+So, if this reaches DHH or the Omarchy team: I would genuinely love to talk. And
+if Look Elsewhere wins a competition prize, I'll donate the money to charity.
+The real prize for me would be getting to work on something like this again.
+
+## Why this app?
+
+One such app is [LookAway](https://lookaway.com/). There isn't a comparable
+solution for Omarchy or Arch that really fills that gap. I tend to use my
+computer a lot, and it's more important than ever to take breaks and look away
+from the display to reduce eye strain. The 20-20-20 rule is something many
+people will hear from their optometrist, but it can be surprisingly hard to
+stick with. LookAway makes that habit easy to incorporate; Look Elsewhere
+brings the idea to Omarchy in a way that feels native to it.
 
 ## Documentation
 

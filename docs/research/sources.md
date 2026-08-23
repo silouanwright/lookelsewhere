@@ -13,16 +13,14 @@
 
 ## User-provided evidence
 
-- [LookAway warning screenshot](reference-screenshots/lookaway-warning.png)
-- [LookAway settings screenshot](reference-screenshots/lookaway-settings.png)
-
-These images are preserved solely as attributed comparative research evidence.
-They are not Look Elsewhere product or promotional assets, are excluded from
-the repository's MIT license, and remain the property of their respective
-rights holder.
+LookAway interface screenshots supplied by Silouan Wright were reviewed locally
+and summarized in the screenshot audit. The third-party image files are not
+redistributed in this repository.
 
 ## Public primary/authoritative sources consulted
 
+- [LookAway product site](https://lookaway.com/)
+- [LookAway documentation](https://lookaway.com/docs/)
 - [Omarchy shell plugin manual](https://github.com/basecamp/omarchy/blob/quattro/manual/32-shell-plugins.md)
 - [Omarchy shell reference](https://github.com/basecamp/omarchy/blob/quattro/shell/README.md)
 - [Omarchy plugin competition rules](https://omarchy.org/news/2026/08/the-first-plugin-competition/)

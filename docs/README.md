@@ -7,6 +7,7 @@ on a particular workstation or chat history.
 
 ## Core documents
 
+- [Configuration reference](../CONFIGURATION.md)
 - [Product brief](product-brief.md)
 - [Product priorities](product-priorities.md)
 - [MVP requirements](mvp-requirements.md)

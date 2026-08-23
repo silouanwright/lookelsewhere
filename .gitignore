@@ -3,3 +3,9 @@
 build/
 result/
 *.log
+
+# Third-party product screenshots used during private design research are not
+# part of the public distribution. Keep only original Look Elsewhere media.
+docs/research/reference-screenshots/lookaway-cleanshot-*/
+docs/research/reference-screenshots/lookaway-settings.png
+docs/research/reference-screenshots/lookaway-warning.png
