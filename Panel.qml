@@ -76,7 +76,7 @@ Panel {
   function dismissHintsOrClose() { close() }
   onSettingsChanged: syncSettings()
   onServiceChanged: syncSettings()
-  onOpenedChanged: if (!opened) {
+  onOpenedChanged: if (opened) {
     page = "now"
   }
 
