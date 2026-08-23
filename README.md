@@ -34,7 +34,7 @@ returns the real schedule unchanged when it ends.
 ## Current capabilities
 
 - Active-use scheduling with timestamp persistence and recovery
-- Idle, Hyprland fullscreen, focused-app MPRIS video playback, PipeWire microphone, and Omarchy dictation evidence
+- Idle, Hyprland fullscreen, focused-app MPRIS playback, PipeWire microphone, and Omarchy dictation evidence
 - Confidence-based protected-context delay and cooldown
 - Wayland-native natural-pause timing before a due warning
 - Casual, Balanced, and Hardcore enforcement policies
@@ -189,6 +189,51 @@ Look Elsewhere requires Omarchy Quattro with Omarchy Shell. It has no installer
 hook, privileged operation, external daemon, account, or network dependency.
 Its optional break sound uses `canberra-gtk-play` when available; the scheduler
 and all visual behavior continue normally without it.
+
+## Limitations and upstream work
+
+### Video detection is currently inferred
+
+MPRIS 2.2 reports playback state, application identity, controls, and generic
+track metadata, but it does not standardize whether the current item contains
+audio, video, or both. `SupportedMimeTypes` describes everything a player can
+open; it does not describe the item currently playing. Chromium similarly
+exports its active browser media session through MPRIS without exposing whether
+that session has a video track.
+
+Look Elsewhere therefore treats playback as video only when the MPRIS player's
+application matches the focused Hyprland application. This deliberately ignores
+background music, but it remains a heuristic: a focused music player or music
+tab can be labeled `Video`, while a player with incomplete application identity
+can be missed. PipeWire is not a generic fallback because browsers normally
+render video directly and expose only their audio stream to PipeWire.
+
+The complete upstream fix requires coordinated patches:
+
+1. **MPRIS specification:** add optional current-item stream information, such
+   as `mpris:mediaTypes = ["audio", "video"]`. A stream-type list is preferable
+   to a MIME type because browser blobs and adaptive streams may not have a
+   useful content MIME type.
+2. **Chromium:** map its internal media-session audio/video state to the new
+   metadata and emit `PropertiesChanged` when that state changes.
+3. **Firefox:** export the equivalent state for its active browser media
+   session.
+4. **Native players:** mpv, VLC, and other MPRIS exporters should publish the
+   field from their decoded track information when available.
+5. **Look Elsewhere:** prefer the standardized field, retain focused-app MPRIS
+   as an explicit compatibility fallback, and report uncertainty rather than
+   silently claiming exact detection.
+
+Quickshell does not currently require an upstream patch for basic support: its
+MPRIS player already exposes the raw metadata map. A typed convenience property
+could be added later, after the MPRIS field is standardized. Until then, a
+browser extension that inspects the active tab's playing media element is the
+most accurate browser-specific integration.
+
+References: [MPRIS Player interface](https://specifications.freedesktop.org/mpris/latest/Player_Interface.html),
+[MPRIS metadata map](https://specifications.freedesktop.org/mpris/latest/Track_List_Interface.html),
+[Chromium MPRIS implementation](https://chromium.googlesource.com/chromium/src/+/b9c645c0b167a38b8f93b6c9e9f5a6a2f3e854ae/ui/base/mpris/mpris_service_impl.cc),
+and [PipeWire media-type keys](https://docs.pipewire.org/1.4/group__pw__keys.html).
 
 ## Project identity
 
