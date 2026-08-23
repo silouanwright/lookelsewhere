@@ -266,10 +266,14 @@ Item {
       next.postponedUntilMs = now + 5 * 60000
       next.snoozesUsed = 1
     }
-    else if (name === "protected") {
+    else if (["protected", "meeting", "microphone", "media", "fullscreen", "dictation"].indexOf(name) >= 0) {
       next.accumulatedActiveMs = config.focusMs
       next.dueAtMs = now
-      demoEvidence = [{ category: "meeting", confidence: 0.95, active: true }]
+      demoEvidence = [{
+        category: name === "protected" ? "meeting" : name,
+        confidence: 0.95,
+        active: true
+      }]
     } else if (name === "warning" || name === "final") {
       next = Model.startWarning(next, now, config)
       if (name === "final") next.warningEndsAtMs = now + config.finalMs

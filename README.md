@@ -52,6 +52,11 @@ With the plugin installed and enabled:
 
 ```bash
 omarchy-shell look-elsewhere demo protected
+omarchy-shell look-elsewhere demo meeting
+omarchy-shell look-elsewhere demo microphone
+omarchy-shell look-elsewhere demo media
+omarchy-shell look-elsewhere demo fullscreen
+omarchy-shell look-elsewhere demo dictation
 omarchy-shell look-elsewhere demo idle
 omarchy-shell look-elsewhere demo flow
 omarchy-shell look-elsewhere demo long-break
