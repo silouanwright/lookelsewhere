@@ -458,9 +458,16 @@ TestCase {
     compare(Model.contextShortLabel("dictation"), "Dictation")
     compare(Model.contextShortLabel("meeting"), "Meeting")
     compare(Model.contextShortLabel("microphone"), "Mic")
-    compare(Model.contextShortLabel("media"), "Media")
+    compare(Model.contextShortLabel("media"), "Video")
     compare(Model.contextShortLabel("fullscreen"), "Fullscreen")
     compare(Model.contextShortLabel("unknown"), "")
+  }
+
+  function test_mprisPlayerMustMatchFocusedApp() {
+    verify(Model.appIdsMatch("chromium.desktop", "chromium"))
+    verify(Model.appIdsMatch("firefox.instance123", "firefox"))
+    verify(!Model.appIdsMatch("spotify", "foot"))
+    verify(!Model.appIdsMatch("", "chromium"))
   }
 
   function test_manualPauseLabel() {

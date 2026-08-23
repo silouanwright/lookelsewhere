@@ -41,12 +41,18 @@ Item {
   readonly property var players: Mpris.players ? Mpris.players.values : []
   readonly property var pipewireNodes: Pipewire.nodes ? Pipewire.nodes.values : []
   readonly property var activeToplevel: Hyprland.activeToplevel
+  readonly property string activeAppId: activeToplevel && activeToplevel.wayland
+    ? String(activeToplevel.wayland.appId || "") : ""
   readonly property bool fullscreenAvailable: !activeToplevel || !!activeToplevel.wayland
   readonly property bool fullscreenActive: config.detectors.fullscreen
     && !!(activeToplevel && activeToplevel.wayland && activeToplevel.wayland.fullscreen)
   readonly property bool mediaActive: {
-    for (var i = 0; i < players.length; i++)
-      if (players[i] && players[i].isPlaying) return true
+    for (var i = 0; i < players.length; i++) {
+      var player = players[i]
+      if (player && player.isPlaying
+          && (Model.appIdsMatch(player.desktopEntry, activeAppId)
+            || Model.appIdsMatch(player.identity, activeAppId))) return true
+    }
     return false
   }
   readonly property bool microphoneActive: {

@@ -544,8 +544,15 @@ function contextShortLabel(category) {
     dictation: "Dictation",
     meeting: "Meeting",
     microphone: "Mic",
-    media: "Media",
+    media: "Video",
     fullscreen: "Fullscreen"
   }
   return labels[String(category || "")] || ""
+}
+
+function appIdsMatch(left, right) {
+  var a = String(left || "").toLowerCase().replace(/\.desktop$/, "")
+  var b = String(right || "").toLowerCase().replace(/\.desktop$/, "")
+  if (!a || !b) return false
+  return a === b || a.indexOf(b + ".") === 0 || b.indexOf(a + ".") === 0
 }

@@ -34,7 +34,7 @@ returns the real schedule unchanged when it ends.
 ## Current capabilities
 
 - Active-use scheduling with timestamp persistence and recovery
-- Idle, Hyprland fullscreen, MPRIS playback, PipeWire microphone, and Omarchy dictation evidence
+- Idle, Hyprland fullscreen, focused-app MPRIS video playback, PipeWire microphone, and Omarchy dictation evidence
 - Confidence-based protected-context delay and cooldown
 - Wayland-native natural-pause timing before a due warning
 - Casual, Balanced, and Hardcore enforcement policies

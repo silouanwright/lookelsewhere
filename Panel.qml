@@ -476,17 +476,6 @@ Panel {
 
         Text {
           Layout.fillWidth: true
-          visible: root.page === "now" && root.service && root.service.protectedSummary !== ""
-          text: root.service ? root.service.protectedSummary : ""
-          color: root.muted
-          font.family: root.fontFamily
-          font.pixelSize: Style.font.bodySmall
-          horizontalAlignment: Text.AlignHCenter
-          wrapMode: Text.WordWrap
-        }
-
-        Text {
-          Layout.fillWidth: true
           visible: root.page === "now" && root.service && root.service.recoveryWarning !== ""
           text: root.service ? root.service.recoveryWarning : ""
           color: Color.urgent
