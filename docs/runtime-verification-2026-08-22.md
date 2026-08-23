@@ -21,8 +21,12 @@ one focused `HDMI-A-2` output at 3840×2160 with scale 2.
 
 ## Live detector acceptance
 
-- Chromium MPRIS playback produced real `media` evidence at confidence `0.8`;
-  the bar changed to `Media`, then both evidence and bar state cleared on pause.
+- Chromium MPRIS playback originally produced real `media` evidence at
+  confidence `0.8`. After narrowing the policy, playing Chromium behind the
+  focused fullscreen Steam game correctly produced no playback evidence.
+- The focused `steam_app_1868140` XWayland game produced high-confidence
+  protected-application evidence and the subdued `Focus` bar status. Its
+  fullscreen mode `2` was reconciled without continuous polling.
 - A real Hyprland fullscreen transition produced `fullscreen` evidence at
   confidence `0.65` and cleared immediately on restore.
 - Dictation and microphone input checks were blocked below LookElsewhere by the
@@ -30,6 +34,17 @@ one focused `HDMI-A-2` output at 3840×2160 with scale 2.
   failure, while PipeWire reported no target input node.
 - The detailed results and current accounting contract are recorded in
   [`detector-acceptance-2026-08-22.md`](detector-acceptance-2026-08-22.md).
+
+## Typing protection
+
+- The guarded `typing` fixture retained the real Wayland idle-notify signal but
+  suppressed persistence and sounds.
+- Repeated modifier-only input changed the bar to `Typing..` and held the
+  warning deadline at exactly 10,000 ms.
+- After input stopped, one quiet second released the hold; the observed
+  countdown reached 8,000 ms two seconds later.
+- Clearing the fixture restored the exact real schedule with no recovery
+  warning.
 
 ## Keyboard and accessibility
 
@@ -67,7 +82,7 @@ one focused `HDMI-A-2` output at 3840×2160 with scale 2.
   from (for example) `6` directly to `4`.
 - Large changes, including fixture changes and schedule resets, snap to the new
   authoritative value rather than animating through stale seconds.
-- Component acceptance covers both behaviors and the complete suite passes 49
+- Component acceptance covers both behaviors and the complete suite passes 52
   tests with zero failures.
 
 ## Break sounds

@@ -9,11 +9,12 @@ Status reflects inspected repository and installed-runtime evidence on 2026-08-2
 | Office hours, including overnight | Implemented | Daytime boundaries, equal-bound all-day behavior, overnight schedules, and pause-to-open accounting are covered by pure tests |
 | Manual pause/resume | Implemented | Service IPC, state-aware quick-panel Pause/Resume action, and paused fixture |
 | Idle detection | Implemented | Wayland idle monitor plus live `idle` fixture proving bar pause/resume presentation |
-| Fullscreen detection | Implemented | Event-driven Quickshell active-toplevel fullscreen state with capability diagnostics |
-| Media detection | Implemented | Quickshell MPRIS playback state with manifest-backed detector toggle |
+| Fullscreen detection | Implemented | Event-driven Quickshell active-toplevel state plus focus-triggered XWayland reconciliation; the live fullscreen Steam game reported mode `2` without continuous polling |
+| Playback detection | Implemented heuristic | Focused-app MPRIS playback with a manifest-backed toggle; live background Chromium playback was correctly ignored, while exact audio/video classification remains an upstream MPRIS limitation |
+| Protected applications | Implemented | Manifest-backed application IDs default to `steam`; live Steam client and `steam_app_<id>` matching plus focused XWayland evidence were verified |
 | Microphone/meeting detection | Partial | PipeWire stream heuristic works locally; communication classification and availability explanation remain |
 | Dictation detection | Implemented | Managed `omarchy-voxtype-status` event stream matches Omarchy's native Dictation indicator and exposes capability diagnostics |
-| Confidence policy, natural pause, cooldown, maximum delay | Implemented | Five-second Wayland input-quiet gate, protected-context precedence, cooldown, and hard-delay bound have deterministic tests |
+| Confidence policy, natural pause, typing hold, cooldown, maximum delay | Implemented | Five-second Wayland input-quiet gate, final-ten-second typing hold, protected-context precedence, cooldown, and hard-delay bound have deterministic tests; live input held at 10 seconds and resumed after one quiet second |
 | Bar and anchored quick panel | Implemented | Installed and exercised with status-only content, keyboard actions, and correct inward anchoring on every bar edge |
 | Warning, final chip, break overlay | Implemented | Deterministic fixtures and approved theme-aware break transition |
 | Multi-monitor single authority | Implemented | Focused-monitor authority in `Overlay.qml`; a compositor output created during an active break immediately rendered the full surface and was removed cleanly; physical mixed-scale focus handoff remains future hardware QA |
@@ -21,10 +22,10 @@ Status reflects inspected repository and installed-runtime evidence on 2026-08-2
 | MVP configuration contract | Implemented | Typed short/long timing, custom break copy, policy, detector, motion, sound, output, and bar settings are wired; README documents `omarchy bar set` and local reset |
 | Outcome totals | Implemented | Prompted/completed/postponed/skipped/delayed persist, compact history summary is visible, and reset IPC exists |
 | Privacy boundary | Implemented by design | No content capture/title persistence/network calls; release audit remains |
-| Deterministic fixtures | Implemented | Working/due/idle/paused/postponed/protected/warning/final/break/recovery/enforcement plus timer-driven `flow` exist and restore real state |
+| Deterministic fixtures | Implemented | Working/due/idle/paused/postponed/protected/typing/warning/final/break/recovery/enforcement plus timer-driven `flow` exist and restore real state |
 | Keyboard and accessibility | Implemented | Native button roles/names/actions, deterministic Tab/Backtab order, Escape dismissal, panel-local mnemonic actions, optional conflict-checked global Omarchy bindings, Hardcore lockout, and reduced-motion behavior; live keyboard evidence and clean runtime logs recorded |
 | Theme and bar-position QA | Implemented | Osaka Jade and Catppuccin Latte plus top/bottom/left/right were exercised live and restored; transient panel IPC lifecycle issue found and fixed |
-| Automated tests and QML review | Implemented | 49 passing model/component tests, including protected-context bar labels, configurable shortcut validation, missed-tick sequencing, long-break cadence, policy migration, Hardcore skip policy, and lead-timed sound transitions, manifest validation, system qmllint, repeated six-pass semantic reviews, remediations, live flow proof, hotplug proof, and keyboard acceptance evidence exist |
+| Automated tests and QML review | Implemented | 52 passing model/component tests, including protected applications, focused-player matching, typing holds, protected-context bar labels, configurable shortcuts, missed-tick sequencing, long-break cadence, policy migration, Hardcore skip policy, and lead-timed sound transitions; final diff review remains in the release sequence |
 | Public packaging | Implemented | Manifest, rights notices, release README, current original root preview, panel/warning stills, 21-second deterministic demo, marketplace draft, clean provenance audit, isolated add/validate/remove proof, and live panel-owned disable/re-enable proof exist |
 | Competition submission | Missing | External publication and marketplace submission require final authorization |
 
