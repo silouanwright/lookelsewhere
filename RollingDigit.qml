@@ -13,7 +13,15 @@ Item {
 
   property int currentValue: -1
   property int previousValue: -1
-  property real reveal: 1
+
+  readonly property bool animating: roll.running
+
+  function settle() {
+    outgoing.y = -root.height
+    outgoing.opacity = 0
+    incoming.y = 0
+    incoming.opacity = 1
+  }
 
   function syncValue() {
     var next = Math.max(0, Math.min(9, Number(value)))
@@ -21,14 +29,17 @@ Item {
       roll.stop()
       previousValue = -1
       currentValue = next
-      reveal = 1
+      settle()
       return
     }
     if (currentValue === next) return
     roll.stop()
     previousValue = currentValue
     currentValue = next
-    reveal = 0
+    outgoing.y = 0
+    outgoing.opacity = 1
+    incoming.y = root.height
+    incoming.opacity = 0
     roll.start()
   }
 
@@ -44,10 +55,10 @@ Item {
   Text {
     id: outgoing
     anchors.horizontalCenter: parent.horizontalCenter
-    y: -root.reveal * root.height
+    y: -root.height
     text: root.previousValue < 0 ? "" : String(root.previousValue)
     color: root.color
-    opacity: 1 - root.reveal
+    opacity: 0
     font.family: root.fontFamily
     font.pixelSize: root.fontSize
     font.weight: root.fontWeight
@@ -58,10 +69,10 @@ Item {
   Text {
     id: incoming
     anchors.horizontalCenter: parent.horizontalCenter
-    y: (1 - root.reveal) * root.height
+    y: 0
     text: root.currentValue < 0 ? "" : String(root.currentValue)
     color: root.color
-    opacity: root.reveal
+    opacity: 1
     font.family: root.fontFamily
     font.pixelSize: root.fontSize
     font.weight: root.fontWeight
@@ -69,15 +80,41 @@ Item {
     Accessible.ignored: true
   }
 
-  NumberAnimation {
+  // Animator types run on Qt Quick's render thread, so a busy Quickshell UI
+  // thread does not make the ticker visibly freeze halfway through a roll.
+  ParallelAnimation {
     id: roll
-    target: root
-    property: "reveal"
-    from: 0
-    to: 1
-    duration: 280
-    easing.type: Easing.OutCubic
-    alwaysRunToEnd: true
-    onFinished: root.previousValue = -1
+    YAnimator {
+      target: outgoing
+      from: 0
+      to: -root.height
+      duration: 280
+      easing.type: Easing.OutCubic
+    }
+    OpacityAnimator {
+      target: outgoing
+      from: 1
+      to: 0
+      duration: 210
+      easing.type: Easing.OutCubic
+    }
+    YAnimator {
+      target: incoming
+      from: root.height
+      to: 0
+      duration: 280
+      easing.type: Easing.OutCubic
+    }
+    OpacityAnimator {
+      target: incoming
+      from: 0
+      to: 1
+      duration: 240
+      easing.type: Easing.OutCubic
+    }
+    onFinished: {
+      root.settle()
+      root.previousValue = -1
+    }
   }
 }

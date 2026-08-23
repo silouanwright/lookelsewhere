@@ -18,6 +18,8 @@ Panel {
   property var hostWidget: null
   property string page: "now"
   property var keyboardHintsOverride: null
+  property int optionsCursorIndex: 0
+  property bool optionsCursorActive: false
 
   // Popup roles are independent from bar roles in an Omarchy theme.
   readonly property color foreground: Color.popups.text
@@ -27,8 +29,13 @@ Panel {
   readonly property bool manuallyPaused: service && service.phase === "waiting-for-pause" && service.snapshot.pauseReason === "manual"
   readonly property bool idlePaused: service && service.idlePauseActive
   readonly property bool delayActionsVisible: !manuallyPaused && service
-  readonly property bool delayActionsEnabled: delayActionsVisible && service.canPostpone
-  readonly property bool shortcutsActive: opened && popup.activeFocusItem !== null
+  readonly property bool delayActionsEnabled: !!delayActionsVisible && !!service.canPostpone
+  readonly property bool shortcutsActive: opened && popup.active
+  readonly property bool numberEditorActive: root.page === "options"
+    && (focusMinutesField.field.activeFocus
+      || focusMinutesField.field.contentItem.activeFocus
+      || shortBreakField.field.activeFocus
+      || shortBreakField.field.contentItem.activeFocus)
   readonly property var shortcuts: Model.panelShortcuts(settings)
   readonly property bool keyboardHintsVisible: keyboardHintsOverride === null
     ? !!(settings && settings.showKeyboardHints === true)
@@ -73,13 +80,66 @@ Panel {
   function toggleManualPause() {
     if (service && !service.interrupting) service.togglePause()
   }
+  function persistSettings(values) {
+    var entry = { id: root.moduleName }
+    for (var existing in root.settings) if (existing !== "id") entry[existing] = root.settings[existing]
+    for (var key in values) entry[key] = values[key]
+
+    root.settings = entry
+    if (root.hostWidget && "settings" in root.hostWidget) root.hostWidget.settings = entry
+    if (root.bar && root.bar.shell && typeof root.bar.shell.updateEntryInline === "function")
+      root.bar.shell.updateEntryInline(root.moduleName, entry)
+  }
   function togglePage(name) { page = page === name ? "now" : name }
   function toggleKeyboardHints() { keyboardHintsOverride = !keyboardHintsVisible }
   function dismissHintsOrClose() { close() }
+  function setOptionsCursor(index) {
+    optionsCursorIndex = Math.max(0, Math.min(8, index))
+    optionsCursorActive = true
+    var targets = [pauseBreaksButton, stopButton, editSettingsButton,
+      focusMinutesField, shortBreakField, enforcementDropdown,
+      reduceMotionRow, soundRow, keyboardHintRow]
+    ensureOptionsCursorVisible(targets[optionsCursorIndex])
+  }
+  function moveOptionsCursor(delta) {
+    setOptionsCursor(optionsCursorActive ? optionsCursorIndex + delta : 0)
+  }
+  function activateOptionsCursor() {
+    if (!optionsCursorActive) { setOptionsCursor(0); return }
+    switch (optionsCursorIndex) {
+    case 0: if (pauseBreaksButton.enabled) pauseBreaksButton.clicked(); break
+    case 1: stopButton.clicked(); break
+    case 2: editSettingsButton.clicked(); break
+    case 3: focusMinutesField.field.forceActiveFocus(); break
+    case 4: shortBreakField.field.forceActiveFocus(); break
+    case 5: enforcementDropdown.toggle(); break
+    case 6: reduceMotionRow.clicked(); break
+    case 7: soundRow.clicked(); break
+    case 8: keyboardHintRow.clicked(); break
+    }
+  }
+  function ensureOptionsCursorVisible(item) {
+    if (!item || !panelScroll || !panelScroll.contentItem) return
+    var flick = panelScroll.contentItem
+    if (flick.contentY === undefined) return
+    var point = item.mapToItem(flick.contentItem || flick, 0, 0)
+    var margin = Style.space(6)
+    if (point.y < flick.contentY + margin)
+      flick.contentY = Math.max(0, point.y - margin)
+    else if (point.y + item.height > flick.contentY + flick.height - margin)
+      flick.contentY = Math.min(Math.max(0, flick.contentHeight - flick.height),
+        point.y + item.height + margin - flick.height)
+  }
   onSettingsChanged: syncSettings()
   onServiceChanged: syncSettings()
+  onPageChanged: if (opened) Qt.callLater(function() {
+    if (root.page === "options") optionsFocus.forceActiveFocus()
+    else neutralFocus.forceActiveFocus()
+  })
   onOpenedChanged: if (opened) {
     page = "now"
+    optionsCursorActive = false
+    optionsCursorIndex = 0
   }
 
   // Window-local mnemonics complement native Tab/Backtab traversal. They are
@@ -93,7 +153,12 @@ Panel {
   Shortcut { sequence: root.shortcuts.options; context: Qt.ApplicationShortcut; enabled: root.shortcutsActive; onActivated: root.togglePage("options") }
   Shortcut { sequence: root.shortcuts.edit; context: Qt.ApplicationShortcut; enabled: root.shortcutsActive && root.page === "options"; onActivated: { root.close(); settingsEditor.running = true } }
   Shortcut { sequence: root.shortcuts.disable; context: Qt.ApplicationShortcut; enabled: root.shortcutsActive && root.page === "options"; onActivated: { root.close(); stopPlugin.running = true } }
-  Shortcut { sequence: root.shortcuts.close; context: Qt.ApplicationShortcut; enabled: root.shortcutsActive; onActivated: root.close() }
+  Shortcut {
+    sequence: root.shortcuts.close
+    context: Qt.ApplicationShortcut
+    enabled: root.shortcutsActive && !root.numberEditorActive && !enforcementDropdown.popupOpen
+    onActivated: root.close()
+  }
   Shortcut { sequence: root.shortcuts.hints; context: Qt.ApplicationShortcut; enabled: root.shortcutsActive; onActivated: root.toggleKeyboardHints() }
 
   KeyboardPanel {
@@ -105,36 +170,57 @@ Panel {
     // The control surface belongs spatially to the eye button. Warning and
     // break surfaces are separate and intentionally centered by Overlay.qml.
     centerOnBar: false
-    focusTarget: neutralFocus
-    contentWidth: popup.fittedContentWidth(Style.space(260))
+    focusTarget: root.page === "options" ? optionsFocus : neutralFocus
+    contentWidth: popup.fittedContentWidth(Style.space(root.page === "options" ? 440 : 260))
     contentHeight: popup.fittedContentHeight(content.implicitHeight)
 
-    Flickable {
-      id: panelScroll
+    Item {
+      id: neutralFocus
+      width: 0
+      height: 0
+      focus: true
+      KeyNavigation.tab: shortcutsButton
+      KeyNavigation.backtab: root.page === "stats" ? settingsButton
+        : (root.delayActionsEnabled ? postpone15Button : breakNowButton)
+      Keys.onEscapePressed: root.dismissHintsOrClose()
+    }
+
+    PanelKeyCatcher {
+      id: keyCatcher
       anchors.fill: parent
-      contentWidth: width
-      contentHeight: content.implicitHeight
-      clip: true
-      boundsBehavior: Flickable.StopAtBounds
-      flickableDirection: Flickable.VerticalFlick
-      interactive: contentHeight > height
-      ScrollBar.vertical: ScrollBar { policy: ScrollBar.AsNeeded }
+      blocked: root.page !== "options"
+        || root.numberEditorActive
+        || enforcementDropdown.popupOpen
+      onMoveRequested: function(dx, dy) {
+        if (dy !== 0) root.moveOptionsCursor(dy)
+      }
+      onActivateRequested: root.activateOptionsCursor()
+      onCloseRequested: root.close()
+      onTabRequested: function(direction) { root.moveOptionsCursor(direction) }
 
       Item {
-        id: neutralFocus
+        id: optionsFocus
         width: 0
         height: 0
         focus: true
-        KeyNavigation.tab: shortcutsButton
-        KeyNavigation.backtab: root.page === "stats" ? settingsButton
-          : (root.page === "options" ? editSettingsButton
-            : (root.delayActionsEnabled ? postpone15Button : breakNowButton))
-        Keys.onEscapePressed: root.dismissHintsOrClose()
       }
+
+      ScrollView {
+        id: panelScroll
+        anchors.fill: parent
+        clip: true
+        Keys.priority: Keys.BeforeItem
+        Keys.onEscapePressed: function(event) {
+          if (!root.numberEditorActive) return
+          optionsFocus.forceActiveFocus()
+          event.accepted = true
+        }
+        ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+        ScrollBar.vertical.policy: content.implicitHeight > height ? ScrollBar.AsNeeded : ScrollBar.AlwaysOff
 
       ColumnLayout {
         id: content
-        width: panelScroll.width
+        width: panelScroll.availableWidth
         spacing: Style.space(6)
 
         PhosphorIconButton {
@@ -210,7 +296,7 @@ Panel {
             accent: root.accent
             iconSize: Style.font.icon
             KeyNavigation.tab: root.page === "stats" ? shortcutsButton
-              : (root.page === "options" ? pauseBreaksButton : breakNowButton)
+              : (root.page === "options" ? null : breakNowButton)
             KeyNavigation.backtab: statsButton
             Keys.onEscapePressed: root.dismissHintsOrClose()
             Accessible.role: Accessible.Button
@@ -373,11 +459,9 @@ Panel {
 
         ColumnLayout {
           Layout.fillWidth: true
-          Layout.leftMargin: toolbarRow.implicitWidth
-          Layout.rightMargin: toolbarRow.implicitWidth
           Layout.topMargin: Style.space(8)
           visible: root.page === "options"
-          spacing: Style.space(8)
+          spacing: Style.space(10)
 
           Text {
             Layout.fillWidth: true
@@ -389,89 +473,350 @@ Panel {
             horizontalAlignment: Text.AlignHCenter
           }
 
-          WeightedButton {
-            id: pauseBreaksButton
-            Layout.alignment: Qt.AlignHCenter
-            label: root.manuallyPaused ? qsTr("Resume breaks") : qsTr("Pause breaks")
-            labelWeight: Font.DemiBold
-            enabled: root.service && !root.service.interrupting
-            selected: root.manuallyPaused
-            bordered: true
-            focusable: true
-            foreground: root.foreground
-            accent: root.accent
+          SectionHeader {
+            Layout.fillWidth: true
+            label: qsTr("App controls")
+            foreground: root.muted
             fontFamily: root.fontFamily
-            KeyNavigation.tab: stopButton
-            KeyNavigation.backtab: settingsButton
-            Keys.onEscapePressed: root.dismissHintsOrClose()
-            Accessible.role: Accessible.Button
-            Accessible.name: label
-            Accessible.onPressAction: clicked()
-            onClicked: root.toggleManualPause()
+          }
+
+          Item {
+            Layout.fillWidth: true
+            Layout.preferredHeight: Math.max(pauseBreakLabels.implicitHeight, pauseBreaksButton.implicitHeight)
+
+            Column {
+              id: pauseBreakLabels
+              anchors.left: parent.left
+              anchors.right: pauseBreaksButton.left
+              anchors.rightMargin: Style.space(12)
+              anchors.verticalCenter: parent.verticalCenter
+              spacing: Style.space(2)
+              Text { width: parent.width; text: qsTr("Break reminders"); color: root.foreground; font.family: root.fontFamily; font.pixelSize: Style.font.body; font.weight: Font.DemiBold; elide: Text.ElideRight }
+              Text { width: parent.width; text: qsTr("Temporarily pause the break schedule"); color: root.muted; font.family: root.fontFamily; font.pixelSize: Style.font.bodySmall; elide: Text.ElideRight }
+            }
+
+            WeightedButton {
+              id: pauseBreaksButton
+              anchors.right: parent.right
+              anchors.verticalCenter: parent.verticalCenter
+              label: root.manuallyPaused ? qsTr("Resume") : qsTr("Pause")
+              labelWeight: Font.DemiBold
+              enabled: root.service && !root.service.interrupting
+              selected: root.manuallyPaused
+              bordered: true
+              focusable: true
+              foreground: root.foreground
+              accent: root.accent
+              fontFamily: root.fontFamily
+              hasCursor: root.optionsCursorActive && root.optionsCursorIndex === 0
+              onHovered: function(on) { if (on) root.setOptionsCursor(0) }
+              KeyNavigation.tab: stopButton
+              Keys.onEscapePressed: root.dismissHintsOrClose()
+              Accessible.role: Accessible.Button
+              Accessible.name: root.manuallyPaused ? qsTr("Resume breaks") : qsTr("Pause breaks")
+              Accessible.onPressAction: clicked()
+              onClicked: root.toggleManualPause()
+
+            }
 
             KeyHintBadge {
               visible: root.keyboardHintsVisible
               keyText: Model.panelShortcutLabel(root.shortcuts.pause)
               available: pauseBreaksButton.enabled
-              placeRight: true
+              x: parent.width - width
+              y: pauseBreaksButton.y - height / 2
             }
           }
 
-          WeightedButton {
-            id: stopButton
-            Layout.alignment: Qt.AlignHCenter
-            label: qsTr("Stop LookElsewhere")
-            labelWeight: Font.DemiBold
-            bordered: true
-            focusable: true
-            foreground: root.foreground
-            accent: root.accent
-            fontFamily: root.fontFamily
-            KeyNavigation.tab: editSettingsButton
-            KeyNavigation.backtab: pauseBreaksButton
-            Keys.onEscapePressed: root.dismissHintsOrClose()
-            Accessible.role: Accessible.Button
-            Accessible.name: qsTr("Stop and disable LookElsewhere")
-            Accessible.onPressAction: clicked()
-            onClicked: {
-              root.close()
-              stopPlugin.running = true
+          PanelSeparator { Layout.fillWidth: true; foreground: root.foreground }
+
+          Item {
+            Layout.fillWidth: true
+            Layout.preferredHeight: Math.max(stopLabels.implicitHeight, stopButton.implicitHeight)
+
+            Column {
+              id: stopLabels
+              anchors.left: parent.left
+              anchors.right: stopButton.left
+              anchors.rightMargin: Style.space(12)
+              anchors.verticalCenter: parent.verticalCenter
+              spacing: Style.space(2)
+              Text { width: parent.width; text: qsTr("Stop LookElsewhere"); color: root.foreground; font.family: root.fontFamily; font.pixelSize: Style.font.body; font.weight: Font.DemiBold; elide: Text.ElideRight }
+              Text { width: parent.width; text: qsTr("Disable the plugin in Omarchy"); color: root.muted; font.family: root.fontFamily; font.pixelSize: Style.font.bodySmall; elide: Text.ElideRight }
+            }
+
+            WeightedButton {
+              id: stopButton
+              anchors.right: parent.right
+              anchors.verticalCenter: parent.verticalCenter
+              label: qsTr("Stop")
+              labelWeight: Font.DemiBold
+              bordered: true
+              focusable: true
+              foreground: root.foreground
+              accent: root.accent
+              fontFamily: root.fontFamily
+              hasCursor: root.optionsCursorActive && root.optionsCursorIndex === 1
+              onHovered: function(on) { if (on) root.setOptionsCursor(1) }
+              KeyNavigation.tab: editSettingsButton
+              KeyNavigation.backtab: pauseBreaksButton
+              Keys.onEscapePressed: root.dismissHintsOrClose()
+              Accessible.role: Accessible.Button
+              Accessible.name: qsTr("Stop and disable LookElsewhere")
+              Accessible.onPressAction: clicked()
+              onClicked: {
+                root.close()
+                stopPlugin.running = true
+              }
+
             }
 
             KeyHintBadge {
               visible: root.keyboardHintsVisible
               keyText: Model.panelShortcutLabel(root.shortcuts.disable)
-              placeRight: true
+              x: parent.width - width
+              y: stopButton.y - height / 2
             }
           }
 
-          WeightedButton {
-            id: editSettingsButton
-            Layout.alignment: Qt.AlignHCenter
-            label: qsTr("Edit settings file")
-            labelWeight: Font.DemiBold
-            bordered: true
-            focusable: true
-            foreground: root.foreground
-            accent: root.accent
-            fontFamily: root.fontFamily
-            KeyNavigation.tab: shortcutsButton
-            KeyNavigation.backtab: stopButton
-            Keys.onEscapePressed: root.dismissHintsOrClose()
-            Accessible.role: Accessible.Button
-            Accessible.name: label
-            Accessible.onPressAction: clicked()
-            onClicked: {
-              root.close()
-              settingsEditor.running = true
+          PanelSeparator { Layout.fillWidth: true; foreground: root.foreground }
+
+          Item {
+            Layout.fillWidth: true
+            Layout.preferredHeight: Math.max(editSettingsLabels.implicitHeight, editSettingsButton.implicitHeight)
+
+            Column {
+              id: editSettingsLabels
+              anchors.left: parent.left
+              anchors.right: editSettingsButton.left
+              anchors.rightMargin: Style.space(12)
+              anchors.verticalCenter: parent.verticalCenter
+              spacing: Style.space(2)
+              Text { width: parent.width; text: qsTr("Configuration"); color: root.foreground; font.family: root.fontFamily; font.pixelSize: Style.font.body; font.weight: Font.DemiBold; elide: Text.ElideRight }
+              Text { width: parent.width; text: qsTr("Open the LookElsewhere settings file"); color: root.muted; font.family: root.fontFamily; font.pixelSize: Style.font.bodySmall; elide: Text.ElideRight }
+            }
+
+            WeightedButton {
+              id: editSettingsButton
+              anchors.right: parent.right
+              anchors.verticalCenter: parent.verticalCenter
+              label: qsTr("Edit file")
+              labelWeight: Font.DemiBold
+              bordered: true
+              focusable: true
+              foreground: root.foreground
+              accent: root.accent
+              fontFamily: root.fontFamily
+              hasCursor: root.optionsCursorActive && root.optionsCursorIndex === 2
+              onHovered: function(on) { if (on) root.setOptionsCursor(2) }
+              KeyNavigation.backtab: stopButton
+              Keys.onEscapePressed: root.dismissHintsOrClose()
+              Accessible.role: Accessible.Button
+              Accessible.name: qsTr("Edit settings file")
+              Accessible.onPressAction: clicked()
+              onClicked: {
+                root.close()
+                settingsEditor.running = true
+              }
+
             }
 
             KeyHintBadge {
               visible: root.keyboardHintsVisible
               keyText: Model.panelShortcutLabel(root.shortcuts.edit)
-              placeRight: true
+              x: parent.width - width
+              y: editSettingsButton.y - height / 2
             }
           }
+
+          SectionHeader {
+            Layout.fillWidth: true
+            Layout.topMargin: Style.space(8)
+            label: qsTr("Break schedule")
+            foreground: root.muted
+            fontFamily: root.fontFamily
+          }
+
+          Item {
+            Layout.fillWidth: true
+            Layout.preferredHeight: Math.max(focusLabels.implicitHeight, focusMinutesField.implicitHeight)
+
+            Column {
+              id: focusLabels
+              anchors.left: parent.left
+              anchors.right: focusMinutesField.left
+              anchors.rightMargin: Style.space(12)
+              anchors.verticalCenter: parent.verticalCenter
+              spacing: Style.space(2)
+              Text { width: parent.width; text: qsTr("Focus interval"); color: root.foreground; font.family: root.fontFamily; font.pixelSize: Style.font.body; font.weight: Font.DemiBold; elide: Text.ElideRight }
+              Text { width: parent.width; text: qsTr("Minutes of active screen time between breaks"); color: root.muted; font.family: root.fontFamily; font.pixelSize: Style.font.bodySmall; elide: Text.ElideRight }
+            }
+
+            NumberField {
+              id: focusMinutesField
+              width: Style.space(72)
+              anchors.right: parent.right
+              anchors.verticalCenter: parent.verticalCenter
+              value: root.settings && root.settings.focusMinutes !== undefined ? Number(root.settings.focusMinutes) : 20
+              from: 1
+              to: 180
+              fieldWidth: Style.space(72)
+              foreground: root.foreground
+              accent: root.accent
+              fontFamily: root.fontFamily
+              hasCursor: root.optionsCursorActive && root.optionsCursorIndex === 3
+              onHovered: function(on) { if (on) root.setOptionsCursor(3) }
+              onModified: function(next) { root.persistSettings({ focusMinutes: next }) }
+            }
+          }
+
+          PanelSeparator { Layout.fillWidth: true; foreground: root.foreground }
+
+          Item {
+            Layout.fillWidth: true
+            Layout.preferredHeight: Math.max(shortBreakLabels.implicitHeight, shortBreakField.implicitHeight)
+
+            Column {
+              id: shortBreakLabels
+              anchors.left: parent.left
+              anchors.right: shortBreakField.left
+              anchors.rightMargin: Style.space(12)
+              anchors.verticalCenter: parent.verticalCenter
+              spacing: Style.space(2)
+              Text { width: parent.width; text: qsTr("Short break"); color: root.foreground; font.family: root.fontFamily; font.pixelSize: Style.font.body; font.weight: Font.DemiBold; elide: Text.ElideRight }
+              Text { width: parent.width; text: qsTr("Seconds for an ordinary eye break"); color: root.muted; font.family: root.fontFamily; font.pixelSize: Style.font.bodySmall; elide: Text.ElideRight }
+            }
+
+            NumberField {
+              id: shortBreakField
+              width: Style.space(72)
+              anchors.right: parent.right
+              anchors.verticalCenter: parent.verticalCenter
+              value: root.settings && root.settings.breakSeconds !== undefined ? Number(root.settings.breakSeconds) : 20
+              from: 5
+              to: 600
+              stepSize: 5
+              fieldWidth: Style.space(72)
+              foreground: root.foreground
+              accent: root.accent
+              fontFamily: root.fontFamily
+              hasCursor: root.optionsCursorActive && root.optionsCursorIndex === 4
+              onHovered: function(on) { if (on) root.setOptionsCursor(4) }
+              onModified: function(next) { root.persistSettings({ breakSeconds: next }) }
+            }
+          }
+
+          PanelSeparator { Layout.fillWidth: true; foreground: root.foreground }
+
+          Item {
+            Layout.fillWidth: true
+            Layout.preferredHeight: Math.max(enforcementLabels.implicitHeight, enforcementDropdown.implicitHeight)
+
+            Column {
+              id: enforcementLabels
+              anchors.left: parent.left
+              anchors.right: enforcementDropdown.left
+              anchors.rightMargin: Style.space(12)
+              anchors.verticalCenter: parent.verticalCenter
+              spacing: Style.space(2)
+              Text { width: parent.width; text: qsTr("Break enforcement"); color: root.foreground; font.family: root.fontFamily; font.pixelSize: Style.font.body; font.weight: Font.DemiBold; elide: Text.ElideRight }
+              Text { width: parent.width; text: qsTr("Choose when an active break may be skipped"); color: root.muted; font.family: root.fontFamily; font.pixelSize: Style.font.bodySmall; elide: Text.ElideRight }
+            }
+
+            Dropdown {
+              id: enforcementDropdown
+              width: Style.space(132)
+              anchors.right: parent.right
+              anchors.verticalCenter: parent.verticalCenter
+              showLabel: false
+              value: root.settings && root.settings.enforcement !== undefined ? String(root.settings.enforcement) : "balanced"
+              options: [
+                { value: "casual", label: qsTr("Casual") },
+                { value: "balanced", label: qsTr("Balanced") },
+                { value: "hardcore", label: qsTr("Hardcore") }
+              ]
+              foreground: root.foreground
+              accent: root.accent
+              fontFamily: root.fontFamily
+              hasCursor: root.optionsCursorActive && root.optionsCursorIndex === 5
+              onPopupOpenChanged: if (!popupOpen && root.opened && root.page === "options")
+                Qt.callLater(function() { optionsFocus.forceActiveFocus() })
+              onHovered: function(on) { if (on) root.setOptionsCursor(5) }
+              onChanged: function(next) { root.persistSettings({ enforcement: next }) }
+            }
+          }
+
+          SectionHeader {
+            Layout.fillWidth: true
+            Layout.topMargin: Style.space(8)
+            label: qsTr("Experience")
+            foreground: root.muted
+            fontFamily: root.fontFamily
+          }
+
+          Toggle {
+            id: reduceMotionRow
+            Layout.fillWidth: true
+            label: qsTr("Reduce motion")
+            description: qsTr("Remove movement and soft-focus reveals")
+            checked: root.settings && root.settings.reducedMotion === true
+            foreground: root.foreground
+            accent: root.accent
+            fontFamily: root.fontFamily
+            hasCursor: root.optionsCursorActive && root.optionsCursorIndex === 6
+            Accessible.role: Accessible.CheckBox
+            Accessible.name: label
+            Accessible.checked: checked
+            Accessible.onPressAction: clicked()
+            onHovered: function(on) { if (on) root.setOptionsCursor(6) }
+            KeyNavigation.tab: soundRow
+            onClicked: root.persistSettings({ reducedMotion: !checked })
+          }
+
+          PanelSeparator { Layout.fillWidth: true; foreground: root.foreground }
+
+          Toggle {
+            id: soundRow
+            Layout.fillWidth: true
+            label: qsTr("Play break sounds")
+            description: qsTr("Use the quiet start and completion cues")
+            checked: !root.settings || root.settings.soundEnabled === undefined || root.settings.soundEnabled === true
+            foreground: root.foreground
+            accent: root.accent
+            fontFamily: root.fontFamily
+            hasCursor: root.optionsCursorActive && root.optionsCursorIndex === 7
+            Accessible.role: Accessible.CheckBox
+            Accessible.name: label
+            Accessible.checked: checked
+            Accessible.onPressAction: clicked()
+            onHovered: function(on) { if (on) root.setOptionsCursor(7) }
+            KeyNavigation.tab: keyboardHintRow
+            KeyNavigation.backtab: reduceMotionRow
+            onClicked: root.persistSettings({ soundEnabled: !checked })
+          }
+
+          PanelSeparator { Layout.fillWidth: true; foreground: root.foreground }
+
+          Toggle {
+            id: keyboardHintRow
+            Layout.fillWidth: true
+            label: qsTr("Show keyboard hints")
+            description: qsTr("Show action keys whenever the panel opens")
+            checked: root.settings && root.settings.showKeyboardHints === true
+            foreground: root.foreground
+            accent: root.accent
+            fontFamily: root.fontFamily
+            hasCursor: root.optionsCursorActive && root.optionsCursorIndex === 8
+            Accessible.role: Accessible.CheckBox
+            Accessible.name: label
+            Accessible.checked: checked
+            Accessible.onPressAction: clicked()
+            onHovered: function(on) { if (on) root.setOptionsCursor(8) }
+            KeyNavigation.tab: shortcutsButton
+            KeyNavigation.backtab: soundRow
+            onClicked: root.persistSettings({ showKeyboardHints: !checked })
+          }
+
         }
 
         Text {
@@ -640,6 +985,7 @@ Panel {
           Layout.preferredHeight: Style.space(2)
         }
 
+        }
       }
     }
   }

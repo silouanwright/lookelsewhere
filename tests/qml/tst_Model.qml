@@ -358,15 +358,42 @@ TestCase {
     compare(s.totals.postponed, 1)
   }
 
-  function test_delayNextBreakPreservesDuePostponeSemantics() {
+  function test_delayNextBreakReschedulesWarningCountdown() {
+    var c = config()
     var s = Model.defaultSnapshot(0)
     s.state = Model.State.Warning
 
-    s = Model.delayNextBreak(s, 1000, 60 * 1000, config())
+    s = Model.delayNextBreak(s, 1000, 60 * 1000, c)
 
-    compare(s.state, Model.State.Waiting)
-    compare(s.postponedUntilMs, 61000)
+    compare(s.state, Model.State.Working)
+    compare(c.focusMs - s.accumulatedActiveMs, 60000)
+    compare(s.postponedUntilMs, 0)
     compare(s.snoozesUsed, 1)
+  }
+
+  function test_warningSnoozeReturnsAtWarningThreshold() {
+    var c = config({ focusMs: 180000, warningMs: 60000, finalMs: 3000 })
+    var s = Model.defaultSnapshot(1000)
+    s.accumulatedActiveMs = 120000
+    s = Model.observe(s, {
+      nowMs: 1000, active: true, idle: false, naturalPause: false, evidence: []
+    }, c)
+    compare(s.state, Model.State.Warning)
+    compare(s.warningEndsAtMs, 61000)
+
+    s = Model.delayNextBreak(s, 1000, 60000, c)
+    compare(s.state, Model.State.Working)
+    compare(c.focusMs - s.accumulatedActiveMs, 120000)
+
+    s = Model.observe(s, {
+      nowMs: 60000, active: true, idle: false, naturalPause: false, evidence: []
+    }, c)
+    compare(s.state, Model.State.Working)
+    s = Model.observe(s, {
+      nowMs: 61000, active: true, idle: false, naturalPause: false, evidence: []
+    }, c)
+    compare(s.state, Model.State.Warning)
+    compare(s.warningEndsAtMs, 121000)
   }
 
   function test_postponeExpiryReturnsToWarning() {

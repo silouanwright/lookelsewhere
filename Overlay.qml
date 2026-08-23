@@ -22,6 +22,9 @@ Item {
   readonly property int remainingSeconds: service ? Math.max(0, Math.ceil(service.remainingMs / 1000)) : 0
   readonly property int remainingMinutesPart: Math.floor(remainingSeconds / 60)
   readonly property int remainingSecondsPart: remainingSeconds % 60
+  readonly property string warningClockText:
+    (remainingMinutesPart < 10 ? "0" : "") + remainingMinutesPart + ":"
+      + (remainingSecondsPart < 10 ? "0" : "") + remainingSecondsPart
   readonly property real breakClockFontSize: Style.font.display * 1.35
   readonly property real clockSeparatorOverlap: Math.max(0,
     (clockColonMetrics.advanceWidth - clockColonMetrics.tightBoundingRect.width) / 2)
@@ -329,10 +332,10 @@ Item {
         id: warningCard
         visible: root.visibleState && !root.breaking && !root.finalCountdown
         anchors.top: parent.top
-        anchors.topMargin: Style.space(56)
+        anchors.topMargin: Style.space(48)
         anchors.horizontalCenter: parent.horizontalCenter
-        width: Math.min(parent.width - Style.space(32), Style.space(520))
-        height: warningContent.implicitHeight + Style.space(28)
+        width: Math.min(parent.width - Style.space(32), warningActions.implicitWidth + Style.space(16))
+        height: warningContent.implicitHeight + Style.space(16)
         radius: Style.cornerRadius
         color: Color.popups.background
         borderSpec: Border.surfaceSpec("popups", "border", Color.popups.border, Math.max(1, Style.space(2)))
@@ -340,58 +343,75 @@ Item {
         ColumnLayout {
           id: warningContent
           anchors.fill: parent
-          anchors.margins: Style.space(14)
-          spacing: Style.space(8)
+          anchors.leftMargin: Style.space(8)
+          anchors.rightMargin: Style.space(8)
+          anchors.topMargin: Style.space(8)
+          anchors.bottomMargin: Style.space(8)
+          spacing: Style.space(6)
 
           RowLayout {
             Layout.fillWidth: true
             spacing: Style.space(12)
-            Text {
-              text: "󰈉"
+            BreakIcon {
+              Layout.preferredWidth: Style.space(38)
+              Layout.preferredHeight: Layout.preferredWidth
               color: Color.accent
-              font.family: Style.font.family
-              font.pixelSize: Style.font.display
             }
             ColumnLayout {
               Layout.fillWidth: true
-              spacing: Style.space(2)
+              spacing: 0
               Text {
-                text: qsTr("Almost time")
+                text: root.warningClockText
                 color: Color.popups.text
                 font.family: Style.font.family
                 font.pixelSize: Style.font.heading
-                font.weight: Font.DemiBold
+                font.weight: Font.Bold
               }
               Text {
                 Layout.fillWidth: true
-                text: qsTr("Your eyes will appreciate this.")
+                Layout.topMargin: -Style.space(3)
+                text: root.service && root.service.nextBreakIsLong
+                  ? qsTr("Long break")
+                  : qsTr("Short break")
                 color: Color.muted
                 font.family: Style.font.family
-                font.pixelSize: Style.font.body
-                wrapMode: Text.WordWrap
+                font.pixelSize: Style.font.bodySmall
+                font.weight: Font.DemiBold
+                elide: Text.ElideRight
               }
-            }
-            Text {
-              text: root.service ? root.service.remainingText : ""
-              color: Color.popups.text
-              font.family: Style.font.family
-              font.pixelSize: Style.font.heading
-              font.weight: Font.DemiBold
             }
           }
           RowLayout {
-            Layout.alignment: Qt.AlignRight
+            id: warningActions
+            Layout.alignment: Qt.AlignHCenter
             visible: window.authoritative
-            spacing: Style.space(8)
+            spacing: Style.space(6)
             OverlayButton {
-              text: qsTr("+5m")
-              visible: root.service && root.service.canPostpone
-              onClicked: if (root.service) root.service.postponeMinutes(5)
+              text: qsTr("Break now")
+              primary: true
+              verticalPadding: Style.space(3)
+              onClicked: if (root.service) root.service.takeBreak()
             }
             OverlayButton {
-              text: qsTr("Now")
-              primary: true
-              onClicked: if (root.service) root.service.takeBreak()
+              text: qsTr("+1m")
+              verticalPadding: Style.space(3)
+              actionEnabled: root.service && root.service.canPostpone
+              disabledTooltipText: qsTr("No snoozes available")
+              onClicked: if (root.service) root.service.delayNextBreakMinutes(1)
+            }
+            OverlayButton {
+              text: qsTr("+5m")
+              verticalPadding: Style.space(3)
+              actionEnabled: root.service && root.service.canPostpone
+              disabledTooltipText: qsTr("No snoozes available")
+              onClicked: if (root.service) root.service.delayNextBreakMinutes(5)
+            }
+            OverlayButton {
+              text: qsTr("+15m")
+              verticalPadding: Style.space(3)
+              actionEnabled: root.service && root.service.canPostpone
+              disabledTooltipText: qsTr("No snoozes available")
+              onClicked: if (root.service) root.service.delayNextBreakMinutes(15)
             }
           }
         }
@@ -415,18 +435,19 @@ Item {
           anchors.leftMargin: Style.space(14)
           anchors.rightMargin: Style.space(14)
           spacing: Style.space(10)
-          Text {
-            text: "󰈉"
+          BreakIcon {
+            Layout.preferredWidth: Style.space(24)
+            Layout.preferredHeight: Layout.preferredWidth
             color: Color.accent
-            font.family: Style.font.family
-            font.pixelSize: Style.font.heading
           }
           Text {
             Layout.fillWidth: true
             text: qsTr("Starting break in")
-            color: Color.muted
+            color: Color.popups.text
+            opacity: 0.78
             font.family: Style.font.family
             font.pixelSize: Style.font.body
+            font.weight: Font.Medium
             elide: Text.ElideRight
           }
           Text {

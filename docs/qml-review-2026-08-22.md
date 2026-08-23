@@ -9,7 +9,7 @@ wide six-pass review, followed by a diff-scoped remediation review. All three
 remediation passes reported zero confirmed findings and zero investigation
 targets. The deterministic linter introduced no new actionable changed-line
 finding; standalone `qmllint` again reported only the documented runtime-root
-import-resolution limitations. The exact QML test suite now passes 52 checks
+import-resolution limitations. The exact QML test suite now passes 53 checks
 with zero failures, including configurable shortcuts, long-break cadence,
 protected applications, typing holds, and policy migration.
 
@@ -42,7 +42,13 @@ protected applications, typing holds, and policy migration.
 - Component tests cover inactive snapping, active animation, reduced motion,
   digit-boundary changes, minimum digit count, sequential recovery from a
   small missed countdown sample, and immediate handling of a true reset. The
-  complete suite passes 52 tests with zero failures.
+  complete suite passes 53 tests with zero failures.
+
+The 2026-08-23 release delta received the same six semantic passes after the
+Options-page keyboard and layout work. It produced one confirmed finding: a
+section divider that bound itself to the full header width while also
+participating in a `RowLayout`. The divider now fills a layout-owned wrapper;
+the remediation recheck and all 53 tests pass.
 
 ## Environmental lint limitations
 
@@ -54,7 +60,7 @@ Standalone `qmllint` cannot fully resolve Omarchy's runtime-root `qs.Commons` an
   the current small eager object tree has material cost.
 
 The process-lifetime investigation is closed: the actual keyboard-accessible
-**Stop Look Elsewhere** control was invoked in the installed shell. Its child
+**Stop LookElsewhere** control was invoked in the installed shell. Its child
 process completed after the panel and plugin objects were unloaded, the plugin
 became disabled, no orphan remained, and re-enabling restored the persisted
 non-demo schedule without a Look Elsewhere error or coredump.

@@ -25,7 +25,7 @@ function defaultConfig() {
     longBreakEvery: 4,
     longBreakMs: 3 * 60 * 1000,
     dueSoonMs: 60 * 1000,
-    warningMs: 25 * 1000,
+    warningMs: 60 * 1000,
     finalMs: 3 * 1000,
     cooldownMs: 60 * 1000,
     maximumDelayMs: 15 * 60 * 1000,
@@ -384,15 +384,19 @@ function postpone(snapshot, nowMs, durationMs, config) {
 function delayNextBreak(snapshot, nowMs, durationMs, config) {
   if (!canPostpone(snapshot, config)) return copySnapshot(snapshot)
   var state = snapshot && snapshot.state
-  if (state !== State.Working && state !== State.DueSoon)
+  if (state !== State.Working && state !== State.DueSoon
+      && state !== State.Warning && state !== State.Final)
     return postpone(snapshot, nowMs, durationMs, config)
 
   var next = copySnapshot(snapshot)
+  var delay = Math.max(0, Number(durationMs || 0))
+  var remaining = state === State.Warning || state === State.Final
+    ? Math.max(0, Number(next.warningEndsAtMs || 0) - Number(nowMs || 0))
+    : Math.max(0, config.focusMs - next.accumulatedActiveMs)
   next.state = State.Working
   next.stateEnteredAtMs = nowMs
   next.lastObservedAtMs = nowMs
-  next.accumulatedActiveMs = Math.max(0,
-    next.accumulatedActiveMs - Math.max(0, Number(durationMs || 0)))
+  next.accumulatedActiveMs = Math.max(0, config.focusMs - remaining - delay)
   next.dueAtMs = 0
   next.postponedUntilMs = 0
   next.warningEndsAtMs = 0
