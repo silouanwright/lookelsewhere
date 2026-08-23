@@ -24,6 +24,9 @@ Item {
   property bool stateLoaded: false
   property bool dictationActive: false
   property bool dictationAvailable: false
+  property string probedActiveAppId: ""
+  property bool probedFullscreenActive: false
+  property bool probedActiveWindowAvailable: false
   property bool startSoundAvailable: true
   property bool completionSoundAvailable: true
   property bool completionCuePlayed: false
@@ -42,10 +45,12 @@ Item {
   readonly property var pipewireNodes: Pipewire.nodes ? Pipewire.nodes.values : []
   readonly property var activeToplevel: Hyprland.activeToplevel
   readonly property string activeAppId: activeToplevel && activeToplevel.wayland
-    ? String(activeToplevel.wayland.appId || "") : ""
-  readonly property bool fullscreenAvailable: !activeToplevel || !!activeToplevel.wayland
+    ? String(activeToplevel.wayland.appId || "") : probedActiveAppId
+  readonly property bool fullscreenAvailable: !activeToplevel
+    || !!activeToplevel.wayland || probedActiveWindowAvailable
   readonly property bool fullscreenActive: config.detectors.fullscreen
-    && !!(activeToplevel && activeToplevel.wayland && activeToplevel.wayland.fullscreen)
+    && !!(activeToplevel && (activeToplevel.wayland
+      ? activeToplevel.wayland.fullscreen : probedFullscreenActive))
   readonly property bool mediaActive: {
     for (var i = 0; i < players.length; i++) {
       var player = players[i]
@@ -134,6 +139,8 @@ Item {
     playTransitionSound(beforeState, snapshot.state)
     if (!demoMode && snapshot.state !== beforeState) scheduleSave()
   }
+
+  onActiveToplevelChanged: activeWindowRefresh.restart()
 
   function configure(values) {
     var authoritative = Model.configFromSettings(values)
@@ -369,6 +376,36 @@ Item {
     respectInhibitors: true
   }
 
+  // Quickshell's Wayland toplevel handle has no appId for XWayland games.
+  // Reconcile once per focus change instead of polling continuously.
+  Timer {
+    id: activeWindowRefresh
+    interval: 120
+    repeat: false
+    onTriggered: {
+      if (activeWindowProbe.running) activeWindowRefresh.restart()
+      else activeWindowProbe.running = true
+    }
+  }
+
+  Process {
+    id: activeWindowProbe
+    command: ["hyprctl", "activewindow", "-j"]
+    stdout: StdioCollector {
+      waitForEnd: true
+      onStreamFinished: {
+        try {
+          var active = JSON.parse(text || "{}")
+          service.probedActiveAppId = String(active.class || active.initialClass || "")
+          service.probedFullscreenActive = Number(active.fullscreen || 0) !== 0
+          service.probedActiveWindowAvailable = service.probedActiveAppId !== ""
+        } catch (error) {
+          service.probedActiveWindowAvailable = false
+        }
+      }
+    }
+  }
+
   // Five quiet seconds is long enough to avoid interrupting an active input
   // burst while remaining imperceptible when the user has naturally paused.
   // Inhibitors are deliberately ignored: media/fullscreen policy is handled
@@ -492,6 +529,7 @@ Item {
 
   Component.onCompleted: {
     ensureStateDir.running = true
+    activeWindowRefresh.start()
   }
 
   IpcHandler {
