@@ -9,7 +9,7 @@ a diff-scoped six-pass review. All six passes reported zero confirmed findings
 and zero investigation targets. The deterministic linter introduced no new
 actionable changed-line finding; standalone `qmllint` again reported only the
 documented runtime-root import-resolution limitations. The exact QML test suite
-now passes 48 checks with zero failures, including configurable shortcut
+now passes 49 checks with zero failures, including configurable shortcut
 validation, long-break cadence, and policy migration.
 
 ## Confirmed findings and disposition
@@ -38,7 +38,7 @@ validation, long-break cadence, and policy migration.
 - Component tests cover inactive snapping, active animation, reduced motion,
   digit-boundary changes, minimum digit count, sequential recovery from a
   small missed countdown sample, and immediate handling of a true reset. The
-  complete suite passes 48 tests with zero failures.
+  complete suite passes 49 tests with zero failures.
 
 ## Environmental lint limitations
 

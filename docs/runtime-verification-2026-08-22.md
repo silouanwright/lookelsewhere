@@ -19,6 +19,18 @@ one focused `HDMI-A-2` output at 3840×2160 with scale 2.
   previous 30-second checkpoint. The final five-second checkpoint bounds that
   visible rollback without counting suspend or idle time as active use.
 
+## Live detector acceptance
+
+- Chromium MPRIS playback produced real `media` evidence at confidence `0.8`;
+  the bar changed to `Media`, then both evidence and bar state cleared on pause.
+- A real Hyprland fullscreen transition produced `fullscreen` evidence at
+  confidence `0.65` and cleared immediately on restore.
+- Dictation and microphone input checks were blocked below LookElsewhere by the
+  machine's unavailable audio input path. Voxtype logged an ALSA stream setup
+  failure, while PipeWire reported no target input node.
+- The detailed results and current accounting contract are recorded in
+  [`detector-acceptance-2026-08-22.md`](detector-acceptance-2026-08-22.md).
+
 ## Keyboard and accessibility
 
 - Opening the anchored panel through IPC establishes its keyboard surface.
@@ -55,7 +67,7 @@ one focused `HDMI-A-2` output at 3840×2160 with scale 2.
   from (for example) `6` directly to `4`.
 - Large changes, including fixture changes and schedule resets, snap to the new
   authoritative value rather than animating through stale seconds.
-- Component acceptance covers both behaviors and the complete suite passes 48
+- Component acceptance covers both behaviors and the complete suite passes 49
   tests with zero failures.
 
 ## Break sounds

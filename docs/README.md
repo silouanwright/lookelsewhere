@@ -22,6 +22,7 @@ on a particular workstation or chat history.
 - [Verification strategy](verification.md)
 - [QML review and remediations](qml-review-2026-08-22.md)
 - [Runtime verification](runtime-verification-2026-08-22.md)
+- [Live detector acceptance](detector-acceptance-2026-08-22.md)
 - [Completion matrix](completion-matrix.md)
 - [Research archive and synthesis](research/README.md)
 - [GitPulse keyboard-first audit](research/gitpulse-keyboard-audit-2026-08-22.md)
