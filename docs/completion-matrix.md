@@ -25,13 +25,16 @@ Status reflects inspected repository and installed-runtime evidence on 2026-08-2
 | Deterministic fixtures | Implemented | Working/due/idle/paused/postponed/protected/typing/warning/final/break/recovery/enforcement plus timer-driven `flow` exist and restore real state |
 | Keyboard and accessibility | Implemented | Native button roles/names/actions, deterministic Tab/Backtab order, Escape dismissal, panel-local mnemonic actions, optional conflict-checked global Omarchy bindings, Hardcore lockout, and reduced-motion behavior; live keyboard evidence and clean runtime logs recorded |
 | Theme and bar-position QA | Implemented | Osaka Jade and Catppuccin Latte plus top/bottom/left/right were exercised live and restored; transient panel IPC lifecycle issue found and fixed |
-| Automated tests and QML review | Implemented | 52 passing model/component tests, including protected applications, focused-player matching, typing holds, protected-context bar labels, configurable shortcuts, missed-tick sequencing, long-break cadence, policy migration, Hardcore skip policy, and lead-timed sound transitions; final diff review remains in the release sequence |
+| Automated tests and QML review | Implemented | 52 passing model/component tests, including protected applications, focused-player matching, typing holds, protected-context bar labels, configurable shortcuts, missed-tick sequencing, long-break cadence, policy migration, Hardcore skip policy, and lead-timed sound transitions; the wide review and remediation recheck are clean |
 | Public packaging | In final verification | Manifest, rights notices, release README, marketplace draft, clean provenance audit, isolated add/validate/remove proof, and live panel-owned disable/re-enable proof exist; original preview/demo assets must be recaptured from the exact final UI |
 | Competition submission | Missing | External publication and marketplace submission require final authorization |
 
 ## Immediate release sequence
 
-1. Re-run automated and source gates against the final documentation commit.
-2. Present the exact distributable commit for publication approval.
-3. After approval, create the public repository, verify installation from its
+1. Recapture the original stills and demo from the exact final UI, then rerun
+   their visual and provenance checks.
+2. Complete the focused-browser half of live playback acceptance after the
+   active fullscreen game releases focus.
+3. Present the exact distributable commit for publication approval.
+4. After approval, create the public repository, verify installation from its
    URL, and request final approval of the marketplace issue body.
