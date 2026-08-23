@@ -56,6 +56,7 @@ TestCase {
     verify(!customized.startSoundEnabled)
     compare(customized.completionSoundPath, "~/Sounds/done.ogg")
     compare(customized.outputMode, "focused")
+    compare(customized.protectedApps.join(","), "steam")
 
     // Omarchy supplies no key after an override is removed. A fresh
     // reconciliation must restore defaults rather than retain old config.
@@ -468,6 +469,17 @@ TestCase {
     verify(Model.appIdsMatch("firefox.instance123", "firefox"))
     verify(!Model.appIdsMatch("spotify", "foot"))
     verify(!Model.appIdsMatch("", "chromium"))
+  }
+
+  function test_protectedApplicationsDefaultToSteam() {
+    var defaults = Model.configFromSettings({})
+    compare(defaults.protectedApps.join(","), "steam")
+    verify(Model.matchesProtectedApp("steam", defaults.protectedApps))
+    verify(!Model.matchesProtectedApp("chromium", defaults.protectedApps))
+
+    var customized = Model.configFromSettings({ protectedApps: "code, org.gnome.Builder.desktop" })
+    compare(customized.protectedApps.join(","), "code,org.gnome.builder")
+    verify(Model.matchesProtectedApp("org.gnome.Builder", customized.protectedApps))
   }
 
   function test_manualPauseLabel() {

@@ -41,8 +41,9 @@ function defaultConfig() {
     startSoundPath: "",
     completionSoundPath: "",
     outputMode: "all",
+    protectedApps: ["steam"],
     officeHours: { enabled: false, startMinute: 8 * 60, endMinute: 18 * 60 },
-    detectors: { idle: true, fullscreen: true, media: true, microphone: true, dictation: true }
+    detectors: { idle: true, fullscreen: true, media: true, microphone: true, dictation: true, applications: true }
   }
 }
 
@@ -74,6 +75,11 @@ function normalizeConfig(input) {
   base.startSoundPath = String(value.startSoundPath || "").trim()
   base.completionSoundPath = String(value.completionSoundPath || "").trim()
   base.outputMode = ["all", "focused"].indexOf(value.outputMode) >= 0 ? value.outputMode : base.outputMode
+  var protectedApps = value.protectedApps === undefined ? base.protectedApps : value.protectedApps
+  if (!Array.isArray(protectedApps)) protectedApps = String(protectedApps || "").split(",")
+  base.protectedApps = protectedApps.map(function(app) {
+    return String(app || "").trim().toLowerCase().replace(/\.desktop$/, "")
+  }).filter(function(app) { return app !== "" })
   if (value.officeHours) {
     base.officeHours.enabled = value.officeHours.enabled === true
     base.officeHours.startMinute = clamp(value.officeHours.startMinute === undefined ? base.officeHours.startMinute : value.officeHours.startMinute, 0, 1439)
@@ -122,6 +128,7 @@ function configFromSettings(settings) {
   if (incoming.startSoundPath !== undefined) next.startSoundPath = String(incoming.startSoundPath)
   if (incoming.completionSoundPath !== undefined) next.completionSoundPath = String(incoming.completionSoundPath)
   if (incoming.outputMode !== undefined) next.outputMode = String(incoming.outputMode)
+  if (incoming.protectedApps !== undefined) next.protectedApps = String(incoming.protectedApps)
   if (incoming.officeHoursEnabled !== undefined) next.officeHours.enabled = incoming.officeHoursEnabled === true
   if (incoming.officeStart !== undefined) next.officeHours.startMinute = parseClockMinute(incoming.officeStart, next.officeHours.startMinute)
   if (incoming.officeEnd !== undefined) next.officeHours.endMinute = parseClockMinute(incoming.officeEnd, next.officeHours.endMinute)
@@ -172,12 +179,13 @@ function inOfficeHours(date, officeHours) {
 
 function strongestEvidence(evidence, config) {
   var enabled = config && config.detectors ? config.detectors : defaultConfig().detectors
-  var priority = ["dictation", "meeting", "microphone", "media", "fullscreen"]
+  var priority = ["dictation", "meeting", "microphone", "application", "media", "fullscreen"]
   var best = null
   for (var i = 0; i < (evidence || []).length; i++) {
     var item = evidence[i] || {}
     var category = String(item.category || "")
-    var detectorKey = category === "meeting" ? "microphone" : category
+    var detectorKey = category === "meeting" ? "microphone"
+      : category === "application" ? "applications" : category
     if (enabled[detectorKey] !== true || item.active !== true) continue
     var confidence = clamp(item.confidence === undefined ? 0 : item.confidence, 0, 1)
     if (confidence < 0.6) continue
@@ -533,6 +541,7 @@ function protectedExplanation(category) {
     meeting: "your meeting is active",
     microphone: "your microphone is active",
     media: "media is playing",
+    application: "a protected application is focused",
     fullscreen: "fullscreen work is active",
     dictation: "dictation is active"
   }
@@ -545,6 +554,7 @@ function contextShortLabel(category) {
     meeting: "Meeting",
     microphone: "Mic",
     media: "Video",
+    application: "Focus",
     fullscreen: "Fullscreen"
   }
   return labels[String(category || "")] || ""
@@ -555,4 +565,10 @@ function appIdsMatch(left, right) {
   var b = String(right || "").toLowerCase().replace(/\.desktop$/, "")
   if (!a || !b) return false
   return a === b || a.indexOf(b + ".") === 0 || b.indexOf(a + ".") === 0
+}
+
+function matchesProtectedApp(appId, protectedApps) {
+  for (var i = 0; i < (protectedApps || []).length; i++)
+    if (appIdsMatch(appId, protectedApps[i])) return true
+  return false
 }

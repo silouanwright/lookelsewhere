@@ -92,12 +92,17 @@ omarchy bar set io.github.silouanwright.look-elsewhere completionSoundEnabled tr
 omarchy bar set io.github.silouanwright.look-elsewhere startSoundPath '"/absolute/path/to/start.ogg"' --json
 omarchy bar set io.github.silouanwright.look-elsewhere completionSoundPath '"~/Sounds/complete.ogg"' --json
 omarchy bar set io.github.silouanwright.look-elsewhere outputMode '"all"' --json
+omarchy bar set io.github.silouanwright.look-elsewhere protectedApps '"steam,code"' --json
 omarchy bar set io.github.silouanwright.look-elsewhere displayMode '"icon-and-time"' --json
 omarchy bar set io.github.silouanwright.look-elsewhere showKeyboardHints true --json
 omarchy bar set io.github.silouanwright.look-elsewhere shortcutBreakNow '"Ctrl+K"' --json
 ```
 
 `displayMode` accepts `icon`, `time`, or `icon-and-time`. The compact countdown shows minutes, then switches to seconds during the final minute. Vertical bars use the icon so the widget remains legible.
+
+`protectedApps` accepts comma-separated Wayland application IDs. A due break is
+held while a listed application is focused; `steam` is included by default.
+Inspect `hyprctl activewindow -j` when an application's ID is unclear.
 
 Look Elsewhere enables two bundled piano cues by default: an ascending phrase
 when a break begins and a resolving phrase when it is time to return.

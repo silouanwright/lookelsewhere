@@ -114,6 +114,8 @@ Item {
     if (microphoneActive && fullscreenActive) value.push({ category: "meeting", confidence: 0.9, active: true })
     else if (microphoneActive) value.push({ category: "microphone", confidence: 0.75, active: true })
     if (mediaActive) value.push({ category: "media", confidence: 0.8, active: true })
+    if (Model.matchesProtectedApp(activeAppId, config.protectedApps))
+      value.push({ category: "application", confidence: 1, active: true })
     if (fullscreenActive) value.push({ category: "fullscreen", confidence: 0.65, active: true })
     return value
   }
