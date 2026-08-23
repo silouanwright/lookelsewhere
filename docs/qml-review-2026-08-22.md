@@ -4,13 +4,14 @@
 **Files reviewed:** `BarWidget.qml`, `Panel.qml`, `Overlay.qml`, `Service.qml`, rolling-number components, and QML tests
 **Method:** deterministic Qt/QML lint, system `qmllint`, and six semantic passes covering bindings, layout, lifecycle, delegates, states, and performance
 
-The final long-break and overlay refinements through commit `bebc87b` received
-a diff-scoped six-pass review. All six passes reported zero confirmed findings
-and zero investigation targets. The deterministic linter introduced no new
-actionable changed-line finding; standalone `qmllint` again reported only the
-documented runtime-root import-resolution limitations. The exact QML test suite
-now passes 49 checks with zero failures, including configurable shortcut
-validation, long-break cadence, and policy migration.
+The competition-boundary implementation through commit `635bcb8` received a
+wide six-pass review, followed by a diff-scoped remediation review. All three
+remediation passes reported zero confirmed findings and zero investigation
+targets. The deterministic linter introduced no new actionable changed-line
+finding; standalone `qmllint` again reported only the documented runtime-root
+import-resolution limitations. The exact QML test suite now passes 52 checks
+with zero failures, including configurable shortcuts, long-break cadence,
+protected applications, typing holds, and policy migration.
 
 ## Confirmed findings and disposition
 
@@ -26,6 +27,9 @@ validation, long-break cadence, and policy migration.
 | State loading raced asynchronous state-directory creation | 88 | Fixed by exposing the state file only after successful directory creation and blocking persistence on failure |
 | Hidden panel and per-output countdowns continuously created rolling animations | 93 | Fixed with an explicit animation-active contract that snaps hidden surfaces and animates only visible countdowns |
 | The floating toolbar could overlap centered page content at larger scales | 91 | Fixed with symmetric content clearance, preserving the approved visual spacing and optical centering |
+| Failed or obsolete active-window probes could retain the previous XWayland application's protection state | 92 | Fixed by clearing fallback state on focus changes and parse failures, and discarding results from older focus generations |
+| A scaled one-line action row could paint below its reserved height and overlap the snooze summary | 88 | Fixed by scaling from the top edge so painted and reserved bounds agree |
+| Hidden output delegates animated and enabled transient blur during focused-output breaks | 91 | Fixed by animating only the presenting delegate and snapping hidden delegates to their settled state |
 
 ## Additional hardening
 
@@ -38,7 +42,7 @@ validation, long-break cadence, and policy migration.
 - Component tests cover inactive snapping, active animation, reduced motion,
   digit-boundary changes, minimum digit count, sequential recovery from a
   small missed countdown sample, and immediate handling of a true reset. The
-  complete suite passes 49 tests with zero failures.
+  complete suite passes 52 tests with zero failures.
 
 ## Environmental lint limitations
 
