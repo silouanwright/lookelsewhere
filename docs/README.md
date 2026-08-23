@@ -1,4 +1,4 @@
-# Look Elsewhere Documentation
+# LookElsewhere Documentation
 
 This directory is the product and engineering source of truth. It consolidates
 the competitive and feasibility research, accepted decisions, implementation
@@ -16,9 +16,7 @@ on a particular workstation or chat history.
 - [Experience and surfaces](experience.md)
 - [Design feedback reconciliation](design-feedback-reconciliation.md)
 - [Privacy and trust](privacy.md)
-- [Competition delivery plan](competition.md)
 - [Marketplace submission draft](marketplace-submission.md)
-- [Marketplace parser and security preflight](marketplace-preflight-2026-08-22.md)
 - [Final submission checklist](submission-checklist.md)
 - [Verification strategy](verification.md)
 - [QML review and remediations](qml-review-2026-08-22.md)
@@ -36,4 +34,4 @@ on a particular workstation or chat history.
 - Product documents describe current accepted behavior, not aspirational feature catalogs.
 - Unproven technical assumptions are labeled as validation conditions.
 - If implementation contradicts an accepted ADR, amend or supersede the ADR before treating the new behavior as intentional.
-- Avoid medical claims. Look Elsewhere supports healthier screen-break habits but does not diagnose, prevent, or treat disease.
+- Avoid medical claims. LookElsewhere supports healthier screen-break habits but does not diagnose, prevent, or treat disease.

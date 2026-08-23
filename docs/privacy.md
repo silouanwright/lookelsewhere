@@ -2,7 +2,7 @@
 
 ## Promise
 
-Look Elsewhere observes the minimum local signals needed to time interruptions. It does not build an activity history, inspect content, require an account, or send telemetry.
+LookElsewhere observes the minimum local signals needed to time interruptions. It does not build an activity history, inspect content, require an account, or send telemetry.
 
 ## Allowed transient evidence
 

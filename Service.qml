@@ -546,13 +546,13 @@ Item {
 
   Process {
     id: breakStartSound
-    command: ["canberra-gtk-play", "-f", service.startSoundPath, "-V", service.soundVolumeDb, "-d", "Look Elsewhere break started"]
+    command: ["canberra-gtk-play", "-f", service.startSoundPath, "-V", service.soundVolumeDb, "-d", "LookElsewhere break started"]
     onExited: function(exitCode) { service.startSoundAvailable = exitCode === 0 }
   }
 
   Process {
     id: breakCompletionSound
-    command: ["canberra-gtk-play", "-f", service.completionSoundPath, "-V", service.soundVolumeDb, "-d", "Look Elsewhere break complete"]
+    command: ["canberra-gtk-play", "-f", service.completionSoundPath, "-V", service.soundVolumeDb, "-d", "LookElsewhere break complete"]
     onExited: function(exitCode) { service.completionSoundAvailable = exitCode === 0 }
   }
 

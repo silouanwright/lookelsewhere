@@ -1,11 +1,11 @@
-# Look Elsewhere Configuration
+# LookElsewhere Configuration
 
-This is the canonical human-facing configuration reference for Look Elsewhere.
+This is the canonical human-facing configuration reference for LookElsewhere.
 The machine-enforced schema and defaults live in [`manifest.json`](manifest.json).
 If this document and the manifest ever disagree, the manifest describes what
 the installed Omarchy Shell actually accepts and this document should be fixed.
 
-Look Elsewhere does not read this file as configuration. Omarchy stores the
+LookElsewhere does not read this file as configuration. Omarchy stores the
 active values in `~/.config/omarchy/shell.json`. Change them with:
 
 ```bash
@@ -75,7 +75,7 @@ uses the default declared by the plugin manifest.
 | Key | Default | Accepted values | Meaning |
 |---|---:|---|---|
 | `soundEnabled` | `true` | Boolean | Master switch for both bundled/custom break cues. |
-| `soundVolume` | `65` | Integer `0–100` | Look Elsewhere cue volume; system output volume remains the final ceiling. |
+| `soundVolume` | `65` | Integer `0–100` | LookElsewhere cue volume; system output volume remains the final ceiling. |
 | `startSoundEnabled` | `true` | Boolean | Play a cue when a break begins. |
 | `completionSoundEnabled` | `true` | Boolean | Play a cue just before a break finishes. |
 | `startSoundPath` | `""` | Absolute path, `~/` path, or empty | Custom start cue; empty uses the bundled piano phrase. |
@@ -98,7 +98,7 @@ conventions.
 | `shortcutHistory` | `"H"` | Open break history. |
 | `shortcutOptions` | `"O"` | Open options. |
 | `shortcutEdit` | `"E"` | Open the configuration file from Options. |
-| `shortcutDisable` | `"Shift+D"` | Stop and disable Look Elsewhere from Options. |
+| `shortcutDisable` | `"Shift+D"` | Stop and disable LookElsewhere from Options. |
 | `shortcutClose` | `"Q"` | Close the panel. |
 | `shortcutHints` | `"?"` | Toggle visible shortcut badges. |
 

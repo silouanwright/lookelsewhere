@@ -1,68 +1,103 @@
-# Look Elsewhere
+<p align="center">
+  <img src="docs/assets/lookelsewhere.svg" width="88" alt="LookElsewhere bed icon">
+</p>
 
-A private, context-aware break coach built natively for Omarchy. Look Elsewhere
-counts active screen use, waits through protected moments such as meetings,
-video, fullscreen work, and dictation, then finds a better moment to pull your
-attention away from the screen.
+<h1 align="center">LookElsewhere</h1>
 
-Inspired by [LookAway](https://lookaway.com/), a beautifully considered Mac app,
-and reimagined for Omarchy, Wayland, and a keyboard-first Linux desktop.
+<p align="center">
+  A private, context-aware break coach built natively for Omarchy.
+</p>
 
-![Look Elsewhere break overlay](preview.png)
+<p align="center">
+  Inspired by <a href="https://lookaway.com/">LookAway</a>, reimagined for Omarchy, Wayland, and a keyboard-first Linux desktop.
+</p>
 
-## Why Look Elsewhere?
+![LookElsewhere break overlay](preview.png)
 
-Most Linux break timers interrupt on a wall-clock schedule. Look Elsewhere pays
-attention to whether you are actually using the computer and whether a break
-would be disruptive right now.
+## Why LookElsewhere?
 
-It is a self-contained Quickshell/QML plugin, not an Electron app. It follows
-your Omarchy theme, lives in the bar, understands Hyprland and Wayland signals,
-works without a mouse, and keeps everything on your machine.
+Let's face it: many of us look at screens for most of the day, whether for
+work, entertainment, or staying close to the people we love. Extended screen
+use can contribute to digital eye strain, dry eyes, headaches, and fatigue.
+
+The [American Optometric Association](https://www.aoa.org/healthy-eyes/eye-and-vision-conditions/computer-vision-syndrome)
+recommends the 20-20-20 rule: every 20 minutes, look at something 20 feet away
+for 20 seconds. It is a simple habit, but how do you remember it? What if you
+are in a meeting, watching a video, using dictation, or finishing something
+important? What if you need another minute without abandoning the habit?
+
+Enter LookElsewhere.
+
+LookElsewhere counts active screen use and waits for a less disruptive moment
+to begin a break. It stays flexible enough for real work while helping you stay
+accountable to step away.
+
+Thank you to [Kushagra Agarwal](https://lookaway.com/press-kit/), the developer
+of LookAway. LookElsewhere is undeniably inspired by his thoughtful Mac app,
+rebuilt with Omarchy and Linux flair.
 
 ## Features
 
-- Active-use scheduling with recovery across shell reloads
-- Idle, fullscreen, focused-video, microphone, dictation, and protected-app detection
-- Progressive warning, final countdown, and multi-monitor break overlay
-- Casual, Balanced, and Hardcore enforcement
-- Configurable short breaks, long breaks, snoozing, office hours, and sounds
-- Native Omarchy surfaces that follow contrasting, rounded, and sharp themes
-- Complete keyboard navigation with direct action keys and visible hints
-- No account, telemetry, screen capture, audio recording, or retained activity titles
+- First-class Omarchy integration with automatic support for installed themes
+- A self-contained Quickshell/QML plugin, not an Electron app
+- Lightweight, responsive, and built for Hyprland and Wayland
+- Complete keyboard-first navigation, with full pointer support too
+- Active-use scheduling that waits through typing, dictation, focused video,
+  meetings, fullscreen apps, protected apps, and away time
+- Progressive warnings, short breaks, periodic long breaks, snoozing, office
+  hours, enforcement modes, and configurable sounds
+- Private by design: no account, telemetry, screen capture, audio recording, or
+  retained window and media titles
+- Free and open source
 
-## From glance to break
+## The menubar
 
-Look Elsewhere starts in the bar, opens an anchored control panel, warns you at
-the top center of the active display, then becomes a calm full-screen break.
+LookElsewhere starts in the bar. At a glance, you can see how much active time
+remains until your next break. When scheduling is paused or protected, the bar
+shows why instead of leaving you to wonder whether the timer stopped.
 
-![Look Elsewhere top-centered warning](docs/assets/progressive-warning.png)
+## The plugin panel
+
+Click the menubar item or invoke your global Omarchy shortcut to open the
+anchored panel. The countdown gently ticks away while you start a break early,
+snooze for a few minutes, see your remaining snoozes, pause scheduling, or open
+history and options.
+
+The default panel stays calm and uncluttered. Keyboard labels appear only when
+you ask for them.
+
+![LookElsewhere quick panel](docs/assets/quick-panel.png)
+
+## A gentle warning
+
+As a break approaches, LookElsewhere begins with a top-centered warning rather
+than immediately taking over your screen. You can start now or use an available
+snooze without losing your place.
+
+![LookElsewhere top-centered warning](docs/assets/progressive-warning.png)
+
+## Full-screen breaks
+
+When it is time, LookElsewhere becomes a calm, theme-aware full-screen
+intermission. Short breaks can last only a few seconds. After a configurable
+number of short breaks, a longer break gives you time to walk, stretch, and
+properly leave the screen.
+
+The title, guidance, duration, long-break cadence, sounds, output behavior,
+snoozing, and enforcement policy are all configurable.
+
+![LookElsewhere long-break overlay](docs/assets/long-break.png)
 
 [Watch the 23-second warning-to-break demo](docs/assets/demo.mp4). It uses
 synthetic state and restores the real schedule when it finishes.
 
-Periodic long breaks use the same themed surface with a clear status pill and a
-longer countdown.
+## Keyboard first
 
-![Look Elsewhere long-break overlay](docs/assets/long-break.png)
+Press `?` to reveal the relevant key directly on every action. Inspired by
+[Godspeed](https://godspeedapp.com/), these theme-aware labels help you learn to
+drive the entire panel without reaching for a pointer.
 
-## Install
-
-```bash
-omarchy plugin add https://github.com/silouanwright/lookelsewhere.git --enable
-```
-
-Look Elsewhere requires Omarchy Quattro with Omarchy Shell. It has no installer
-hook, privileged operation, external daemon, account, or network dependency.
-
-## Keyboard-native control
-
-Press `?` to reveal every direct action key. Inspired by
-[Godspeed](https://godspeedapp.com/), the badges make keyboard control visible,
-inherit the active Omarchy theme, and deactivate when another shell surface
-takes focus.
-
-![Look Elsewhere keyboard shortcut hints](docs/assets/quick-panel.png)
+![LookElsewhere keyboard shortcut hints](docs/assets/keyboard-shortcuts.png)
 
 Tab and Shift+Tab traverse every control, Enter or Space activates it, and
 Escape closes the panel. Local action keys are configurable in
@@ -74,36 +109,20 @@ For global invocation, add the recommended `Super+Alt+L` Omarchy binding:
 o.bind("SUPER + ALT + L", "LookElsewhere", "omarchy-shell look-elsewhere-panel toggle")
 ```
 
-## Configure
+## Configuration
 
-Look Elsewhere follows Omarchy's config-first plugin convention. Use the bar
-CLI to change a setting without editing `~/.config/omarchy/shell.json` by hand:
+LookElsewhere follows Omarchy's config-first convention. Timing, long breaks,
+detectors, enforcement, snoozing, office hours, sounds, display modes,
+protected apps, guidance text, outputs, motion, and shortcuts can all be
+changed through Omarchy's supported CLI.
 
 ```bash
 omarchy bar set io.github.silouanwright.look-elsewhere focusMinutes 25 --json
 omarchy bar set io.github.silouanwright.look-elsewhere enforcement '"balanced"' --json
 ```
 
-Timing, long breaks, detectors, enforcement, snoozing, office hours, sounds,
-display modes, protected apps, guidance text, outputs, motion, and shortcuts are
-all configurable. See [Configuration](CONFIGURATION.md) for every option,
-default, accepted value, and example.
-
-## How smart timing works
-
-Only active screen use advances the focus timer. When a break becomes due,
-Look Elsewhere briefly looks for strong local evidence that interruption would
-be disruptive. It can wait through:
-
-- idle and away time;
-- fullscreen applications and configured protected apps;
-- media playing in the focused application;
-- active microphone or meeting-like activity; and
-- Omarchy dictation.
-
-The bar always reflects why time is being held. Detection uses coarse local
-state only. Look Elsewhere does not store media titles, window titles,
-transcripts, audio, or screen content.
+See [Configuration](CONFIGURATION.md) for every setting, default, accepted
+value, and example.
 
 ## Enforcement
 
@@ -113,11 +132,26 @@ transcripts, audio, or screen content.
 
 Hardcore ends only when the break timer completes.
 
+## Install
+
+```bash
+omarchy plugin add https://github.com/silouanwright/lookelsewhere.git --enable
+```
+
+LookElsewhere requires Omarchy Quattro with Omarchy Shell. It has no installer
+hook, privileged operation, external daemon, account, or network dependency.
+
+To remove it:
+
+```bash
+omarchy plugin remove io.github.silouanwright.look-elsewhere
+```
+
 ## Limitations
 
 - Hyprland and Omarchy are the supported and tested environment.
-- MPRIS does not identify whether the current item has a video track. Look
-  Elsewhere infers video only when the playing application is focused, which
+- MPRIS does not identify whether the current item has a video track.
+  LookElsewhere infers video only when the playing application is focused. This
   avoids pausing for background music but remains a heuristic.
 - Wayland exposes coarse application and device state, not semantic intent.
   Screen sharing, recording, and every meeting state cannot yet be identified
@@ -126,8 +160,8 @@ Hardcore ends only when the break timer completes.
   shell reloads recoverable, but a separate daemon may become appropriate for
   broader Linux support later.
 
-The platform improvements uncovered while building this are documented in
-[Upstream Opportunities](docs/upstream-opportunities.md).
+The platform improvements uncovered while building LookElsewhere are recorded
+in [Upstream Opportunities](docs/upstream-opportunities.md).
 
 ## Roadmap
 
@@ -143,24 +177,11 @@ New features should stay private, explainable, keyboard-accessible, and native
 to Omarchy. A calm break tool should not become another dashboard demanding
 attention.
 
-## Development
-
-Deterministic demo states, verification evidence, architecture decisions, and
-the completion matrix live under [Documentation](docs/README.md). Start with:
-
-```bash
-omarchy-shell look-elsewhere demo flow
-omarchy-shell look-elsewhere demo long-break
-omarchy-shell look-elsewhere demoOff
-```
-
-Demo fixtures never persist synthetic state.
-
 ## A note from the developer
 
 I'm Silouan Wright, a lead frontend engineer who has been building software for
-over 20 years. I've used Omarchy since its first release, and building Look
-Elsewhere reminded me how much I want to come back to work on something I
+over 20 years. I've used Omarchy since its first release, and building
+LookElsewhere reminded me how much I want to come back to work on something I
 genuinely love.
 
 I built this plugin in close collaboration with an AI coding agent. What
@@ -176,12 +197,17 @@ runtime testing, and release hardening. I care as much about the state machine
 under an interface as I do about the last few pixels people experience.
 
 Working on Omarchy with agentic development has made building software exciting
-for me again. I would love to bring that combination of engineering experience,
-product judgment, communication, and attention to detail to Omarchy full time.
+for me again. If LookElsewhere wins, the thing I would most like to win is not
+the money. It is a job building plugins and bringing more of the thoughtful
+tools people love on the Mac to Omarchy, making it easier for them to switch.
 
-If this reaches DHH or the Omarchy team, I would genuinely love to talk. If Look
-Elsewhere wins a competition prize, I'll donate the money to charity. The real
-prize would be getting to work on something like this again.
+If this reaches DHH or the Omarchy team, I would genuinely love to talk. I want
+to work again, and I would love for this to be the work I get to do.
+
+## Development
+
+Architecture decisions, research, verification evidence, deterministic demo
+states, and the completion matrix live under [Documentation](docs/README.md).
 
 ## License
 

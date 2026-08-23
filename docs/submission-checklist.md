@@ -12,7 +12,7 @@ submission.
 - [x] The plugin ID is still absent from the public marketplace registry.
 - [x] README installation and removal commands match the current Omarchy CLI.
 - [x] `LICENSE` and `THIRD_PARTY_NOTICES.md` cover the shipped code and icons.
-- [x] Root `preview.png` and every README asset are original Look Elsewhere
+- [x] Root `preview.png` and every README asset are original LookElsewhere
   captures from the exact release UI.
 - [x] No secrets, raw personal context, generated state, or machine-specific
   paths are tracked.
@@ -55,7 +55,7 @@ submission.
 - [ ] Silouan confirms he can receive a prize by Zelle, Venmo, PayPal, or EU
   IBAN, as required by the competition rules.
 - [ ] The GitHub repository is public at
-  `https://github.com/silouanwright/look-elsewhere` and its default branch HEAD
+  `https://github.com/silouanwright/lookelsewhere` and its default branch HEAD
   equals the approved SHA.
 - [ ] Installation from the public URL succeeds on the installed Omarchy
   release and the public clone validates.

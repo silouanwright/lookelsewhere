@@ -531,7 +531,7 @@ function stateLabel(snapshot) {
   if (state === State.Final) return "Starting break"
   if (state === State.Breaking) return "Look elsewhere"
   if (state === State.Paused) return "Breaks paused"
-  if (state === State.Disabled) return "Look Elsewhere is off"
+  if (state === State.Disabled) return "LookElsewhere is off"
   if (state === State.DueSoon) return "Break due soon"
   return "Break starts in"
 }

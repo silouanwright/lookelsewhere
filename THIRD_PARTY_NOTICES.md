@@ -1,6 +1,6 @@
 # Third-party notices
 
-Look Elsewhere includes regular `bed`, `chart-line-up`, and `gear` SVG artwork
+LookElsewhere includes regular `bed`, `chart-line-up`, and `gear` SVG artwork
 from [Phosphor Icons](https://github.com/phosphor-icons/core), used under the
 MIT License. The bed path is used by the break icon component and asset; the
 other two paths are used by the quick-panel toolbar.
@@ -33,7 +33,7 @@ samples in the [Versilian Community Sample Library Keys](https://versilian-studi
 VCSL Keys is released under Creative Commons Zero (CC0 1.0) and may be used,
 modified, and redistributed without restriction.
 
-Look Elsewhere uses the G-sharp 3 and C4, velocity-layer 4 sustain recordings.
+LookElsewhere uses the G-sharp 3 and C4, velocity-layer 4 sustain recordings.
 The cues trim and fade the source notes, stagger and mix them into ascending
 and descending two-note phrases, loudness-normalize the results, and encode
 them as 48 kHz stereo Ogg Vorbis files. This notice is retained as provenance
@@ -46,7 +46,7 @@ The files under
 two `lookaway-*.png` files beside that directory are screenshots supplied by
 the author from a licensed LookAway installation. They are retained only as
 comparative research evidence supporting the accompanying criticism,
-analysis, and design decisions. They are not Look Elsewhere product or
+analysis, and design decisions. They are not LookElsewhere product or
 promotional assets and are not covered by this repository's MIT license.
 LookAway and its interface remain the property of their respective rights
 holder; inclusion does not imply affiliation or endorsement.

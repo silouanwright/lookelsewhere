@@ -2,7 +2,7 @@
 
 ## One sentence
 
-Look Elsewhere is a native Omarchy break coach that understands what the user is doing and interrupts at a less disruptive moment.
+LookElsewhere is a native Omarchy break coach that understands what the user is doing and interrupts at a less disruptive moment.
 
 ## User and problem
 

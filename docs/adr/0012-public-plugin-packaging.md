@@ -9,7 +9,7 @@ The competition and marketplace expect a public GitHub repository, root manifest
 
 ## Decision
 
-Publish `silouanwright/look-elsewhere` under MIT with root plugin files, documented commands, no install hook, no privilege escalation, no required network service, and the fewest practical dependencies.
+Publish `silouanwright/lookelsewhere` under MIT with root plugin files, documented commands, no install hook, no privilege escalation, no required network service, and the fewest practical dependencies.
 
 ## Alternatives
 

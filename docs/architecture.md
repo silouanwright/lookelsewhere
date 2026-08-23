@@ -4,7 +4,7 @@
 
 ```text
 Omarchy Shell / Quickshell process
-└── Look Elsewhere plugin
+└── LookElsewhere plugin
     ├── Service.qml
     │   ├── authoritative timestamps and state transitions
     │   ├── persistence/recovery adapter
