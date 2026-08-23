@@ -86,6 +86,32 @@ TestCase {
     compare(value.officeHours.startMinute, 8 * 60)
   }
 
+  function test_panelShortcutConfiguration() {
+    var defaults = Model.panelShortcuts({})
+    compare(defaults.breakNow, "B")
+    compare(defaults.disable, "Shift+D")
+    compare(defaults.hints, "?")
+
+    var customized = Model.panelShortcuts({
+      shortcutBreakNow: "ctrl + k",
+      shortcutDisable: "super+x",
+      shortcutHints: "F1"
+    })
+    compare(customized.breakNow, "Ctrl+K")
+    compare(customized.disable, "Meta+X")
+    compare(customized.hints, "F1")
+    compare(Model.panelShortcutLabel("Shift+D"), "⬆D")
+    compare(Model.panelShortcutLabel("Ctrl+K"), "Ctrl+K")
+
+    var invalid = Model.panelShortcuts({ shortcutBreakNow: "Escape", shortcutPause: "" })
+    compare(invalid.breakNow, "B")
+    compare(invalid.pause, "P")
+
+    var duplicate = Model.panelShortcuts({ shortcutBreakNow: "H" })
+    compare(duplicate.breakNow, "B")
+    compare(duplicate.history, "H")
+  }
+
   function test_activeUseDoesNotCountIdle() {
     var c = config()
     var s = Model.defaultSnapshot(1000)

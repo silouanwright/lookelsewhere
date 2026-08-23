@@ -400,6 +400,82 @@ function shouldLeadCompletionCue(state, remainingMs, leadMs) {
   return state === State.Breaking && remaining > 0 && remaining <= Number(leadMs || 0)
 }
 
+function panelShortcutDefinitions() {
+  return [
+    { action: "breakNow", setting: "shortcutBreakNow", fallback: "B" },
+    { action: "snooze1", setting: "shortcutSnooze1", fallback: "1" },
+    { action: "snooze5", setting: "shortcutSnooze5", fallback: "2" },
+    { action: "snooze15", setting: "shortcutSnooze15", fallback: "3" },
+    { action: "pause", setting: "shortcutPause", fallback: "P" },
+    { action: "history", setting: "shortcutHistory", fallback: "H" },
+    { action: "options", setting: "shortcutOptions", fallback: "O" },
+    { action: "edit", setting: "shortcutEdit", fallback: "E" },
+    { action: "disable", setting: "shortcutDisable", fallback: "Shift+D" },
+    { action: "close", setting: "shortcutClose", fallback: "Q" },
+    { action: "hints", setting: "shortcutHints", fallback: "?" }
+  ]
+}
+
+function normalizePanelShortcut(value) {
+  var parts = String(value === undefined || value === null ? "" : value)
+    .split("+").map(function(part) { return part.trim() }).filter(function(part) { return part !== "" })
+  if (!parts.length) return ""
+
+  var base = parts.pop()
+  if (/^[a-z]$/i.test(base)) base = base.toUpperCase()
+  else if (/^f(?:[1-9]|1[0-2])$/i.test(base)) base = base.toUpperCase()
+  else if (!/^[0-9?]$/.test(base)) return ""
+
+  var aliases = { control: "Ctrl", ctrl: "Ctrl", alt: "Alt", shift: "Shift", meta: "Meta", super: "Meta" }
+  var requested = {}
+  for (var i = 0; i < parts.length; i++) {
+    var modifier = aliases[parts[i].toLowerCase()]
+    if (!modifier || requested[modifier]) return ""
+    requested[modifier] = true
+  }
+  var order = ["Ctrl", "Alt", "Shift", "Meta"]
+  var normalized = []
+  for (var j = 0; j < order.length; j++) if (requested[order[j]]) normalized.push(order[j])
+  normalized.push(base)
+  return normalized.join("+")
+}
+
+function panelShortcuts(settings) {
+  var definitions = panelShortcutDefinitions()
+  var source = settings || {}
+  var result = {}
+  for (var i = 0; i < definitions.length; i++) {
+    var definition = definitions[i]
+    result[definition.action] = normalizePanelShortcut(source[definition.setting]) || definition.fallback
+  }
+
+  // A duplicate QML Shortcut becomes ambiguous. Restore every participant
+  // to its unique documented default, repeating in case a custom key occupied
+  // one of those defaults.
+  for (var pass = 0; pass < definitions.length; pass++) {
+    var counts = {}
+    for (var j = 0; j < definitions.length; j++) {
+      var value = result[definitions[j].action]
+      counts[value] = Number(counts[value] || 0) + 1
+    }
+    var changed = false
+    for (var k = 0; k < definitions.length; k++) {
+      var item = definitions[k]
+      if (counts[result[item.action]] > 1 && result[item.action] !== item.fallback) {
+        result[item.action] = item.fallback
+        changed = true
+      }
+    }
+    if (!changed) break
+  }
+  return result
+}
+
+function panelShortcutLabel(sequence) {
+  var value = String(sequence || "")
+  return /^Shift\+.$/.test(value) ? "⬆" + value.slice(-1) : value
+}
+
 function resetTotals(snapshot) {
   var next = copySnapshot(snapshot)
   next.totals = { prompted: 0, completed: 0, postponed: 0, skipped: 0, delayed: 0 }

@@ -84,6 +84,7 @@ omarchy bar set io.github.silouanwright.look-elsewhere completionSoundPath '"~/S
 omarchy bar set io.github.silouanwright.look-elsewhere outputMode '"all"' --json
 omarchy bar set io.github.silouanwright.look-elsewhere displayMode '"icon-and-time"' --json
 omarchy bar set io.github.silouanwright.look-elsewhere showKeyboardHints true --json
+omarchy bar set io.github.silouanwright.look-elsewhere shortcutBreakNow '"Ctrl+K"' --json
 ```
 
 `displayMode` accepts `icon`, `time`, or `icon-and-time`. The compact countdown shows minutes, then switches to seconds during the final minute. Vertical bars use the icon so the widget remains legible.
@@ -133,6 +134,15 @@ automatically deactivate when another Omarchy surface takes keyboard focus.
 | `Shift+d` | Stop and disable LookElsewhere while Options is open |
 | `?` | Toggle visible key hints for every action; the choice persists for the shell session |
 | `q` or `Esc` | Close the panel without changing key-hint visibility |
+
+The direct action keys are manifest-backed settings (`shortcutBreakNow`,
+`shortcutSnooze1`, `shortcutSnooze5`, `shortcutSnooze15`, `shortcutPause`,
+`shortcutHistory`, `shortcutOptions`, `shortcutEdit`, `shortcutDisable`,
+`shortcutClose`, and `shortcutHints`). They accept a letter, digit, `?`, F1–F12,
+or a chord using Ctrl, Alt, Shift, or Meta. Invalid or conflicting values fall
+back to the documented defaults, and visible badges always show the effective
+binding. Tab, Shift+Tab, Enter, Space, and Escape remain fixed accessibility
+conventions.
 
 LookElsewhere does not silently claim global keys. For first-class invocation
 from anywhere, add the recommended `Super+Alt+L` binding to

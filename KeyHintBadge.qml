@@ -10,7 +10,7 @@ Rectangle {
   property bool centerOnCorner: false
 
   readonly property real badgeSize: Style.space(14)
-  readonly property bool shiftChord: keyText === "⬆D"
+  readonly property bool shiftChord: /^⬆.$/.test(keyText)
   readonly property real keyWidth: shiftChord ? shiftRow.implicitWidth : label.implicitWidth
 
   x: placeRight ? parent.width + Style.space(3)
@@ -54,7 +54,7 @@ Rectangle {
 
     Text {
       anchors.verticalCenter: parent.verticalCenter
-      text: "D"
+      text: root.keyText.slice(1)
       color: Color.popups.background
       font.family: Style.font.family
       font.pixelSize: Style.font.caption

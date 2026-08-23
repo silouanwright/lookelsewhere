@@ -48,7 +48,18 @@
       "completionSoundPath": "",
       "outputMode": "all",
       "displayMode": "icon-and-time",
-      "showKeyboardHints": false
+      "showKeyboardHints": false,
+      "shortcutBreakNow": "B",
+      "shortcutSnooze1": "1",
+      "shortcutSnooze5": "2",
+      "shortcutSnooze15": "3",
+      "shortcutPause": "P",
+      "shortcutHistory": "H",
+      "shortcutOptions": "O",
+      "shortcutEdit": "E",
+      "shortcutDisable": "Shift+D",
+      "shortcutClose": "Q",
+      "shortcutHints": "?"
     },
     "schema": [
       { "key": "focusMinutes", "type": "integer", "label": "Focus interval (minutes)", "min": 1, "max": 180, "step": 1, "defaultValue": 20 },
@@ -77,7 +88,18 @@
       { "key": "completionSoundPath", "type": "string", "label": "Custom break-completion sound", "defaultValue": "", "description": "Absolute path or ~/ path to an audio file. Leave empty to use the bundled piano cue." },
       { "key": "outputMode", "type": "enum", "label": "Break outputs", "options": ["all", "focused"], "defaultValue": "all", "description": "Show interruptions on every output or only the currently focused output." },
       { "key": "displayMode", "type": "enum", "label": "Bar display", "options": ["icon", "time", "icon-and-time"], "defaultValue": "icon-and-time", "description": "Show the eye, the compact countdown, or both. Vertical bars use the icon." },
-      { "key": "showKeyboardHints", "type": "boolean", "label": "Show keyboard hints by default", "defaultValue": false, "description": "Show shortcut badges whenever the panel opens. Toggle them temporarily with ?." }
+      { "key": "showKeyboardHints", "type": "boolean", "label": "Show keyboard hints by default", "defaultValue": false, "description": "Show shortcut badges whenever the panel opens. Toggle them temporarily with the configured hint key." },
+      { "key": "shortcutBreakNow", "type": "string", "label": "Shortcut: break now", "defaultValue": "B" },
+      { "key": "shortcutSnooze1", "type": "string", "label": "Shortcut: snooze 1 minute", "defaultValue": "1" },
+      { "key": "shortcutSnooze5", "type": "string", "label": "Shortcut: snooze 5 minutes", "defaultValue": "2" },
+      { "key": "shortcutSnooze15", "type": "string", "label": "Shortcut: snooze 15 minutes", "defaultValue": "3" },
+      { "key": "shortcutPause", "type": "string", "label": "Shortcut: pause or resume", "defaultValue": "P" },
+      { "key": "shortcutHistory", "type": "string", "label": "Shortcut: history", "defaultValue": "H" },
+      { "key": "shortcutOptions", "type": "string", "label": "Shortcut: options", "defaultValue": "O" },
+      { "key": "shortcutEdit", "type": "string", "label": "Shortcut: edit settings", "defaultValue": "E" },
+      { "key": "shortcutDisable", "type": "string", "label": "Shortcut: stop LookElsewhere", "defaultValue": "Shift+D" },
+      { "key": "shortcutClose", "type": "string", "label": "Shortcut: close panel", "defaultValue": "Q" },
+      { "key": "shortcutHints", "type": "string", "label": "Shortcut: toggle hints", "defaultValue": "?" }
     ]
   }
 }
