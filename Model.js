@@ -528,3 +528,14 @@ function protectedExplanation(category) {
   }
   return "Held quietly while " + (labels[String(category || "")] || "protected work is active") + "."
 }
+
+function contextShortLabel(category) {
+  var labels = {
+    dictation: "Dictation",
+    meeting: "Meeting",
+    microphone: "Mic",
+    media: "Media",
+    fullscreen: "Fullscreen"
+  }
+  return labels[String(category || "")] || ""
+}

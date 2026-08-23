@@ -61,6 +61,9 @@ Item {
   readonly property bool idle: demoMode ? demoIdle : idleMonitor.isIdle
   readonly property bool naturalPauseReady: demoMode ? demoNaturalPause : naturalPauseMonitor.isIdle
   readonly property bool idlePauseActive: config.detectors.idle && idle
+  readonly property var currentProtection: Model.strongestEvidence(evidence(), config)
+  readonly property string contextLabel: currentProtection
+    ? Model.contextShortLabel(currentProtection.category) : ""
   readonly property string phase: snapshot.state || Model.State.Working
   readonly property string label: idlePauseActive ? "Paused while you’re away" : Model.stateLabel(snapshot)
   readonly property string remainingText: Model.formatDuration(remainingMs)

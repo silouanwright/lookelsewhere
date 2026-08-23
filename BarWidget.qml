@@ -17,7 +17,11 @@ BarWidget {
   }
   readonly property bool showIcon: displayMode !== "time" || (bar && bar.vertical)
   readonly property bool showTime: displayMode !== "icon" && (!bar || !bar.vertical)
-  readonly property string compactTime: service ? (service.idlePauseActive ? qsTr("Idle") : Model.formatBarDuration(service.remainingMs)) : "—"
+  readonly property string compactTime: service
+    ? (service.idlePauseActive ? qsTr("Idle")
+      : service.contextLabel !== "" ? service.contextLabel
+      : Model.formatBarDuration(service.remainingMs))
+    : "—"
 
   function injectPanel() {
     var target = root.panelItem

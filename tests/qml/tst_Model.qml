@@ -435,6 +435,15 @@ TestCase {
     compare(Model.protectedExplanation("dictation"), "Held quietly while dictation is active.")
   }
 
+  function test_contextShortLabels() {
+    compare(Model.contextShortLabel("dictation"), "Dictation")
+    compare(Model.contextShortLabel("meeting"), "Meeting")
+    compare(Model.contextShortLabel("microphone"), "Mic")
+    compare(Model.contextShortLabel("media"), "Media")
+    compare(Model.contextShortLabel("fullscreen"), "Fullscreen")
+    compare(Model.contextShortLabel("unknown"), "")
+  }
+
   function test_manualPauseLabel() {
     var snapshot = Model.defaultSnapshot(0)
     snapshot.state = Model.State.Waiting
