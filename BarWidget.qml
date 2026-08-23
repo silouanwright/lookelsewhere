@@ -17,6 +17,8 @@ BarWidget {
   }
   readonly property bool showIcon: displayMode !== "time" || (bar && bar.vertical)
   readonly property bool showTime: displayMode !== "icon" && (!bar || !bar.vertical)
+  readonly property bool showingStatus: service
+    && (service.idlePauseActive || service.contextLabel !== "")
   readonly property string compactTime: service
     ? (service.idlePauseActive ? qsTr("Idle")
       : service.contextLabel !== "" ? service.contextLabel
@@ -108,6 +110,7 @@ BarWidget {
         visible: root.showTime
         text: root.compactTime
         color: button.active && button.useActiveColor ? button.activeColor : button.foreground
+        opacity: root.showingStatus ? 0.62 : 1
         font.family: button.fontFamily
         font.pixelSize: Style.font.body
         font.weight: Font.Medium
