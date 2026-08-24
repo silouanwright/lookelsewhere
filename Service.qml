@@ -43,6 +43,13 @@ Item {
   property var preDemoConfig: null
   property string preDemoRecoveryWarning: ""
   property bool preDemoPersistenceBlocked: false
+  property int demoSequenceIndex: -1
+  property string demoFixture: ""
+  readonly property var demoSequence: [
+    "idle", "typing", "meeting", "microphone", "media", "fullscreen",
+    "dictation", "due", "warning", "final", "casual-break",
+    "balanced-break", "hardcore-break", "long-break", "paused", "postponed"
+  ]
 
   readonly property var players: Mpris.players ? Mpris.players.values : []
   readonly property var pipewireNodes: Pipewire.nodes ? Pipewire.nodes.values : []
@@ -249,7 +256,13 @@ Item {
       preDemoConfig = JSON.parse(JSON.stringify(config))
       preDemoRecoveryWarning = recoveryWarning
       preDemoPersistenceBlocked = persistenceBlocked
+    } else if (preDemoConfig) {
+      // Fixtures may temporarily alter timing or enforcement. Always derive
+      // the next fixture from the real configuration so states cannot bleed.
+      config = JSON.parse(JSON.stringify(preDemoConfig))
     }
+    demoFixture = name
+    demoSequenceIndex = demoSequence.indexOf(name)
     demoMode = true
     demoIdle = false
     demoNaturalPause = true
@@ -322,6 +335,16 @@ Item {
     observe()
   }
 
+  function advanceDemo() {
+    var nextIndex = demoSequenceIndex + 1
+    if (nextIndex >= demoSequence.length) {
+      clearDemo()
+      return "off"
+    }
+    setDemo(demoSequence[nextIndex])
+    return demoFixture
+  }
+
   function clearDemo() {
     demoMode = false
     demoIdle = false
@@ -337,6 +360,8 @@ Item {
     preDemoConfig = null
     preDemoRecoveryWarning = ""
     preDemoPersistenceBlocked = false
+    demoSequenceIndex = -1
+    demoFixture = ""
   }
 
   function scheduleSave() {
@@ -583,6 +608,7 @@ Item {
     function resetHistory(): string { service.resetHistory(); return "ok" }
     function resetLocalData(): string { service.resetLocalData(); return "ok" }
     function demo(state: string): string { service.setDemo(state); return service.phase }
+    function demoNext(): string { return service.advanceDemo() }
     function demoOff(): string { service.clearDemo(); return service.phase }
   }
 }
