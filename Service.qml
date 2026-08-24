@@ -18,8 +18,8 @@ Item {
   readonly property string stateDir: Quickshell.env("HOME") + "/.local/state/look-elsewhere"
   readonly property string statePath: stateDir + "/state.json"
   readonly property int stateReadLimit: 64 * 1024
-  readonly property string stateReaderPath: decodeURIComponent(
-    String(Qt.resolvedUrl("tools/read-state")).replace(/^file:\/\//, ""))
+  readonly property string boundedReaderPath: decodeURIComponent(
+    String(Qt.resolvedUrl("tools/bounded-read")).replace(/^file:\/\//, ""))
 
   property var config: Model.defaultConfig()
   property var snapshot: Model.defaultSnapshot(Date.now())
@@ -498,7 +498,8 @@ Item {
 
   Process {
     id: stateLoader
-    command: [service.stateReaderPath, service.statePath]
+    command: [service.boundedReaderPath, "--max-bytes",
+      String(service.stateReadLimit), service.statePath]
     stdout: StdioCollector {
       id: stateReaderOutput
       waitForEnd: true

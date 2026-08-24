@@ -12,8 +12,8 @@ if quickshell log -n -p /usr/share/omarchy/shell --no-color 2>&1 \
   exit 1
 fi
 
-grep -q 'stateReaderPath' "$plugin/Service.qml"
-grep -q 'os.O_NOFOLLOW | os.O_NONBLOCK' "$plugin/tools/read-state"
+grep -q 'boundedReaderPath' "$plugin/Service.qml"
+grep -q 'os.O_NOFOLLOW | os.O_NONBLOCK' "$plugin/tools/bounded-read"
 grep -q 'blockAllReads: true' "$plugin/Service.qml"
 
 echo "LookElsewhere loads and opens in the running Omarchy Shell."
