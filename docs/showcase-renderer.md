@@ -21,6 +21,10 @@ tools/render-showcase \
   --output docs/assets/theme-fullscreen-grid.png
 ```
 
+Full-screen renders use each theme's first packaged wallpaper behind the real
+Omarchy lock-surface tint. If a theme has no wallpaper, the renderer falls
+back to that theme's background color.
+
 Pass any number of installed theme directory names to choose and order the
 tiles. User themes in `~/.config/omarchy/themes` take precedence over stock
 themes in `/usr/share/omarchy/themes`.
