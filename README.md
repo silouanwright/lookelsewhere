@@ -22,6 +22,8 @@ LookElsewhere counts active screen use and waits for a less disruptive moment
 to begin a break. It stays flexible enough for real work while helping you stay
 accountable to step away.
 
+## Inspiration
+
 Thank you to [Kushagra Agarwal](https://lookaway.com/press-kit/), the developer
 of LookAway. LookElsewhere is undeniably inspired by his thoughtful Mac app,
 rebuilt with Omarchy and Linux flair.
