@@ -2,8 +2,7 @@
 
 # LookElsewhere
 
-Inspired by [LookAway](https://lookaway.com/), reimagined for Omarchy, Wayland,
-and a keyboard-first Linux desktop.
+A private, context-aware break coach built natively for Omarchy.
 
 ## Why LookElsewhere?
 
@@ -43,9 +42,12 @@ rebuilt with Omarchy and Linux flair.
 
 ## At home in every theme
 
-LookElsewhere inherits your Omarchy theme automatically.
+LookElsewhere inherits your Omarchy theme automatically, from the bar and
+quick panel through the full-screen break experience.
 
 ![LookElsewhere across six Omarchy themes](docs/assets/theme-grid.png)
+
+![LookElsewhere full-screen breaks across six Omarchy themes](docs/assets/theme-fullscreen-grid.png)
 
 ## The menubar
 
