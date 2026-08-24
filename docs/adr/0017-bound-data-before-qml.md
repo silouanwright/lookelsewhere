@@ -14,9 +14,11 @@ cause unbounded allocation in the shell.
 ## Decision
 
 Apply byte limits at the producer boundary, before data enters QML. Read state
-through a process capped at 64 KiB and keep `FileView` write-only. Cap active
-window output at 64 KiB and shape it outside QML to one bounded application
-identifier and one fullscreen boolean.
+through a descriptor-bound helper capped at 64 KiB and keep `FileView`
+write-only. The helper opens with `O_NOFOLLOW | O_NONBLOCK`, verifies the open
+descriptor is a regular file owned by the current user, and emits only the
+bounded payload. Cap active-window output at 64 KiB and shape it outside QML
+to one bounded application identifier and one fullscreen boolean.
 
 Reject oversized, malformed, or stale input without partially applying it.
 Preserve an unreadable state file and block further persistence until the user

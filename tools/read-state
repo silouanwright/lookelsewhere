@@ -1,0 +1,51 @@
+#!/usr/bin/env python3
+"""Emit a bounded LookElsewhere state file only after descriptor checks."""
+
+import errno
+import os
+import stat
+import sys
+
+
+MAX_BYTES = 64 * 1024
+
+
+def main() -> int:
+    if len(sys.argv) != 2:
+        return 64
+
+    try:
+        fd = os.open(
+            sys.argv[1],
+            os.O_RDONLY | os.O_CLOEXEC | os.O_NOFOLLOW | os.O_NONBLOCK,
+        )
+    except FileNotFoundError:
+        return 0
+    except OSError as error:
+        return 66 if error.errno in (errno.ELOOP, errno.ENXIO) else 68
+
+    try:
+        metadata = os.fstat(fd)
+        if not stat.S_ISREG(metadata.st_mode):
+            return 66
+        if metadata.st_uid != os.getuid():
+            return 67
+
+        payload = bytearray()
+        while len(payload) <= MAX_BYTES:
+            chunk = os.read(fd, min(16 * 1024, MAX_BYTES + 1 - len(payload)))
+            if not chunk:
+                break
+            payload.extend(chunk)
+        if len(payload) > MAX_BYTES:
+            return 65
+        sys.stdout.buffer.write(payload)
+        return 0
+    except OSError:
+        return 68
+    finally:
+        os.close(fd)
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

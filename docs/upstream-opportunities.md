@@ -248,10 +248,12 @@ before application code can validate their size. A long-lived shell plugin
 cannot safely ingest replaceable files or application-influenced command output
 without bounding the producer before QML receives it.
 
-**Current workaround.** LookElsewhere reads state through `head` with a 64 KiB
-limit and keeps `FileView` write-only. Its `hyprctl activewindow` fallback caps
-the JSON stream and uses `jq` to return only a bounded application identifier
-and fullscreen boolean.
+**Current workaround.** LookElsewhere reads state through a descriptor-bound
+helper that uses `O_NOFOLLOW | O_NONBLOCK`, verifies regular-file type and
+current-user ownership with `fstat`, and emits at most 64 KiB. `FileView`
+remains write-only. Its `hyprctl activewindow` fallback caps the JSON stream
+and uses `jq` to return only a bounded application identifier and fullscreen
+boolean.
 
 **Proposed upstream work.** Add byte-limited file reads and process collectors
 that stop or reject input at a caller-defined maximum before allocating the

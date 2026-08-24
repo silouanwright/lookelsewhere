@@ -18,6 +18,8 @@ Item {
   readonly property string stateDir: Quickshell.env("HOME") + "/.local/state/look-elsewhere"
   readonly property string statePath: stateDir + "/state.json"
   readonly property int stateReadLimit: 64 * 1024
+  readonly property string stateReaderPath: decodeURIComponent(
+    String(Qt.resolvedUrl("tools/read-state")).replace(/^file:\/\//, ""))
 
   property var config: Model.defaultConfig()
   property var snapshot: Model.defaultSnapshot(Date.now())
@@ -387,6 +389,13 @@ Item {
     stateLoaded = true
   }
 
+  function blockStateLoad(message) {
+    recoveryWarning = message
+    persistenceBlocked = true
+    snapshot = Model.defaultSnapshot(Date.now())
+    stateLoaded = true
+  }
+
   function flushState() {
     if (persistenceBlocked || demoMode) return
     stateFile.setText(JSON.stringify({ version: 1, snapshot: snapshot }, null, 2) + "\n")
@@ -489,18 +498,20 @@ Item {
 
   Process {
     id: stateLoader
-    command: ["head", "-c", String(service.stateReadLimit + 1), "--", service.statePath]
+    command: [service.stateReaderPath, service.statePath]
     stdout: StdioCollector {
+      id: stateReaderOutput
       waitForEnd: true
-      onStreamFinished: {
-        if (data.length > service.stateReadLimit) {
-          service.recoveryWarning = "Saved state is too large to read safely. The original file has been preserved."
-          service.persistenceBlocked = true
-          service.snapshot = Model.defaultSnapshot(Date.now())
-          service.stateLoaded = true
-          return
-        }
-        service.loadState(text)
+    }
+    onExited: function(exitCode) {
+      if (exitCode === 0) {
+        service.loadState(stateReaderOutput.text)
+      } else if (exitCode === 65) {
+        service.blockStateLoad("Saved state is too large to read safely. The original file has been preserved.")
+      } else if (exitCode === 66 || exitCode === 67) {
+        service.blockStateLoad("Saved state is not a regular file owned by this user. The original path has been preserved.")
+      } else {
+        service.blockStateLoad("Saved state could not be read safely. The original file has been preserved.")
       }
     }
   }
