@@ -83,15 +83,22 @@ LookElsewhere inherits your Omarchy theme and looks beautiful on all of them.
 
 ## Keyboard first
 
-Press `?` to reveal the relevant key directly on every action. Inspired by
-[Godspeed](https://godspeedapp.com/), these theme-aware labels help you learn to
-drive the entire panel without reaching for a pointer.
+<img src="docs/assets/keyboard-shortcuts.png" alt="LookElsewhere jump commands" width="560">
 
-![LookElsewhere keyboard-first panel navigation](docs/assets/keyboard-first.gif)
+Press `?` to reveal a command layer inspired by
+[Godspeed](https://godspeedapp.com/). The labels are not decorative hints. Each
+one is a live, configurable, window-local shortcut. Jump directly to starting a
+break, snoozing, pausing, history, options, or any settings category without
+stepping through the controls in between.
 
-The entire interface is controllable with the arrow keys. Tab and Shift+Tab
-traverse every control, Enter or Space activates it, and Escape closes the
-panel. Local action keys are configurable in [Configuration](CONFIGURATION.md).
+Jump commands complement complete keyboard navigation rather than replacing
+it. Arrow keys move spatially through the entire interface, Tab and Shift+Tab
+follow a predictable focus order, Enter or Space activates the focused control,
+and Escape backs out or closes the panel. Navigation skips unavailable actions,
+returns cleanly from editors and dropdowns, and scrolls focused settings into
+view. The shortcuts are active only while the LookElsewhere panel owns them.
+
+Every jump command is configurable in [Configuration](CONFIGURATION.md).
 
 For global invocation, add the recommended `Super+Alt+L` Omarchy binding:
 
