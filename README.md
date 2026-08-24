@@ -1,10 +1,9 @@
 ![LookElsewhere break overlay](preview.png)
 
-<h1 align="center">LookElsewhere</h1>
+# LookElsewhere
 
-<p align="center">
-  Inspired by <a href="https://lookaway.com/">LookAway</a>, reimagined for Omarchy, Wayland, and a keyboard-first Linux desktop.
-</p>
+Inspired by [LookAway](https://lookaway.com/), reimagined for Omarchy, Wayland,
+and a keyboard-first Linux desktop.
 
 ## Why LookElsewhere?
 
