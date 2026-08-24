@@ -40,10 +40,9 @@ rebuilt with Omarchy and Linux flair.
   retained window and media titles
 - Free and open source
 
-## At home in every theme
+## Themes
 
-LookElsewhere inherits your Omarchy theme automatically, from the bar and
-quick panel through the full-screen break experience.
+LookElsewhere inherits your Omarchy theme and looks beautiful on all of them.
 
 ![LookElsewhere across six Omarchy themes](docs/assets/theme-grid.png)
 
