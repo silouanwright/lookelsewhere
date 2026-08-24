@@ -6,10 +6,7 @@ Reduce eye strain without breaking your flow.
 
 ## Install
 
-Requires Omarchy 4.x and Python 3. Python powers one small standard-library
-helper that safely bounds and validates the replaceable scheduler-state file
-before its contents enter the long-lived Omarchy Shell process. A normal
-Omarchy installation already includes the system Python runtime.
+Requires Omarchy 4.x.
 
 ```bash
 omarchy plugin add https://github.com/silouanwright/lookelsewhere.git --enable
