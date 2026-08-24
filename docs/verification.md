@@ -14,6 +14,7 @@ Test formatting, state-to-copy mapping, action availability, focus order, overla
 
 - `omarchy plugin validate <repo>`
 - `tests/check-panel-shortcuts.sh`
+- `tests/check-input-bounds.sh`
 - `tests/check-live-plugin.sh` after deploying to the installed plugin directory
 - `qmllint` with installed Omarchy Shell imports
 - JSON schema/version checks for configuration and state fixtures

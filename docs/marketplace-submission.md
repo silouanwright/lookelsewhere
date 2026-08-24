@@ -40,7 +40,8 @@ window or media titles, create accounts, or use the network.
 It has no installer or background service and never calls `sudo` or `pkexec`.
 Outside its own plugin directory, it writes only private scheduler state to
 `~/.local/state/look-elsewhere/state.json`; configuration is managed by
-Omarchy in `shell.json`. It invokes `hyprctl` for active-window fallback,
+Omarchy in `shell.json`. It invokes `hyprctl` and `jq` for a bounded,
+field-reduced active-window fallback,
 `omarchy-voxtype-status` for optional dictation state, and
 `canberra-gtk-play` for break cues. Missing optional integrations degrade
 gracefully. Bundled sounds can be disabled or replaced with user-provided

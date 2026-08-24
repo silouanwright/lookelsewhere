@@ -72,6 +72,11 @@ configuration.
 
 The state document contains no configuration, is versioned, and is written atomically. Legacy documents containing a `config` field remain readable, but that field is ignored. Before release, corrupt/unsupported-state recovery must retain diagnostic evidence rather than silently replacing the original.
 
+The long-lived shell never ingests an unbounded file or compositor record.
+State is loaded through a 64 KiB producer cap while `FileView` remains
+write-only, and the active-window fallback is capped and shaped by `jq` before
+QML receives it. Oversized input fails closed and preserves the state file.
+
 ## External integrations
 
 - Quickshell Wayland/idle facilities

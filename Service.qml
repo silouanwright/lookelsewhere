@@ -17,6 +17,7 @@ Item {
   readonly property string pluginId: "io.github.silouanwright.look-elsewhere"
   readonly property string stateDir: Quickshell.env("HOME") + "/.local/state/look-elsewhere"
   readonly property string statePath: stateDir + "/state.json"
+  readonly property int stateReadLimit: 64 * 1024
 
   property var config: Model.defaultConfig()
   property var snapshot: Model.defaultSnapshot(Date.now())
@@ -402,15 +403,17 @@ Item {
   Process {
     id: activeWindowProbe
     property int generation: 0
-    command: ["hyprctl", "activewindow", "-j"]
+    // Bound and shape compositor output before it enters the long-lived QML
+    // process. Window titles and every other unused field are dropped.
+    command: ["bash", "-c", "LC_ALL=C; payload=$(hyprctl activewindow -j | head -c 65537); [ ${#payload} -le 65536 ] || exit 65; printf '%s' \"$payload\" | jq -c '{class: ((.class // .initialClass // \"\") | tostring | .[0:256]), fullscreen: ((.fullscreen // 0) != 0)}'", "lookelsewhere-active-window"]
     stdout: StdioCollector {
       waitForEnd: true
       onStreamFinished: {
         if (activeWindowProbe.generation !== service.activeWindowGeneration) return
         try {
           var active = JSON.parse(text || "{}")
-          service.probedActiveAppId = String(active.class || active.initialClass || "")
-          service.probedFullscreenActive = Number(active.fullscreen || 0) !== 0
+          service.probedActiveAppId = String(active.class || "")
+          service.probedFullscreenActive = active.fullscreen === true
           service.probedActiveWindowAvailable = service.probedActiveAppId !== ""
         } catch (error) {
           service.probedActiveAppId = ""
@@ -450,7 +453,7 @@ Item {
     onExited: function(exitCode) {
       if (exitCode === 0) {
         service.stateStorageReady = true
-        Qt.callLater(function() { stateFile.reload() })
+        stateLoader.running = true
       } else {
         service.recoveryWarning = "Local state storage could not be prepared. Changes will not be saved."
         service.persistenceBlocked = true
@@ -459,14 +462,31 @@ Item {
     }
   }
 
+  Process {
+    id: stateLoader
+    command: ["head", "-c", String(service.stateReadLimit + 1), "--", service.statePath]
+    stdout: StdioCollector {
+      waitForEnd: true
+      onStreamFinished: {
+        if (data.length > service.stateReadLimit) {
+          service.recoveryWarning = "Saved state is too large to read safely. The original file has been preserved."
+          service.persistenceBlocked = true
+          service.snapshot = Model.defaultSnapshot(Date.now())
+          service.stateLoaded = true
+          return
+        }
+        service.loadState(text)
+      }
+    }
+  }
+
   FileView {
     id: stateFile
     path: service.stateStorageReady ? service.statePath : ""
+    blockAllReads: true
     watchChanges: false
     atomicWrites: true
     printErrors: false
-    onLoaded: if (service.stateStorageReady) service.loadState(text())
-    onLoadFailed: if (service.stateStorageReady) service.loadState("")
   }
 
   Timer {

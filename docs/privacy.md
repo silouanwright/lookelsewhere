@@ -30,6 +30,9 @@ Persist user configuration only through Omarchy's `shell.json`. The plugin state
 - Use argument arrays, never data-bearing shell command construction.
 - Bound execution time and prevent overlapping requests.
 - Redact or avoid sensitive stdout/stderr.
+- Cap state and compositor input before it crosses into QML. State reads stop
+  at 64 KiB; active-window output stops at 64 KiB and is reduced to a bounded
+  application identifier plus one fullscreen boolean.
 - Do not request elevated privileges.
 
 ## User control
