@@ -40,7 +40,8 @@ rebuilt with Omarchy and Linux flair.
   hours, enforcement modes, and configurable sounds
 - Private by design: no account, telemetry, screen capture, audio recording, or
   retained window and media titles
-- Free and open source
+- Free and open source, while comparable apps require a paid license or
+  subscription
 
 ## Install
 
@@ -50,20 +51,6 @@ omarchy plugin add https://github.com/silouanwright/lookelsewhere.git --enable
 
 LookElsewhere requires Omarchy Quattro with Omarchy Shell. It has no installer
 hook, privileged operation, external daemon, account, or network dependency.
-
-Pause reminders from the Options page. To disable or later restore the entire
-plugin, use Omarchy's plugin manager or:
-
-```bash
-omarchy plugin disable io.github.silouanwright.look-elsewhere
-omarchy plugin enable io.github.silouanwright.look-elsewhere right
-```
-
-To remove it:
-
-```bash
-omarchy plugin remove io.github.silouanwright.look-elsewhere
-```
 
 ## The menubar
 
