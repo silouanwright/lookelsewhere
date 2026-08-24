@@ -56,6 +56,8 @@ shows why instead of leaving you to wonder whether the timer stopped.
 
 ## Full-screen breaks
 
+![LookElsewhere long-break overlay](docs/assets/long-break.png)
+
 When it is time, LookElsewhere becomes a calm, theme-aware full-screen
 intermission. Short breaks can last only a few seconds. After a configurable
 number of short breaks, a longer break gives you time to walk, stretch, and
@@ -63,8 +65,6 @@ properly leave the screen.
 
 The title, guidance, duration, long-break cadence, sounds, output behavior,
 snoozing, and enforcement policy are all configurable.
-
-![LookElsewhere long-break overlay](docs/assets/long-break.png)
 
 [Watch the 23-second warning-to-break demo](docs/assets/demo.mp4). It uses
 synthetic state and restores the real schedule when it finishes.
