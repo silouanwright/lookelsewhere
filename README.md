@@ -6,12 +6,11 @@ Reduce eye strain without breaking your flow.
 
 ## Install
 
+Requires Omarchy 4.x.
+
 ```bash
 omarchy plugin add https://github.com/silouanwright/lookelsewhere.git --enable
 ```
-
-LookElsewhere requires Omarchy Quattro with Omarchy Shell. It has no installer
-hook, privileged operation, external daemon, account, or network dependency.
 
 ## Why LookElsewhere?
 
