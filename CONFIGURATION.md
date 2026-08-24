@@ -35,6 +35,15 @@ uses the default declared by the plugin manifest.
 | `maximumDelayMinutes` | `15` | Integer `0–180` | Maximum time protected context may delay a due break. |
 | `snoozeBudget` | `3` | Integer `0–10` | Snoozes available during each focus cycle. |
 
+### Enforcement modes
+
+- **Casual:** allows bounded snoozing before a break and skipping during it.
+- **Balanced:** the default; currently uses the same snooze and skip permissions
+  as Casual.
+- **Hardcore:** retains bounded snoozing before a break, but an active break
+  cannot be skipped with the button or Escape and ends only when its timer
+  completes.
+
 ## Break copy
 
 | Key | Default | Accepted values | Meaning |

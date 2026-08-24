@@ -108,10 +108,9 @@ o.bind("SUPER + ALT + L", "LookElsewhere", "omarchy-shell look-elsewhere-panel t
 
 ## Configuration
 
-LookElsewhere follows Omarchy's config-first convention. Timing, long breaks,
-detectors, enforcement, snoozing, office hours, sounds, display modes,
-protected apps, guidance text, outputs, motion, and shortcuts can all be
-changed through Omarchy's supported CLI.
+LookElsewhere follows Omarchy's config-first convention. The plugin manifest
+defines and validates every setting, while Omarchy stores your choices in its
+own configuration file.
 
 ```bash
 omarchy bar set io.github.silouanwright.look-elsewhere focusMinutes 25 --json
@@ -119,15 +118,7 @@ omarchy bar set io.github.silouanwright.look-elsewhere enforcement '"balanced"' 
 ```
 
 See [Configuration](CONFIGURATION.md) for every setting, default, accepted
-value, and example.
-
-## Enforcement
-
-- **Casual:** breaks may be snoozed or skipped.
-- **Balanced:** bounded snoozing with a more deliberate skip interaction.
-- **Hardcore:** bounded snoozing before the break, but no skipping once it begins.
-
-Hardcore ends only when the break timer completes.
+value, behavior, and a complete JSONC reference.
 
 ## Install
 
@@ -191,7 +182,9 @@ testing, and the visual refinement that turns working software into a product.
 
 LookElsewhere represents the work I want to keep doing: building native plugins
 and bringing more of the thoughtful tools people love on the Mac to Omarchy and
-Linux. If you're working toward that future, I'd be glad to talk.
+Linux. If this reaches DHH or the Omarchy team, I'd love to talk about a role
+doing more of this work. If you know them and think LookElsewhere makes the
+case, an introduction would mean a lot.
 
 ## Development
 
