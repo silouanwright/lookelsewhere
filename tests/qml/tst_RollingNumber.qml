@@ -63,7 +63,9 @@ Item {
 
       number.value = 4
       tryCompare(number, "displayedValue", 5)
-      tryCompare(number, "displayedValue", 4, 600)
+      wait(300)
+      compare(number.displayedValue, 5)
+      tryCompare(number, "displayedValue", 4, 700)
     }
 
     function test_largeResetSnapsInsteadOfCountingThrough() {

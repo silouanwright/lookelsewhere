@@ -230,7 +230,7 @@ Panel {
           iconSize: Style.font.icon
           KeyNavigation.tab: statsButton
           KeyNavigation.backtab: root.page === "stats" ? settingsButton
-            : (root.page === "options" ? editSettingsButton
+            : (root.page === "options" ? settingsPage.finalFocusTarget
               : (root.delayActionsEnabled ? postpone15Button : breakNowButton))
           KeyNavigation.right: statsButton
           KeyNavigation.down: root.page === "options" ? settingsPage.initialFocusTarget

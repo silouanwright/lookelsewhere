@@ -41,6 +41,10 @@ ColumnLayout {
     || officeStartDropdown.popupOpen || officeEndDropdown.popupOpen
     || outputModeDropdown.popupOpen || displayModeDropdown.popupOpen
   readonly property Item initialFocusTarget: settingsTabs
+  readonly property Item finalFocusTarget: {
+    var controls = targets()
+    return controls.length ? controls[controls.length - 1] : settingsTabs
+  }
 
   signal persistRequested(var values)
   signal pauseRequested()

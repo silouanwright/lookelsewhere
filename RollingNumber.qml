@@ -64,7 +64,9 @@ Item {
   // instead of making the rolling ticker jump over a number.
   Timer {
     id: catchUp
-    interval: 280
+    // Leave the recovered value visibly settled after RollingDigit's 280 ms
+    // animation. Equal durations can replace it on the animation's final frame.
+    interval: 420
     repeat: true
     triggeredOnStart: true
     onTriggered: {
