@@ -138,9 +138,18 @@ value, behavior, and a complete JSONC reference.
 - Wayland exposes coarse application and device state, not semantic intent.
   Screen sharing, recording, and every meeting state cannot yet be identified
   perfectly without upstream support.
+- The `Typing..` state means recent keyboard or pointer activity. Wayland does
+  not reveal which kind of input occurred, and LookElsewhere never reads keys
+  or pointer coordinates.
+- An active microphone is only a meeting heuristic. Calls with no active input
+  may be missed, while unrelated recording can delay a break.
+- Hardcore prevents LookElsewhere's own skip actions, but it is not a security
+  lock and cannot block compositor shortcuts, virtual terminals, or stopping
+  Omarchy Shell.
 - The scheduler currently lives inside Quickshell. Timestamp persistence makes
-  shell reloads recoverable, but a separate daemon may become appropriate for
-  broader Linux support later.
+  shell reloads recoverable, but a reload can roll the visible countdown back
+  by up to the five-second checkpoint interval. A separate daemon may become
+  appropriate for broader Linux support later.
 
 The platform improvements uncovered while building LookElsewhere are recorded
 in [Upstream Opportunities](docs/upstream-opportunities.md).

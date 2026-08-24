@@ -49,7 +49,9 @@ Item {
   Component.onCompleted: syncValue()
 
   implicitWidth: Math.max(incoming.implicitWidth, outgoing.implicitWidth)
-  implicitHeight: Math.max(incoming.implicitHeight, outgoing.implicitHeight)
+  // Native font rasterization can extend one pixel below Text.implicitHeight.
+  // Keep the rolling clip without shaving the bottom edge of the glyph.
+  implicitHeight: Math.ceil(Math.max(incoming.implicitHeight, outgoing.implicitHeight)) + 1
   clip: true
 
   Text {

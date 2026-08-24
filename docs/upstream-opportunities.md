@@ -1,6 +1,6 @@
 # Upstream Opportunities Exposed by LookElsewhere
 
-This document records platform boundaries encountered while building Look
+This document records platform boundaries encountered while building
 LookElsewhere. It distinguishes generally useful upstream work from application
 heuristics, local hardware failures, and features that belong in this plugin.
 
@@ -16,8 +16,9 @@ heuristics, local hardware failures, and features that belong in this plugin.
 | P1 | First-class plugin keybindings | Omarchy |
 | P1 | Stable anchored-popover controller | Omarchy Shell |
 | P1 | Standard meeting, sharing, and recording state | XDG portals / desktop ecosystem |
+| P1 | Bounded file and process input for QML | Quickshell |
 | P2 | Public lock-service action | Omarchy Shell |
-| P2 | Space-key selection in open dropdowns | Omarchy Shell |
+| P2 | Keyboard-complete popup controls | Omarchy Shell |
 | P2 | Richer Voxtype status and audio discovery | Voxtype / Omarchy |
 | Research | Privacy-safe recent-input categories | Wayland compositors / protocol ecosystem |
 
@@ -239,6 +240,48 @@ Wayland's input isolation.
 
 **Unlocks.** More accurate “finish typing or dragging” behavior while retaining
 privacy.
+
+## 12. Bounded file and process input for QML
+
+**Problem.** `FileView.text()` and `StdioCollector` accumulate complete inputs
+before application code can validate their size. A long-lived shell plugin
+cannot safely ingest replaceable files or application-influenced command output
+without bounding the producer before QML receives it.
+
+**Current workaround.** LookElsewhere reads state through `head` with a 64 KiB
+limit and keeps `FileView` write-only. Its `hyprctl activewindow` fallback caps
+the JSON stream and uses `jq` to return only a bounded application identifier
+and fullscreen boolean.
+
+**Proposed upstream work.** Add byte-limited file reads and process collectors
+that stop or reject input at a caller-defined maximum before allocating the
+complete payload. Expose truncation as an explicit error. A typed, bounded
+Hyprland active-window service would remove this plugin's subprocess fallback
+entirely.
+
+**Unlocks.** Safer parsing in every resident QML plugin, fewer helper processes,
+and a reusable answer to untrusted or unexpectedly large local input.
+
+## 13. Keyboard-complete popup controls
+
+**Problem.** Omarchy's shared dropdown does not select an open item with Space,
+and plugins must assemble their own cross-control arrow navigation, focus
+restoration, and Escape behavior. Similar-looking controls can therefore have
+different keyboard contracts.
+
+**Current workaround.** LookElsewhere wraps or vendors the smallest necessary
+controls and gives each one an `activate()` contract. Its settings page owns one
+ordered navigation model, while shortcuts remain scoped to the focused popup
+window.
+
+**Proposed upstream work.** Make shared toggles, dropdowns, number fields,
+segmented controls, and popup navigation fully keyboard-complete: visible focus,
+Tab and reverse Tab, directional movement, Enter and Space activation, Escape
+restoration, and accessibility metadata. Document a standard ordered-navigation
+composition for plugin panels.
+
+**Unlocks.** Consistent keyboard-first plugins without each author rebuilding
+focus and activation semantics.
 
 ## What should not move upstream
 

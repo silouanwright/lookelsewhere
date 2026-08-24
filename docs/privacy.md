@@ -45,4 +45,7 @@ Persist user configuration only through Omarchy's `shell.json`. The plugin state
 
 ## Threat considerations
 
-Plugins run unsandboxed inside the user’s long-lived Omarchy Shell process. Dependencies and external commands therefore expand the trust boundary. The competition MVP should minimize dependencies, avoid install hooks, document all commands, and keep network access unnecessary.
+Plugins run unsandboxed inside the user’s long-lived Omarchy Shell process.
+Dependencies and external commands therefore expand the trust boundary.
+LookElsewhere minimizes dependencies, has no install hook, documents its
+commands, and does not require network access at runtime.

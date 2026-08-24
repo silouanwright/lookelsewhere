@@ -20,3 +20,5 @@ ADRs use `Accepted`, `Proposed`, or `Superseded` status. Accepted decisions gove
 | [0014](0014-wayland-natural-pause-gate.md) | Gate due breaks on a short Wayland input pause | Accepted |
 | [0015](0015-explicit-protected-applications.md) | Protect explicitly configured applications | Accepted |
 | [0016](0016-integrated-manifest-backed-settings.md) | Add integrated manifest-backed settings pages | Accepted |
+| [0017](0017-bound-data-before-qml.md) | Bound and shape replaceable data before QML | Accepted |
+| [0018](0018-window-scoped-keyboard-ownership.md) | Scope panel shortcuts to the popup window | Accepted |

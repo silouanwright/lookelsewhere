@@ -12,8 +12,8 @@ an explicit choice rather than the default.
 
 Offer Casual, Balanced, and Hardcore presets. Balanced is the default:
 postponement is available but bounded. Hardcore is an explicit unskippable
-choice: once its full-screen break begins, neither pointer, keyboard, nor IPC
-can end it before the timer completes.
+choice: once its full-screen break begins, none of LookElsewhere's pointer,
+keyboard, or IPC actions can end it before the timer completes.
 
 ## Alternatives
 
@@ -25,3 +25,7 @@ can end it before the timer completes.
 The UI and configuration contract must explain exact consequences and
 remaining postponement budget. Hardcore cannot be enabled accidentally; users
 who select it accept that an active break must run to completion.
+
+Hardcore is product enforcement, not a security boundary. It does not attempt
+to block compositor shortcuts, virtual terminals, process termination, shell
+restart, or other operating-system escape paths.

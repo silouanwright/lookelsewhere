@@ -70,7 +70,10 @@ keyboard activation on one source of truth instead of parallel index tables.
 Neither is runtime state, and the scheduler state file never stores user
 configuration.
 
-The state document contains no configuration, is versioned, and is written atomically. Legacy documents containing a `config` field remain readable, but that field is ignored. Before release, corrupt/unsupported-state recovery must retain diagnostic evidence rather than silently replacing the original.
+The state document contains no configuration, is versioned, and is written
+atomically. Legacy documents containing a `config` field remain readable, but
+that field is ignored. Corrupt or unsupported state retains diagnostic evidence
+rather than silently replacing the original.
 
 The long-lived shell never ingests an unbounded file or compositor record.
 State is loaded through a 64 KiB producer cap while `FileView` remains
