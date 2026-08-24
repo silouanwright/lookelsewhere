@@ -1,17 +1,10 @@
-<h1 align="center">
-  <img src="docs/assets/lookelsewhere.svg" width="72" alt="LookElsewhere bed icon"><br>
-  LookElsewhere
-</h1>
-
-<p align="center">
-  A thoughtful screen-break coach that knows when not to interrupt.
-</p>
-
-![LookElsewhere break overlay](preview.png)
+<h1 align="center">LookElsewhere</h1>
 
 <p align="center">
   Inspired by <a href="https://lookaway.com/">LookAway</a>, reimagined for Omarchy, Wayland, and a keyboard-first Linux desktop.
 </p>
+
+![LookElsewhere break overlay](preview.png)
 
 ## Why LookElsewhere?
 
