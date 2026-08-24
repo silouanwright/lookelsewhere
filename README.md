@@ -97,9 +97,9 @@ drive the entire panel without reaching for a pointer.
 
 ![LookElsewhere keyboard shortcut hints](docs/assets/keyboard-shortcuts.png)
 
-Tab and Shift+Tab traverse every control, Enter or Space activates it, and
-Escape closes the panel. Local action keys are configurable in
-[Configuration](CONFIGURATION.md).
+The entire interface is controllable with the arrow keys. Tab and Shift+Tab
+traverse every control, Enter or Space activates it, and Escape closes the
+panel. Local action keys are configurable in [Configuration](CONFIGURATION.md).
 
 For global invocation, add the recommended `Super+Alt+L` Omarchy binding:
 

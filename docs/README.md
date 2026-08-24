@@ -19,6 +19,7 @@ on a particular workstation or chat history.
 - [Marketplace submission draft](marketplace-submission.md)
 - [Final submission checklist](submission-checklist.md)
 - [Verification strategy](verification.md)
+- [Showcase renderer](showcase-renderer.md)
 - [QML review and remediations](qml-review-2026-08-22.md)
 - [Runtime verification](runtime-verification-2026-08-22.md)
 - [Live detector acceptance](detector-acceptance-2026-08-22.md)

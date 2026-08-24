@@ -4,6 +4,7 @@ set -euo pipefail
 panel="${1:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/Panel.qml}"
 repo=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 settings_page="$repo/SettingsPage.qml"
+now_view="$repo/PanelNowView.qml"
 keyboard_line=$(grep -n -m1 '^  KeyboardPanel {' "$panel" | cut -d: -f1)
 first_shortcut_line=$(grep -n -m1 '^[[:space:]]*Shortcut {' "$panel" | cut -d: -f1)
 window_shortcuts=$(grep -c 'context: Qt.WindowShortcut' "$panel")
@@ -28,5 +29,8 @@ grep -q 'if (triggerGuard.containsMouse) root.suppressTriggerRelease = true' "$r
 grep -q 'event.key === Qt.Key_Space' "$repo/Ui/SettingDropdown.qml"
 grep -q 'onClicked: root.clicked()' "$repo/Ui/ToggleSettingRow.qml"
 grep -q 'persistSettings({ showKeyboardHints: !keyboardHintsVisible })' "$panel"
+grep -q 'PanelNowView {' "$panel"
+grep -q 'KeyNavigation.tab: root.delayActionsEnabled ? postpone1Button : root.shortcutsTarget' "$now_view"
+grep -q 'KeyNavigation.right: root.settingsTarget' "$now_view"
 
 echo "Panel shortcuts and spatial keyboard navigation are wired to KeyboardPanel."

@@ -1,0 +1,108 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
+surface=panel
+output=
+columns=3
+density=2
+width=1920
+height=1080
+radius=0
+themes=()
+
+usage() {
+  cat <<'EOF'
+Usage: tools/render-showcase [options] [theme-slug ...]
+
+Options:
+  --surface panel|fullscreen  Surface to render (default: panel)
+  --output FILE               Output PNG
+  --columns N                 Grid columns (default: 3)
+  --density N                 Output pixel density (default: 2)
+  --size WIDTHxHEIGHT         Fullscreen logical size (default: 1920x1080)
+  --radius N                  Panel corner radius (default: 0)
+
+Themes default to the six used in the README. Theme slugs are resolved from
+~/.config/omarchy/themes first, then /usr/share/omarchy/themes.
+EOF
+}
+
+while (($#)); do
+  case "$1" in
+    --surface) surface=$2; shift 2 ;;
+    --output) output=$2; shift 2 ;;
+    --columns) columns=$2; shift 2 ;;
+    --density) density=$2; shift 2 ;;
+    --size) width=${2%x*}; height=${2#*x}; shift 2 ;;
+    --radius) radius=$2; shift 2 ;;
+    -h|--help) usage; exit 0 ;;
+    --*) echo "Unknown option: $1" >&2; usage >&2; exit 2 ;;
+    *) themes+=("$1"); shift ;;
+  esac
+done
+
+[[ $surface == panel || $surface == fullscreen ]] || { echo "Invalid surface: $surface" >&2; exit 2; }
+[[ $columns =~ ^[1-9][0-9]*$ ]] || { echo "Columns must be a positive integer" >&2; exit 2; }
+[[ $density =~ ^[1-9][0-9]*([.][0-9]+)?$ ]] || { echo "Density must be positive" >&2; exit 2; }
+[[ $width =~ ^[1-9][0-9]*$ && $height =~ ^[1-9][0-9]*$ ]] || { echo "Size must be WIDTHxHEIGHT" >&2; exit 2; }
+[[ $radius =~ ^[0-9]+$ ]] || { echo "Radius must be a non-negative integer" >&2; exit 2; }
+command -v quickshell >/dev/null
+command -v magick >/dev/null
+
+if ((${#themes[@]} == 0)); then
+  themes=(catppuccin-latte everforest gruvbox nord osaka-jade tokyo-night)
+fi
+output=${output:-"$repo/docs/assets/theme-${surface}-grid.png"}
+mkdir -p "$(dirname "$output")"
+
+render_root=$(mktemp -d /tmp/lookelsewhere-showcase.XXXXXX)
+capture_home=$(mktemp -d /tmp/lookelsewhere-showcase-home.XXXXXX)
+cleanup() {
+  find "$render_root" -depth -delete 2>/dev/null || true
+  find "$capture_home" -depth -delete 2>/dev/null || true
+}
+trap cleanup EXIT
+
+mkdir -p "$capture_home/.local/state/omarchy/current" "$capture_home/.config"
+ln -s /usr/share/omarchy/shell/Commons "$render_root/Commons"
+ln -s /usr/share/omarchy/shell/Ui "$render_root/Ui"
+ln -s "$repo" "$render_root/LookElsewhere"
+ln -s "$repo/tools/showcase/Showcase.qml" "$render_root/shell.qml"
+ln -s "$repo/tools/showcase/ShowcasePanel.qml" "$render_root/ShowcasePanel.qml"
+[[ -e "$HOME/.config/fontconfig" ]] && ln -s "$HOME/.config/fontconfig" "$capture_home/.config/fontconfig"
+[[ -e "$HOME/.config/omarchy/shell.toml" ]] && {
+  mkdir -p "$capture_home/.config/omarchy"
+  ln -s "$HOME/.config/omarchy/shell.toml" "$capture_home/.config/omarchy/shell.toml"
+}
+
+tiles=()
+for theme in "${themes[@]}"; do
+  theme_dir=
+  for candidate in "$HOME/.config/omarchy/themes/$theme" "/usr/share/omarchy/themes/$theme"; do
+    if [[ -d $candidate ]]; then theme_dir=$candidate; break; fi
+  done
+  [[ -n $theme_dir ]] || { echo "Theme not found: $theme" >&2; exit 2; }
+
+  ln -sfn "$theme_dir" "$capture_home/.local/state/omarchy/current/theme"
+  tile="$render_root/$theme.png"
+  background=$(find "$theme_dir/backgrounds" -maxdepth 1 -type f 2>/dev/null | sort | head -n 1 || true)
+  HOME="$capture_home" \
+  QT_QPA_PLATFORM=offscreen \
+  QSG_RHI_BACKEND=software \
+  LOOKELSEWHERE_SHOWCASE_SURFACE="$surface" \
+  LOOKELSEWHERE_SHOWCASE_OUTPUT="$tile" \
+  LOOKELSEWHERE_SHOWCASE_BACKGROUND="$background" \
+  LOOKELSEWHERE_SHOWCASE_WIDTH="$width" \
+  LOOKELSEWHERE_SHOWCASE_HEIGHT="$height" \
+  LOOKELSEWHERE_SHOWCASE_DENSITY="$density" \
+  LOOKELSEWHERE_SHOWCASE_RADIUS="$radius" \
+    timeout 15 quickshell -p "$render_root" >/dev/null 2>&1
+  [[ -s $tile ]] || { echo "Render failed: $theme" >&2; exit 1; }
+  tiles+=("$tile")
+  echo "Rendered $theme"
+done
+
+grid_columns=$((columns < ${#tiles[@]} ? columns : ${#tiles[@]}))
+magick montage "${tiles[@]}" -tile "${grid_columns}x" -geometry +0+0 -background none "$output"
+echo "$output"

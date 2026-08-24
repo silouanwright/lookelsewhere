@@ -199,11 +199,10 @@ Item {
         enabled: root.breaking && window.authoritative
         focus: enabled
 
-        ColumnLayout {
+        BreakContent {
           x: Math.round((parent.width - width) / 2)
           y: Math.round((parent.height - implicitHeight) / 2 + window.contentOffset)
           width: Math.min(parent.width - Style.space(48), Style.space(520))
-          spacing: Style.space(18)
           opacity: Math.max(0, Math.min(1, window.contentOpacity))
           scale: Math.min(1, Math.max(0.1,
             (parent.height - Style.space(48)) / Math.max(1, implicitHeight)))
@@ -216,110 +215,22 @@ Item {
             blurMax: 32
             blurMultiplier: 1
           }
-
-          BedIcon {
-            Layout.alignment: Qt.AlignHCenter
-            Layout.preferredWidth: Style.space(64)
-            Layout.preferredHeight: Layout.preferredWidth
-            color: Color.accent
-          }
-          Text {
-            Layout.fillWidth: true
-            Layout.topMargin: -Style.space(4)
-            text: root.service ? root.service.config.breakTitle : qsTr("Look elsewhere")
-            color: Color.lock.text
-            font.family: Style.font.family
-            font.pixelSize: Style.font.displayLarge * 1.35
-            font.weight: Font.Bold
-            horizontalAlignment: Text.AlignHCenter
-            wrapMode: Text.WordWrap
-          }
-          Text {
-            Layout.fillWidth: true
-            Layout.topMargin: -Style.space(12)
-            horizontalAlignment: Text.AlignHCenter
-            text: root.service ? root.service.config.breakSubtitle
-              : qsTr("Let your eyes settle on something distant. Breathe. The screen will still be here.")
-            color: Color.lock.placeholder
-            font.family: Style.font.family
-            font.pixelSize: Style.font.subtitle
-            wrapMode: Text.WordWrap
-          }
-          BorderSurface {
-            Layout.alignment: Qt.AlignHCenter
-            Layout.topMargin: 0
-            Layout.bottomMargin: -Style.space(12)
-            visible: root.service && root.service.snapshot.activeBreakIsLong
-            implicitWidth: longBreakLabel.implicitWidth + Style.space(14)
-            implicitHeight: longBreakLabel.implicitHeight + Style.space(6)
-            color: Style.hoverFillFor(Color.lock.text, Color.accent)
-            borderSpec: Border.controlSpec("normal", Color.lock.text, Color.accent)
-            radius: height / 2
-
-            Text {
-              id: longBreakLabel
-              anchors.centerIn: parent
-              text: qsTr("Long break")
-              color: Color.lock.text
-              font.family: Style.font.family
-              font.pixelSize: Style.font.bodySmall
-              font.weight: Font.Bold
-            }
-          }
-          Row {
-            Layout.alignment: Qt.AlignHCenter
-            spacing: -root.clockSeparatorOverlap
-            Accessible.role: Accessible.StaticText
-            Accessible.name: qsTr("%1 minutes and %2 seconds remaining")
-              .arg(root.remainingMinutesPart)
-              .arg(root.remainingSecondsPart)
-
-            RollingNumber {
-              value: root.remainingMinutesPart
-              minimumDigits: 2
-              color: Color.lock.text
-              fontFamily: Style.font.family
-              fontSize: root.breakClockFontSize
-              fontWeight: Font.DemiBold
-              reducedMotion: root.service && root.service.config.reducedMotion
-              animationActive: window.visible && root.breaking
-            }
-            Text {
-              text: ":"
-              color: Color.lock.text
-              font.family: Style.font.family
-              font.pixelSize: root.breakClockFontSize
-              font.weight: Font.DemiBold
-              Accessible.ignored: true
-            }
-            RollingNumber {
-              value: root.remainingSecondsPart
-              minimumDigits: 2
-              color: Color.lock.text
-              fontFamily: Style.font.family
-              fontSize: root.breakClockFontSize
-              fontWeight: Font.DemiBold
-              reducedMotion: root.service && root.service.config.reducedMotion
-              animationActive: window.visible && root.breaking
-            }
-          }
-          RowLayout {
-            Layout.alignment: Qt.AlignHCenter
-            visible: window.authoritative
-            spacing: Style.space(10)
-            OverlayButton {
-              text: qsTr("Skip break")
-              visible: !!root.service
-              actionEnabled: root.service && root.service.canSkipBreak
-              disabledTooltipText: qsTr("Breaks cannot be skipped in Hardcore mode")
-              onClicked: if (root.service) root.service.skipBreak()
-            }
-            OverlayButton {
-              text: qsTr("+1 minute")
-              visible: root.service && root.service.canPostpone
-              onClicked: if (root.service) root.service.postponeMinutes(1)
-            }
-          }
+          title: root.service ? root.service.config.breakTitle : qsTr("Look elsewhere")
+          subtitle: root.service ? root.service.config.breakSubtitle
+            : qsTr("Let your eyes settle on something distant. Breathe. The screen will still be here.")
+          longBreak: root.service && root.service.snapshot.activeBreakIsLong
+          minutes: root.remainingMinutesPart
+          seconds: root.remainingSecondsPart
+          reducedMotion: root.service && root.service.config.reducedMotion
+          animationActive: window.visible && root.breaking
+          actionsVisible: window.authoritative
+          skipVisible: !!root.service
+          skipEnabled: root.service && root.service.canSkipBreak
+          postponeVisible: root.service && root.service.canPostpone
+          clockFontSize: root.breakClockFontSize
+          clockSeparatorOverlap: root.clockSeparatorOverlap
+          onSkipRequested: if (root.service) root.service.skipBreak()
+          onPostponeRequested: if (root.service) root.service.postponeMinutes(1)
         }
 
         Keys.onPressed: function(event) {

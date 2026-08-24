@@ -146,11 +146,11 @@ Panel {
       focus: true
       KeyNavigation.tab: shortcutsButton
       KeyNavigation.backtab: root.page === "stats" ? settingsButton
-        : (root.delayActionsEnabled ? postpone15Button : breakNowButton)
+        : (root.delayActionsEnabled ? nowView.postpone15Target : nowView.breakNowTarget)
       Keys.onEscapePressed: root.dismissHintsOrClose()
       Keys.onPressed: function(event) {
         if (event.key === Qt.Key_Down || event.text === "j") {
-          if (root.page === "now") breakNowButton.forceActiveFocus()
+          if (root.page === "now") nowView.breakNowTarget.forceActiveFocus()
           else if (root.page === "options") settingsPage.focusInitial()
           else shortcutsButton.forceActiveFocus()
           event.accepted = true
@@ -231,10 +231,10 @@ Panel {
           KeyNavigation.tab: statsButton
           KeyNavigation.backtab: root.page === "stats" ? settingsButton
             : (root.page === "options" ? settingsPage.finalFocusTarget
-              : (root.delayActionsEnabled ? postpone15Button : breakNowButton))
+              : (root.delayActionsEnabled ? nowView.postpone15Target : nowView.breakNowTarget))
           KeyNavigation.right: statsButton
           KeyNavigation.down: root.page === "options" ? settingsPage.initialFocusTarget
-            : (root.page === "now" ? breakNowButton : shortcutsButton)
+            : (root.page === "now" ? nowView.breakNowTarget : shortcutsButton)
           Keys.onEscapePressed: root.dismissHintsOrClose()
           Accessible.role: Accessible.Button
           Accessible.name: qsTr("Toggle keyboard shortcut hints")
@@ -271,7 +271,7 @@ Panel {
             KeyNavigation.left: shortcutsButton
             KeyNavigation.right: settingsButton
             KeyNavigation.down: root.page === "options" ? settingsPage.initialFocusTarget
-              : (root.page === "now" ? breakNowButton : statsButton)
+              : (root.page === "now" ? nowView.breakNowTarget : statsButton)
             Keys.onEscapePressed: root.dismissHintsOrClose()
             Accessible.role: Accessible.Button
             Accessible.name: tooltipText
@@ -299,12 +299,12 @@ Panel {
             accent: root.accent
             iconSize: Style.font.icon
             KeyNavigation.tab: root.page === "stats" ? shortcutsButton
-              : (root.page === "options" ? settingsPage.initialFocusTarget : breakNowButton)
+              : (root.page === "options" ? settingsPage.initialFocusTarget : nowView.breakNowTarget)
             KeyNavigation.backtab: statsButton
             KeyNavigation.left: statsButton
             KeyNavigation.right: shortcutsButton
             KeyNavigation.down: root.page === "options" ? settingsPage.initialFocusTarget
-              : (root.page === "now" ? breakNowButton : settingsButton)
+              : (root.page === "now" ? nowView.breakNowTarget : settingsButton)
             Keys.onEscapePressed: root.dismissHintsOrClose()
             Accessible.role: Accessible.Button
             Accessible.name: tooltipText
@@ -318,107 +318,35 @@ Panel {
           }
         }
 
-        ColumnLayout {
-          Layout.fillWidth: true
-          Layout.leftMargin: toolbarRow.implicitWidth
-          Layout.rightMargin: toolbarRow.implicitWidth
-          Layout.topMargin: Style.space(8)
+        PanelNowView {
+          id: nowView
           visible: root.page === "now"
-          spacing: Style.space(4)
-
-          Item {
-            Layout.alignment: Qt.AlignHCenter
-            Layout.preferredWidth: Style.space(34)
-            Layout.preferredHeight: Layout.preferredWidth
-            Layout.bottomMargin: Style.space(3)
-            Accessible.ignored: true
-
-            BedIcon {
-              anchors.fill: parent
-              color: root.accent
-            }
-          }
-
-          Text {
-            Layout.fillWidth: true
-            Layout.bottomMargin: -Style.space(10)
-            text: root.idlePaused ? qsTr("LookElsewhere is paused")
-              : root.service && root.service.nextBreakIsLong ? qsTr("Long break starts in")
-              : qsTr("Break starts in")
-            color: root.foreground
-            font.family: root.fontFamily
-            font.pixelSize: Style.font.body
-            font.weight: Font.DemiBold
-            horizontalAlignment: Text.AlignHCenter
-          }
-
-          Item {
-            Layout.alignment: Qt.AlignHCenter
-            Layout.preferredWidth: Math.max(clockRow.implicitWidth, idleClock.implicitWidth)
-            Layout.preferredHeight: Math.max(clockRow.implicitHeight, idleClock.implicitHeight)
-            Accessible.role: Accessible.StaticText
-            Accessible.name: root.idlePaused
-              ? qsTr("Idle; focus timer paused")
-              : qsTr("Time remaining: %1").arg(root.service ? root.service.remainingText : qsTr("Starting"))
-
-            Row {
-              id: clockRow
-              anchors.centerIn: parent
-              // Remove only the active font's unused colon side-bearing. This
-              // preserves natural glyph metrics across Omarchy themes while
-              // keeping independently rolling digit columns visually unified.
-              spacing: -root.clockSeparatorOverlap
-              opacity: root.idlePaused ? 0 : 1
-              Accessible.ignored: true
-
-              RollingNumber {
-                value: root.remainingMinutesPart
-                minimumDigits: 2
-                color: root.foreground
-                fontFamily: root.fontFamily
-                fontSize: Style.font.display * 1.55
-                fontWeight: Font.Bold
-                reducedMotion: root.service && root.service.config.reducedMotion
-                animationActive: root.opened && root.page === "now" && !root.idlePaused
-              }
-
-              Text {
-                text: ":"
-                color: root.foreground
-                font.family: root.fontFamily
-                font.pixelSize: Style.font.display * 1.55
-                font.weight: Font.Bold
-                Accessible.ignored: true
-              }
-
-              RollingNumber {
-                value: root.remainingSecondsPart
-                minimumDigits: 2
-                color: root.foreground
-                fontFamily: root.fontFamily
-                fontSize: Style.font.display * 1.55
-                fontWeight: Font.Bold
-                reducedMotion: root.service && root.service.config.reducedMotion
-                animationActive: root.opened && root.page === "now" && !root.idlePaused
-              }
-
-              Behavior on opacity { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
-            }
-
-            Text {
-              id: idleClock
-              anchors.centerIn: parent
-              text: qsTr("Idle")
-              color: root.foreground
-              font.family: root.fontFamily
-              font.pixelSize: Style.font.display * 1.55
-              font.weight: Font.Bold
-              opacity: root.idlePaused ? 1 : 0
-              Accessible.ignored: true
-
-              Behavior on opacity { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
-            }
-          }
+          foreground: root.foreground
+          muted: root.muted
+          accent: root.accent
+          fontFamily: root.fontFamily
+          idlePaused: root.idlePaused
+          nextBreakIsLong: root.service && root.service.nextBreakIsLong
+          minutes: root.remainingMinutesPart
+          seconds: root.remainingSecondsPart
+          remainingText: root.service ? root.service.remainingText : qsTr("Starting")
+          reducedMotion: root.service && root.service.config.reducedMotion
+          animationActive: root.opened && root.page === "now"
+          recoveryWarning: root.service ? root.service.recoveryWarning : ""
+          delayActionsVisible: root.delayActionsVisible
+          delayActionsEnabled: root.delayActionsEnabled
+          snoozeBudgetSummary: root.snoozeBudgetSummary
+          snoozeUnavailableSummary: root.snoozeUnavailableSummary
+          snoozeAvailabilitySummary: root.snoozeAvailabilitySummary
+          keyboardHintsVisible: root.keyboardHintsVisible
+          shortcuts: root.shortcuts
+          clockSeparatorOverlap: root.clockSeparatorOverlap
+          shortcutsTarget: shortcutsButton
+          statsTarget: statsButton
+          settingsTarget: settingsButton
+          onBreakNowRequested: root.takeBreakAndClose()
+          onPostponeRequested: function(minutes) { root.postponeAndClose(minutes) }
+          onEscapeRequested: root.dismissHintsOrClose()
         }
 
         ColumnLayout {
@@ -491,182 +419,6 @@ Panel {
           onCloseRequested: root.close()
         }
 
-        Text {
-          Layout.fillWidth: true
-          visible: root.page === "now" && root.service && root.service.recoveryWarning !== ""
-          text: root.service ? root.service.recoveryWarning : ""
-          color: Color.urgent
-          font.family: root.fontFamily
-          font.pixelSize: Style.font.bodySmall
-          horizontalAlignment: Text.AlignHCenter
-          wrapMode: Text.WordWrap
-        }
-
-        Item {
-          Layout.fillWidth: true
-          Layout.preferredHeight: actionRow.implicitHeight * actionRow.fitScale
-          Layout.topMargin: -Style.space(3)
-          visible: root.page === "now"
-
-          RowLayout {
-            id: actionRow
-            readonly property real fitScale: Math.min(1,
-              (parent.width - Style.space(4)) / Math.max(1, implicitWidth))
-            anchors.horizontalCenter: parent.horizontalCenter
-            transformOrigin: Item.Top
-            scale: fitScale
-            spacing: Style.space(5)
-
-          LookUi.WeightedButton {
-            id: breakNowButton
-            label: qsTr("Break now")
-            labelWeight: Font.Bold
-            selected: true
-            focusable: true
-            foreground: root.foreground
-            accent: root.accent
-            fontFamily: root.fontFamily
-            fontSize: Style.font.bodySmall
-            horizontalPadding: Style.space(7)
-            KeyNavigation.tab: root.delayActionsEnabled ? postpone1Button : shortcutsButton
-            KeyNavigation.backtab: settingsButton
-            KeyNavigation.up: shortcutsButton
-            KeyNavigation.right: root.delayActionsEnabled ? postpone1Button : settingsButton
-            Keys.onEscapePressed: root.dismissHintsOrClose()
-            Accessible.role: Accessible.Button
-            Accessible.name: label
-            Accessible.onPressAction: clicked()
-            onClicked: root.takeBreakAndClose()
-
-            LookUi.KeyHintBadge {
-              visible: root.keyboardHintsVisible
-              keyText: Model.panelShortcutLabel(root.shortcuts.breakNow)
-              centerOnCorner: true
-            }
-          }
-
-          LookUi.WeightedButton {
-            id: postpone1Button
-            visible: root.delayActionsVisible
-            actionEnabled: root.delayActionsEnabled
-            tooltipText: root.delayActionsEnabled ? root.snoozeBudgetSummary : ""
-            disabledTooltipText: root.delayActionsEnabled ? "" : root.snoozeUnavailableSummary
-            label: qsTr("+1m")
-            bordered: true
-            focusable: root.delayActionsEnabled
-            foreground: root.foreground
-            accent: root.accent
-            fontFamily: root.fontFamily
-            fontSize: Style.font.bodySmall
-            horizontalPadding: Style.space(6)
-            KeyNavigation.tab: postpone5Button
-            KeyNavigation.backtab: breakNowButton
-            KeyNavigation.left: breakNowButton
-            KeyNavigation.right: postpone5Button
-            KeyNavigation.up: statsButton
-            Keys.onEscapePressed: root.dismissHintsOrClose()
-            Accessible.role: Accessible.Button
-            Accessible.name: root.delayActionsEnabled
-              ? qsTr("Snooze next break for 1 minute")
-              : qsTr("Snooze unavailable; %1").arg(root.snoozeUnavailableSummary)
-            Accessible.onPressAction: clicked()
-            onClicked: root.postponeAndClose(1)
-
-            LookUi.KeyHintBadge {
-              visible: root.keyboardHintsVisible
-              keyText: Model.panelShortcutLabel(root.shortcuts.snooze1)
-              available: postpone1Button.actionEnabled
-              centerOnCorner: true
-            }
-          }
-
-          LookUi.WeightedButton {
-            id: postpone5Button
-            visible: root.delayActionsVisible
-            actionEnabled: root.delayActionsEnabled
-            tooltipText: root.delayActionsEnabled ? root.snoozeBudgetSummary : ""
-            disabledTooltipText: root.delayActionsEnabled ? "" : root.snoozeUnavailableSummary
-            label: qsTr("+5m")
-            bordered: true
-            focusable: root.delayActionsEnabled
-            foreground: root.foreground
-            accent: root.accent
-            fontFamily: root.fontFamily
-            fontSize: Style.font.bodySmall
-            horizontalPadding: Style.space(6)
-            KeyNavigation.tab: postpone15Button
-            KeyNavigation.backtab: postpone1Button
-            KeyNavigation.left: postpone1Button
-            KeyNavigation.right: postpone15Button
-            KeyNavigation.up: statsButton
-            Keys.onEscapePressed: root.dismissHintsOrClose()
-            Accessible.role: Accessible.Button
-            Accessible.name: root.delayActionsEnabled
-              ? qsTr("Snooze next break for 5 minutes")
-              : qsTr("Snooze unavailable; %1").arg(root.snoozeUnavailableSummary)
-            Accessible.onPressAction: clicked()
-            onClicked: root.postponeAndClose(5)
-
-            LookUi.KeyHintBadge {
-              visible: root.keyboardHintsVisible
-              keyText: Model.panelShortcutLabel(root.shortcuts.snooze5)
-              available: postpone5Button.actionEnabled
-              centerOnCorner: true
-            }
-          }
-
-            LookUi.WeightedButton {
-              id: postpone15Button
-              visible: root.delayActionsVisible
-              actionEnabled: root.delayActionsEnabled
-              tooltipText: root.delayActionsEnabled ? root.snoozeBudgetSummary : ""
-              disabledTooltipText: root.delayActionsEnabled ? "" : root.snoozeUnavailableSummary
-              label: qsTr("+15m")
-              bordered: true
-              focusable: root.delayActionsEnabled
-              foreground: root.foreground
-              accent: root.accent
-              fontFamily: root.fontFamily
-              fontSize: Style.font.bodySmall
-              horizontalPadding: Style.space(6)
-              KeyNavigation.tab: shortcutsButton
-              KeyNavigation.backtab: postpone5Button
-              KeyNavigation.left: postpone5Button
-              KeyNavigation.right: settingsButton
-              KeyNavigation.up: settingsButton
-              Keys.onEscapePressed: root.dismissHintsOrClose()
-              Accessible.role: Accessible.Button
-              Accessible.name: root.delayActionsEnabled
-                ? qsTr("Snooze next break for 15 minutes")
-                : qsTr("Snooze unavailable; %1").arg(root.snoozeUnavailableSummary)
-              Accessible.onPressAction: clicked()
-              onClicked: root.postponeAndClose(15)
-
-              LookUi.KeyHintBadge {
-                visible: root.keyboardHintsVisible
-                keyText: Model.panelShortcutLabel(root.shortcuts.snooze15)
-                available: postpone15Button.actionEnabled
-                centerOnCorner: true
-              }
-            }
-          }
-        }
-
-        Text {
-          Layout.fillWidth: true
-          Layout.topMargin: Style.space(3)
-          visible: root.page === "now" && root.delayActionsVisible
-          text: root.snoozeAvailabilitySummary
-          color: root.muted
-          font.family: root.fontFamily
-          font.pixelSize: Style.font.caption
-          horizontalAlignment: Text.AlignHCenter
-        }
-
-        Item {
-          Layout.fillWidth: true
-          Layout.preferredHeight: Style.space(2)
-        }
 
         }
       }
