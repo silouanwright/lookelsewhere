@@ -46,6 +46,15 @@ pitched up one semitone and given a smooth tail fade before encoding. This
 notice is retained as provenance even though attribution is not required by
 CC0.
 
+## Hero Patterns
+
+The optional panel backgrounds use the Topography, Graph Paper, Wiggle,
+Bank Note, and Diagonal Lines patterns from
+[Hero Patterns](https://heropatterns.com/), drawn and maintained by Steve
+Schoger. They are distributed under the
+[Creative Commons Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/).
+Light and dark SVG variants preserve subtle contrast across Omarchy themes.
+
 ## Comparative product screenshots
 
 The files under

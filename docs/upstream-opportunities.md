@@ -249,7 +249,7 @@ cannot safely ingest replaceable files or application-influenced command output
 without bounding the producer before QML receives it.
 
 **Current workaround.** LookElsewhere reads state through its reusable
-`tools/bounded-read` helper, which walks path components through directory
+`vendor/qmlpack/bounded-read/bin/bounded-read` helper, which walks path components through directory
 descriptors without following symlinks, verifies regular-file type and
 current-user ownership with `fstat`, and emits at most 64 KiB. A timeout covers
 regular filesystems for which `O_NONBLOCK` provides no guarantee. `FileView`

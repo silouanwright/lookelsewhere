@@ -13,6 +13,7 @@ ShellRoot {
   readonly property int requestedHeight: Math.max(1, Number(Quickshell.env("LOOKELSEWHERE_SHOWCASE_HEIGHT")) || 1080)
   readonly property real density: Math.max(1, Number(Quickshell.env("LOOKELSEWHERE_SHOWCASE_DENSITY")) || 2)
   readonly property int cornerRadius: Math.max(0, Number(Quickshell.env("LOOKELSEWHERE_SHOWCASE_RADIUS")) || 0)
+  readonly property string panelPattern: Quickshell.env("LOOKELSEWHERE_SHOWCASE_PATTERN") || "off"
 
   FloatingWindow {
     id: window
@@ -30,6 +31,7 @@ ShellRoot {
         id: panel
         visible: shell.surface === "panel"
         cornerRadius: shell.cornerRadius
+        pattern: shell.panelPattern
       }
 
       Item {

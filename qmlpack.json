@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "profile": "omarchy",
+  "dependencies": {
+    "bounded-read": "github:silouanwright/omatools/packages/bounded-read@0.2.0",
+    "oma-ui": "github:silouanwright/omatools/packages/oma-ui@0.2.0"
+  }
+}

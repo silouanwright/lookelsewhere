@@ -77,6 +77,7 @@ uses the default declared by the plugin manifest.
 | `reducedMotion` | `false` | Boolean | Remove animated movement and soft-focus reveals. |
 | `outputMode` | `"all"` | `"all"`, `"focused"` | Show interruptions on every output or only the focused output. |
 | `displayMode` | `"icon-and-time"` | `"icon"`, `"time"`, `"icon-and-time"` | Bar-widget presentation. Vertical bars use the icon. |
+| `panelPattern` | `"off"` | `"off"`, `"topography"`, `"graph-paper"`, `"wiggle"`, `"bank-note"`, `"diagonal-lines"` | Optional patterned background for the plugin panel. |
 | `showKeyboardHints` | `false` | Boolean | Show action-key badges whenever the panel opens. |
 
 ## Sound
@@ -151,6 +152,7 @@ the complete default value set in one copyable shape:
   "reducedMotion": false,
   "outputMode": "all",
   "displayMode": "icon-and-time",
+  "panelPattern": "off",
   "showKeyboardHints": false,
 
   // Sound

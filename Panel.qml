@@ -6,7 +6,8 @@ import Quickshell.Io
 import qs.Commons
 import qs.Ui
 import "Model.js" as Model
-import "Ui" as LookUi
+import "Ui" as ProductUi
+import "vendor/qmlpack/oma-ui/Ui" as LookUi
 
 Panel {
   id: root
@@ -111,6 +112,12 @@ Panel {
     focusTarget: root.page === "options" ? settingsPage.initialFocusTarget : neutralFocus
     contentWidth: popup.fittedContentWidth(Style.space(root.page === "options" ? 440 : 260))
     contentHeight: popup.fittedContentHeight(content.implicitHeight)
+
+    ProductUi.PanelPattern {
+      anchors.fill: parent
+      anchors.margins: -popup.padding
+      pattern: root.service ? root.service.config.panelPattern : "off"
+    }
 
     // Window-local mnemonics must live in the popup's item tree so Qt can
     // associate WindowShortcut with the layer-shell window that owns focus.

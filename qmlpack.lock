@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "packages": {
+    "bounded-read": {
+      "source": "github:silouanwright/omatools/packages/bounded-read@0.2.0",
+      "resolution": {
+        "transport": "github",
+        "repository_id": 1345448296,
+        "repository_name": "silouanwright/omatools",
+        "package_path": "packages/bounded-read",
+        "requested": "0.2.0",
+        "version": "0.2.0",
+        "tag": "packages/bounded-read/v0.2.0",
+        "commit": "d23300955bbd847a9abead2f90025a7589684f63"
+      },
+      "digest": "sha256:b64703a15b9cb0854306a900152b8f9321ecfe7ada1fe62a975e68b74c577031",
+      "files": {
+        "LICENSE": "sha256:0c088bc264e3ae0398a852410ed879ead024daa8806895963f83ce1fc688d317",
+        "README.md": "sha256:7d6d03ba07a4a371d9021fb23c946daf005fbf22207fed43e1a86ad303b5fed2",
+        "bin/bounded-read": "sha256:6a1fbfc7c1ab8811aa1a36b0222ec40d4ea7c6a2a49bfac03934ce38583b828b"
+      }
+    },
+    "oma-ui": {
+      "source": "github:silouanwright/omatools/packages/oma-ui@0.2.0",
+      "resolution": {
+        "transport": "github",
+        "repository_id": 1345448296,
+        "repository_name": "silouanwright/omatools",
+        "package_path": "packages/oma-ui",
+        "requested": "0.2.0",
+        "version": "0.2.0",
+        "tag": "packages/oma-ui/v0.2.0",
+        "commit": "d23300955bbd847a9abead2f90025a7589684f63"
+      },
+      "digest": "sha256:3a0a786b81db1b2bd81983cc77b701698b72a14c33e0a14808aabdd19156490f",
+      "files": {
+        "LICENSE": "sha256:0c088bc264e3ae0398a852410ed879ead024daa8806895963f83ce1fc688d317",
+        "README.md": "sha256:92e70445da4c35deca843486f18a3c0778ba1728227fa9648663e86245066467",
+        "THIRD_PARTY_NOTICES.md": "sha256:4b9d048b2a51fe9e2aeb980bb084e8e4cb8fe967e6606710e52910ff00461fab",
+        "Ui/DropdownSettingRow.qml": "sha256:d8eeffac4fde978873a5d2d476ef4639651f1a63d1671e35d9ed23a7f00fd82b",
+        "Ui/KeyHintBadge.qml": "sha256:30b77c1eefc95ea1c1a559b2043c2c51f92968196f4eeea62bdec1c5773e435c",
+        "Ui/NumberSettingRow.qml": "sha256:e250d1e7c382424b30caeaed759ff4801b3c68bdb5aa9db80dbcf5e6e21e89b2",
+        "Ui/PhosphorIconButton.qml": "sha256:3d8e92e2196cafb1bb5e90c1f667c4e695e71410e23efb4c179e9a403da71668",
+        "Ui/SectionHeader.qml": "sha256:859a91a9ea00444c3f211a11531ba4529e3e7f4b857404436e58d8b90e1c4f86",
+        "Ui/SettingDropdown.qml": "sha256:5cb774eba063968a5819ae89426d4df2db0cdc07b39e1561b1bd6922dc6911c9",
+        "Ui/SettingLabels.qml": "sha256:a2ec5049319584277f6e953b7ea057c19760da2200a951f111a2f4fc65011b21",
+        "Ui/SettingsTabBar.qml": "sha256:f010d884896cb7a3db09a167695af095e4cebbf5510804e1dfdfa7c88a73f43f",
+        "Ui/ToggleSettingRow.qml": "sha256:bc1b03cb85526a1b357715a4937aee4876dbcee5ef6efbf53ff3f30c8ace8c11",
+        "Ui/WeightedButton.qml": "sha256:778078209ca0de0511e7939b934148ea4124eaef43917aca5ff729529a1ada75",
+        "Ui/qmldir": "sha256:0297f27bf7834247e08759fa098c982a1936045d144bb0fe9ca35ee2ada593b3"
+      }
+    }
+  }
+}

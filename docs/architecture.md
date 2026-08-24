@@ -1,9 +1,10 @@
 # Architecture
 
-Reusable presentation controls live in the internal `Ui/` QML module and are
-imported as `LookUi.*`. The module composes Omarchy primitives rather than
-forking the shell design system; product-specific scheduling, overlays, and
-break visuals remain outside it. See `Ui/README.md` for the ownership boundary.
+Reusable presentation controls come from the Qmlpack-managed `oma-ui` source
+package under `vendor/qmlpack/oma-ui/Ui` and are imported as `LookUi.*`. The
+module composes Omarchy primitives rather than forking the shell design system;
+product-specific scheduling, overlays, patterns, and break visuals remain
+owned by LookElsewhere.
 
 ## Current architecture
 
@@ -22,7 +23,10 @@ Omarchy Shell / Quickshell process
     ├── SettingsPage.qml
     │   └── settings tabs, scrolling, persistence signals, and keyboard navigation
     ├── Ui/
-    │   └── reusable themed controls and shared setting-row contracts
+    │   └── product-specific panel pattern
+    ├── vendor/qmlpack/
+    │   ├── oma-ui/Ui: reusable themed controls and setting-row contracts
+    │   └── bounded-read: descriptor-safe state-file reader
     ├── Overlay.qml
     │   └── top-center warning, final chip, and per-output break presentation
     ├── Model.js
@@ -32,7 +36,9 @@ Omarchy Shell / Quickshell process
     └── scheduler/history JSON under XDG state
 ```
 
-The plugin is self-contained to preserve one-command installation. Durable
+The plugin commits its Qmlpack lock and vendored source, so it remains
+self-contained for one-command installation without requiring end users to
+install Qmlpack. Durable
 state is timestamp-based so it can rehydrate after Quickshell reloads instead
 of trusting in-memory countdown values.
 

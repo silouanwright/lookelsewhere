@@ -2,7 +2,7 @@
 set -euo pipefail
 
 repo=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
-reader="$repo/tools/bounded-read"
+reader="$repo/vendor/qmlpack/bounded-read/bin/bounded-read"
 fixture=$(mktemp -d /tmp/lookelsewhere-bounded-read.XXXXXX)
 trap 'find "$fixture" -depth -delete 2>/dev/null || true' EXIT
 

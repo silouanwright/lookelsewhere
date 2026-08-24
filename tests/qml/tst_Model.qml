@@ -43,7 +43,8 @@ TestCase {
       soundVolume: 35,
       startSoundEnabled: false,
       completionSoundPath: "~/Sounds/done.ogg",
-      outputMode: "focused"
+      outputMode: "focused",
+      panelPattern: "wiggle"
     })
     compare(customized.focusMs, 25 * 60000)
     compare(customized.breakTitle, "Rest your eyes")
@@ -56,6 +57,7 @@ TestCase {
     verify(!customized.startSoundEnabled)
     compare(customized.completionSoundPath, "~/Sounds/done.ogg")
     compare(customized.outputMode, "focused")
+    compare(customized.panelPattern, "wiggle")
     compare(customized.protectedApps.join(","), "steam")
 
     // Omarchy supplies no key after an override is removed. A fresh
@@ -72,6 +74,7 @@ TestCase {
     compare(restored.startSoundPath, "")
     compare(restored.completionSoundPath, "")
     compare(restored.outputMode, "all")
+    compare(restored.panelPattern, "off")
   }
 
   function test_settingsNormalizeInvalidValues() {
@@ -79,10 +82,12 @@ TestCase {
       focusMinutes: "not-a-number",
       breakSeconds: 99999,
       enforcement: "unknown",
+      panelPattern: "unknown",
       officeStart: "25:90"
     })
     compare(value.focusMs, 20 * 60000)
     compare(value.breakMs, 60 * 60 * 1000)
+    compare(value.panelPattern, "off")
     compare(value.enforcement, "balanced")
     compare(value.officeHours.startMinute, 8 * 60)
   }

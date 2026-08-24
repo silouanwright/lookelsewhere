@@ -22,7 +22,7 @@ Item {
   readonly property string statePath: stateDir + "/state.json"
   readonly property int stateReadLimit: 64 * 1024
   readonly property string boundedReaderPath: decodeURIComponent(
-    String(Qt.resolvedUrl("tools/bounded-read")).replace(/^file:\/\//, ""))
+    String(Qt.resolvedUrl("vendor/qmlpack/bounded-read/bin/bounded-read")).replace(/^file:\/\//, ""))
 
   property var config: Model.defaultConfig()
   property var snapshot: Model.defaultSnapshot(Date.now())

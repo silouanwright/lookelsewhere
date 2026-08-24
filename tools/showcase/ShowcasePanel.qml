@@ -3,12 +3,14 @@ import QtQuick.Layouts
 import qs.Commons
 import qs.Ui
 import "LookElsewhere"
-import "LookElsewhere/Ui" as LookUi
+import "LookElsewhere/Ui" as ProductUi
+import "LookElsewhere/vendor/qmlpack/oma-ui/Ui" as LookUi
 
 BorderSurface {
   id: root
 
   property int cornerRadius: 0
+  property string pattern: "off"
 
   implicitWidth: Style.space(260)
   implicitHeight: content.implicitHeight + padding * 2
@@ -16,6 +18,15 @@ BorderSurface {
   borderSpec: Border.surfaceSpec("popups", "border", Color.popups.border, Math.max(1, Style.space(2)))
   padding: Style.spacing.popupPadding
   radius: cornerRadius
+
+  ProductUi.PanelPattern {
+    anchors.fill: parent
+    anchors.topMargin: root.borderTop
+    anchors.rightMargin: root.borderRight
+    anchors.bottomMargin: root.borderBottom
+    anchors.leftMargin: root.borderLeft
+    pattern: root.pattern
+  }
 
   ColumnLayout {
     id: content

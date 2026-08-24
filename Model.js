@@ -44,6 +44,7 @@ function defaultConfig() {
     startSoundPath: "",
     completionSoundPath: "",
     outputMode: "all",
+    panelPattern: "off",
     protectedApps: ["steam"],
     officeHours: { enabled: false, startMinute: 8 * 60, endMinute: 18 * 60 },
     detectors: { idle: true, fullscreen: true, media: true, microphone: true, dictation: true, applications: true }
@@ -78,6 +79,8 @@ function normalizeConfig(input) {
   base.startSoundPath = String(value.startSoundPath || "").trim()
   base.completionSoundPath = String(value.completionSoundPath || "").trim()
   base.outputMode = ["all", "focused"].indexOf(value.outputMode) >= 0 ? value.outputMode : base.outputMode
+  base.panelPattern = ["off", "topography", "graph-paper", "wiggle", "bank-note", "diagonal-lines"].indexOf(value.panelPattern) >= 0
+    ? value.panelPattern : base.panelPattern
   var protectedApps = value.protectedApps === undefined ? base.protectedApps : value.protectedApps
   if (!Array.isArray(protectedApps)) protectedApps = String(protectedApps || "").split(",")
   base.protectedApps = protectedApps.map(function(app) {
@@ -131,6 +134,7 @@ function configFromSettings(settings) {
   if (incoming.startSoundPath !== undefined) next.startSoundPath = String(incoming.startSoundPath)
   if (incoming.completionSoundPath !== undefined) next.completionSoundPath = String(incoming.completionSoundPath)
   if (incoming.outputMode !== undefined) next.outputMode = String(incoming.outputMode)
+  if (incoming.panelPattern !== undefined) next.panelPattern = String(incoming.panelPattern)
   if (incoming.protectedApps !== undefined) next.protectedApps = String(incoming.protectedApps)
   if (incoming.officeHoursEnabled !== undefined) next.officeHours.enabled = incoming.officeHoursEnabled === true
   if (incoming.officeStart !== undefined) next.officeHours.startMinute = parseClockMinute(incoming.officeStart, next.officeHours.startMinute)

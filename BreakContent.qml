@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import qs.Commons
 import qs.Ui
-import "Ui" as LookUi
+import "vendor/qmlpack/oma-ui/Ui" as LookUi
 
 ColumnLayout {
   id: root

@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "name": "oma-ui",
+  "license": "MIT",
+  "files": [
+    "Ui/DropdownSettingRow.qml",
+    "Ui/KeyHintBadge.qml",
+    "Ui/NumberSettingRow.qml",
+    "Ui/PhosphorIconButton.qml",
+    "Ui/SectionHeader.qml",
+    "Ui/SettingDropdown.qml",
+    "Ui/SettingLabels.qml",
+    "Ui/SettingsTabBar.qml",
+    "Ui/ToggleSettingRow.qml",
+    "Ui/WeightedButton.qml",
+    "Ui/qmldir",
+    "README.md",
+    "LICENSE",
+    "THIRD_PARTY_NOTICES.md"
+  ],
+  "compatibility": {
+    "omarchy": ">=4 <5",
+    "quickshell": ">=0.3 <0.4"
+  }
+}

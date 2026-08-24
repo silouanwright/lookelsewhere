@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "name": "bounded-read",
+  "license": "MIT",
+  "files": [
+    "bin/bounded-read",
+    "README.md",
+    "LICENSE"
+  ],
+  "executables": [
+    "bin/bounded-read"
+  ],
+  "compatibility": {
+    "omarchy": ">=4 <5"
+  }
+}

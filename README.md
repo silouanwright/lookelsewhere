@@ -93,10 +93,16 @@ LookElsewhere inherits your Omarchy theme and looks beautiful on all of them.
 
 ## Keyboard first
 
+For global invocation, add the recommended `Super+Alt+L` Omarchy binding:
+
+```lua
+o.bind("SUPER + ALT + L", "LookElsewhere", "omarchy-shell look-elsewhere-panel toggle")
+```
+
 <img src="docs/assets/keyboard-shortcuts.png" alt="LookElsewhere jump commands" width="560">
 
-Press `?` to reveal a command layer inspired by
-[Godspeed](https://godspeedapp.com/). Every label is a live, configurable
+Press `?` to reveal a command layer. Inspired by
+[Godspeed](https://godspeedapp.com/), every label is a live, configurable
 shortcut.
 
 - Jump directly to breaks, snoozes, history, options, or a settings category.
@@ -106,12 +112,6 @@ shortcut.
 
 Shortcuts are window-local and can be changed in
 [Configuration](CONFIGURATION.md).
-
-For global invocation, add the recommended `Super+Alt+L` Omarchy binding:
-
-```lua
-o.bind("SUPER + ALT + L", "LookElsewhere", "omarchy-shell look-elsewhere-panel toggle")
-```
 
 ## Configuration
 
@@ -170,7 +170,7 @@ attention.
 
 ## About the developer
 
-I'm Silouan Wright, a lead frontend engineer who has been building software for
+I'm a lead frontend engineer who has been building software for
 over 20 years. I built LookElsewhere in close collaboration with an AI coding
 agent, combining its speed with research, product judgment, precise feedback,
 testing, and the visual refinement that turns working software into a product.

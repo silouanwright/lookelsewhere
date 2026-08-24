@@ -14,7 +14,8 @@ cause unbounded allocation in the shell.
 ## Decision
 
 Apply byte limits at the producer boundary, before data enters QML. Read state
-through the reusable `tools/bounded-read` helper capped at 64 KiB and keep `FileView`
+through the Qmlpack-managed `vendor/qmlpack/bounded-read/bin/bounded-read`
+helper capped at 64 KiB and keep `FileView`
 write-only. The helper opens with `O_NOFOLLOW | O_NONBLOCK`, verifies the open
 descriptor is a regular file owned by the current user, and emits only the
 bounded payload. Cap active-window output at 64 KiB and shape it outside QML

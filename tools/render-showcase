@@ -9,6 +9,7 @@ density=2
 width=1920
 height=1080
 radius=0
+pattern=off
 themes=()
 
 usage() {
@@ -22,6 +23,7 @@ Options:
   --density N                 Output pixel density (default: 2)
   --size WIDTHxHEIGHT         Fullscreen logical size (default: 1920x1080)
   --radius N                  Panel corner radius (default: 0)
+  --pattern NAME              Optional panel pattern (default: off)
 
 Themes default to the six used in the README. Theme slugs are resolved from
 ~/.config/omarchy/themes first, then /usr/share/omarchy/themes.
@@ -36,6 +38,7 @@ while (($#)); do
     --density) density=$2; shift 2 ;;
     --size) width=${2%x*}; height=${2#*x}; shift 2 ;;
     --radius) radius=$2; shift 2 ;;
+    --pattern) pattern=$2; shift 2 ;;
     -h|--help) usage; exit 0 ;;
     --*) echo "Unknown option: $1" >&2; usage >&2; exit 2 ;;
     *) themes+=("$1"); shift ;;
@@ -97,6 +100,7 @@ for theme in "${themes[@]}"; do
   LOOKELSEWHERE_SHOWCASE_HEIGHT="$height" \
   LOOKELSEWHERE_SHOWCASE_DENSITY="$density" \
   LOOKELSEWHERE_SHOWCASE_RADIUS="$radius" \
+  LOOKELSEWHERE_SHOWCASE_PATTERN="$pattern" \
     timeout 15 quickshell -p "$render_root" >/dev/null 2>&1
   [[ -s $tile ]] || { echo "Render failed: $theme" >&2; exit 1; }
   tiles+=("$tile")

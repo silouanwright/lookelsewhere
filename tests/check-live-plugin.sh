@@ -13,9 +13,10 @@ if quickshell log -n -p /usr/share/omarchy/shell --no-color 2>&1 \
 fi
 
 grep -q 'boundedReaderPath' "$plugin/Service.qml"
-grep -q 'os.O_NOFOLLOW | os.O_NONBLOCK' "$plugin/tools/bounded-read"
-grep -q 'dir_fd=directory_fd' "$plugin/tools/bounded-read"
-test "$(head -n 1 "$plugin/tools/bounded-read")" = '#!/usr/bin/python3'
+reader="$plugin/vendor/qmlpack/bounded-read/bin/bounded-read"
+grep -q 'os.O_NOFOLLOW | os.O_NONBLOCK' "$reader"
+grep -q 'dir_fd=directory_fd' "$reader"
+test "$(head -n 1 "$reader")" = '#!/usr/bin/python3'
 grep -q 'Model.recoverSnapshot' "$plugin/Service.qml"
 grep -q 'exec install -d -m 700' "$plugin/Service.qml"
 grep -q 'blockAllReads: true' "$plugin/Service.qml"

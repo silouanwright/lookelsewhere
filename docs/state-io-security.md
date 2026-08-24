@@ -25,7 +25,7 @@ metadata.
   system `/usr/bin/python3`. Python is used only because its standard library
   exposes the descriptor-relative Linux operations needed here without adding
   a compiler, installer, or architecture-specific binary.
-- `tools/bounded-read` opens each absolute path component relative to an
+- `vendor/qmlpack/bounded-read/bin/bounded-read` opens each absolute path component relative to an
   already-open directory descriptor with `O_NOFOLLOW`.
 - The final descriptor is opened read-only with `O_NONBLOCK`, checked with
   `fstat`, and accepted only when it is a regular file owned by the current

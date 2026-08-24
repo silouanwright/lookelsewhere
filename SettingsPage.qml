@@ -4,7 +4,7 @@ import QtQuick.Layouts
 import qs.Commons
 import qs.Ui
 import "Model.js" as Model
-import "Ui" as LookUi
+import "vendor/qmlpack/oma-ui/Ui" as LookUi
 
 ColumnLayout {
   id: settingsPage
@@ -40,11 +40,17 @@ ColumnLayout {
   readonly property bool dropdownOpen: enforcementDropdown.popupOpen
     || officeStartDropdown.popupOpen || officeEndDropdown.popupOpen
     || outputModeDropdown.popupOpen || displayModeDropdown.popupOpen
+    || panelPatternDropdown.popupOpen
   readonly property Item initialFocusTarget: settingsTabs
   readonly property Item finalFocusTarget: {
     var controls = targets()
     return controls.length ? controls[controls.length - 1] : settingsTabs
   }
+
+  onEditorActiveChanged: if (!editorActive && active) Qt.callLater(function() {
+    if (settingsPage.active && settingsPage.focusProxy)
+      settingsPage.focusProxy.forceActiveFocus()
+  })
 
   signal persistRequested(var values)
   signal pauseRequested()
@@ -83,8 +89,8 @@ ColumnLayout {
       breaks: [focusMinutesField, shortBreakField, longBreakEveryField,
         longBreakSecondsField, snoozeBudgetField, maximumDelayField,
         enforcementDropdown],
-      experience: [reduceMotionRow, soundRow, soundVolumeField, startSoundRow,
-        completionSoundRow, outputModeDropdown, displayModeDropdown,
+      experience: [reduceMotionRow, panelPatternDropdown, soundRow, soundVolumeField,
+        startSoundRow, completionSoundRow, outputModeDropdown, displayModeDropdown,
         keyboardHintRow]
     }
     return byTab[settingsTab] || []
@@ -96,6 +102,13 @@ ColumnLayout {
     cursorActive = true
     ensureCursorVisible(controls[cursorIndex])
   }
+  function hasCursorFor(target) {
+    return cursorActive && targets()[cursorIndex] === target
+  }
+  function setCursorTarget(target) {
+    var index = targets().indexOf(target)
+    if (index >= 0) setCursor(index)
+  }
   function moveCursor(delta) {
     if (cursorActive && delta < 0 && cursorIndex === 0) {
       cursorActive = false
@@ -103,6 +116,7 @@ ColumnLayout {
       ensureCursorVisible(settingsTabs)
       return
     }
+    if (focusProxy) focusProxy.forceActiveFocus()
     setCursor(cursorActive ? cursorIndex + delta : 0)
   }
   function activateCursor() {
@@ -143,6 +157,11 @@ ColumnLayout {
       : settingsPage.settingsTab === "breaks" ? focusMinutesField.field
       : reduceMotionRow
     Keys.onEscapePressed: settingsPage.dismissHintsOrClose()
+    Keys.onTabPressed: {
+      settingsPage.focusProxy.forceActiveFocus()
+      settingsPage.setCursor(0)
+    }
+    Keys.onBacktabPressed: settingsPage.settingsButtonTarget.forceActiveFocus()
     onDownRequested: {
       settingsPage.focusProxy.forceActiveFocus()
       settingsPage.setCursor(0)
@@ -178,8 +197,8 @@ ColumnLayout {
     muted: settingsPage.muted
     accent: settingsPage.accent
     fontFamily: settingsPage.fontFamily
-    hasCursor: settingsPage.cursorActive && settingsPage.cursorIndex === 0
-    onHovered: function(on) { if (on) settingsPage.setCursor(0) }
+    hasCursor: settingsPage.hasCursorFor(pauseBreaksButton)
+    onHovered: function(on) { if (on) settingsPage.setCursorTarget(pauseBreaksButton) }
     KeyNavigation.tab: editSettingsButton
     Keys.onEscapePressed: settingsPage.dismissHintsOrClose()
     onClicked: settingsPage.toggleManualPause()
@@ -221,8 +240,8 @@ ColumnLayout {
       foreground: settingsPage.foreground
       accent: settingsPage.accent
       fontFamily: settingsPage.fontFamily
-      hasCursor: settingsPage.cursorActive && settingsPage.cursorIndex === 1
-      onHovered: function(on) { if (on) settingsPage.setCursor(1) }
+      hasCursor: settingsPage.hasCursorFor(editSettingsButton)
+      onHovered: function(on) { if (on) settingsPage.setCursorTarget(editSettingsButton) }
       KeyNavigation.backtab: pauseBreaksButton
       Keys.onEscapePressed: settingsPage.dismissHintsOrClose()
       Accessible.role: Accessible.Button
@@ -262,8 +281,8 @@ ColumnLayout {
     description: qsTr("Show break reminders only during these hours")
     checked: settingsPage.settings && settingsPage.settings.officeHoursEnabled === true
     foreground: settingsPage.foreground; accent: settingsPage.accent; fontFamily: settingsPage.fontFamily
-    hasCursor: settingsPage.cursorActive && settingsPage.cursorIndex === 2
-    onHovered: function(on) { if (on) settingsPage.setCursor(2) }
+    hasCursor: settingsPage.hasCursorFor(officeHoursRow)
+    onHovered: function(on) { if (on) settingsPage.setCursorTarget(officeHoursRow) }
     onClicked: settingsPage.persistSettings({ officeHoursEnabled: !checked })
   }
 
@@ -276,9 +295,9 @@ ColumnLayout {
     description: qsTr("Beginning of the active schedule")
     value: settingsPage.settings && settingsPage.settings.officeStart !== undefined ? String(settingsPage.settings.officeStart) : "08:00"
     options: settingsPage.clockOptions()
-    hasCursor: settingsPage.cursorActive && settingsPage.cursorIndex === 3
+    hasCursor: settingsPage.hasCursorFor(officeStartDropdown)
     foreground: settingsPage.foreground; muted: settingsPage.muted; accent: settingsPage.accent; fontFamily: settingsPage.fontFamily
-    onHovered: function(on) { if (on) settingsPage.setCursor(3) }
+    onHovered: function(on) { if (on) settingsPage.setCursorTarget(officeStartDropdown) }
     onPopupClosed: if (settingsPage.active) Qt.callLater(function() { settingsPage.focusProxy.forceActiveFocus() })
     onChanged: function(next) { settingsPage.persistSettings({ officeStart: next }) }
   }
@@ -292,9 +311,9 @@ ColumnLayout {
     description: qsTr("End of the active schedule; overnight is supported")
     value: settingsPage.settings && settingsPage.settings.officeEnd !== undefined ? String(settingsPage.settings.officeEnd) : "18:00"
     options: settingsPage.clockOptions()
-    hasCursor: settingsPage.cursorActive && settingsPage.cursorIndex === 4
+    hasCursor: settingsPage.hasCursorFor(officeEndDropdown)
     foreground: settingsPage.foreground; muted: settingsPage.muted; accent: settingsPage.accent; fontFamily: settingsPage.fontFamily
-    onHovered: function(on) { if (on) settingsPage.setCursor(4) }
+    onHovered: function(on) { if (on) settingsPage.setCursorTarget(officeEndDropdown) }
     onPopupClosed: if (settingsPage.active) Qt.callLater(function() { settingsPage.focusProxy.forceActiveFocus() })
     onChanged: function(next) { settingsPage.persistSettings({ officeEnd: next }) }
   }
@@ -321,8 +340,8 @@ ColumnLayout {
     description: qsTr("Count active screen time instead of time away")
     checked: !settingsPage.settings || settingsPage.settings.idleDetection === undefined || settingsPage.settings.idleDetection === true
     foreground: settingsPage.foreground; accent: settingsPage.accent; fontFamily: settingsPage.fontFamily
-    hasCursor: settingsPage.cursorActive && settingsPage.cursorIndex === 0
-    onHovered: function(on) { if (on) settingsPage.setCursor(0) }
+    hasCursor: settingsPage.hasCursorFor(idleDetectionRow)
+    onHovered: function(on) { if (on) settingsPage.setCursorTarget(idleDetectionRow) }
     onClicked: settingsPage.persistSettings({ idleDetection: !checked })
   }
   PanelSeparator { Layout.fillWidth: true; foreground: settingsPage.foreground }
@@ -333,8 +352,8 @@ ColumnLayout {
     description: qsTr("Delay a due break while fullscreen")
     checked: !settingsPage.settings || settingsPage.settings.fullscreenDetection === undefined || settingsPage.settings.fullscreenDetection === true
     foreground: settingsPage.foreground; accent: settingsPage.accent; fontFamily: settingsPage.fontFamily
-    hasCursor: settingsPage.cursorActive && settingsPage.cursorIndex === 1
-    onHovered: function(on) { if (on) settingsPage.setCursor(1) }
+    hasCursor: settingsPage.hasCursorFor(fullscreenDetectionRow)
+    onHovered: function(on) { if (on) settingsPage.setCursorTarget(fullscreenDetectionRow) }
     onClicked: settingsPage.persistSettings({ fullscreenDetection: !checked })
   }
   PanelSeparator { Layout.fillWidth: true; foreground: settingsPage.foreground }
@@ -345,8 +364,8 @@ ColumnLayout {
     description: qsTr("Delay while the focused app is playing media")
     checked: !settingsPage.settings || settingsPage.settings.mediaDetection === undefined || settingsPage.settings.mediaDetection === true
     foreground: settingsPage.foreground; accent: settingsPage.accent; fontFamily: settingsPage.fontFamily
-    hasCursor: settingsPage.cursorActive && settingsPage.cursorIndex === 2
-    onHovered: function(on) { if (on) settingsPage.setCursor(2) }
+    hasCursor: settingsPage.hasCursorFor(mediaDetectionRow)
+    onHovered: function(on) { if (on) settingsPage.setCursorTarget(mediaDetectionRow) }
     onClicked: settingsPage.persistSettings({ mediaDetection: !checked })
   }
   PanelSeparator { Layout.fillWidth: true; foreground: settingsPage.foreground }
@@ -357,8 +376,8 @@ ColumnLayout {
     description: qsTr("Delay during calls without recording audio")
     checked: !settingsPage.settings || settingsPage.settings.microphoneDetection === undefined || settingsPage.settings.microphoneDetection === true
     foreground: settingsPage.foreground; accent: settingsPage.accent; fontFamily: settingsPage.fontFamily
-    hasCursor: settingsPage.cursorActive && settingsPage.cursorIndex === 3
-    onHovered: function(on) { if (on) settingsPage.setCursor(3) }
+    hasCursor: settingsPage.hasCursorFor(microphoneDetectionRow)
+    onHovered: function(on) { if (on) settingsPage.setCursorTarget(microphoneDetectionRow) }
     onClicked: settingsPage.persistSettings({ microphoneDetection: !checked })
   }
   PanelSeparator { Layout.fillWidth: true; foreground: settingsPage.foreground }
@@ -369,8 +388,8 @@ ColumnLayout {
     description: qsTr("Delay while Omarchy dictation is active")
     checked: !settingsPage.settings || settingsPage.settings.dictationDetection === undefined || settingsPage.settings.dictationDetection === true
     foreground: settingsPage.foreground; accent: settingsPage.accent; fontFamily: settingsPage.fontFamily
-    hasCursor: settingsPage.cursorActive && settingsPage.cursorIndex === 4
-    onHovered: function(on) { if (on) settingsPage.setCursor(4) }
+    hasCursor: settingsPage.hasCursorFor(dictationDetectionRow)
+    onHovered: function(on) { if (on) settingsPage.setCursorTarget(dictationDetectionRow) }
     onClicked: settingsPage.persistSettings({ dictationDetection: !checked })
   }
 
@@ -416,8 +435,8 @@ ColumnLayout {
       foreground: settingsPage.foreground
       accent: settingsPage.accent
       fontFamily: settingsPage.fontFamily
-      hasCursor: settingsPage.cursorActive && settingsPage.cursorIndex === 0
-      onHovered: function(on) { if (on) settingsPage.setCursor(0) }
+      hasCursor: settingsPage.hasCursorFor(focusMinutesField)
+      onHovered: function(on) { if (on) settingsPage.setCursorTarget(focusMinutesField) }
       onModified: function(next) { settingsPage.persistSettings({ focusMinutes: next }) }
     }
   }
@@ -452,8 +471,8 @@ ColumnLayout {
       foreground: settingsPage.foreground
       accent: settingsPage.accent
       fontFamily: settingsPage.fontFamily
-      hasCursor: settingsPage.cursorActive && settingsPage.cursorIndex === 1
-      onHovered: function(on) { if (on) settingsPage.setCursor(1) }
+      hasCursor: settingsPage.hasCursorFor(shortBreakField)
+      onHovered: function(on) { if (on) settingsPage.setCursorTarget(shortBreakField) }
       onModified: function(next) { settingsPage.persistSettings({ breakSeconds: next }) }
     }
   }
@@ -467,9 +486,9 @@ ColumnLayout {
     description: qsTr("Make every Nth break long; 0 disables it")
     value: settingsPage.settings && settingsPage.settings.longBreakEvery !== undefined ? Number(settingsPage.settings.longBreakEvery) : 4
     from: 0; to: 20
-    hasCursor: settingsPage.cursorActive && settingsPage.cursorIndex === 2
+    hasCursor: settingsPage.hasCursorFor(longBreakEveryField)
     foreground: settingsPage.foreground; muted: settingsPage.muted; accent: settingsPage.accent; fontFamily: settingsPage.fontFamily
-    onHovered: function(on) { if (on) settingsPage.setCursor(2) }
+    onHovered: function(on) { if (on) settingsPage.setCursorTarget(longBreakEveryField) }
     onModified: function(next) { settingsPage.persistSettings({ longBreakEvery: next }) }
   }
 
@@ -482,9 +501,9 @@ ColumnLayout {
     description: qsTr("Seconds for each long break")
     value: settingsPage.settings && settingsPage.settings.longBreakSeconds !== undefined ? Number(settingsPage.settings.longBreakSeconds) : 180
     from: 5; to: 3600; stepSize: 30
-    hasCursor: settingsPage.cursorActive && settingsPage.cursorIndex === 3
+    hasCursor: settingsPage.hasCursorFor(longBreakSecondsField)
     foreground: settingsPage.foreground; muted: settingsPage.muted; accent: settingsPage.accent; fontFamily: settingsPage.fontFamily
-    onHovered: function(on) { if (on) settingsPage.setCursor(3) }
+    onHovered: function(on) { if (on) settingsPage.setCursorTarget(longBreakSecondsField) }
     onModified: function(next) { settingsPage.persistSettings({ longBreakSeconds: next }) }
   }
 
@@ -497,9 +516,9 @@ ColumnLayout {
     description: qsTr("Snoozes allowed during each focus cycle")
     value: settingsPage.settings && settingsPage.settings.snoozeBudget !== undefined ? Number(settingsPage.settings.snoozeBudget) : 3
     from: 0; to: 10
-    hasCursor: settingsPage.cursorActive && settingsPage.cursorIndex === 4
+    hasCursor: settingsPage.hasCursorFor(snoozeBudgetField)
     foreground: settingsPage.foreground; muted: settingsPage.muted; accent: settingsPage.accent; fontFamily: settingsPage.fontFamily
-    onHovered: function(on) { if (on) settingsPage.setCursor(4) }
+    onHovered: function(on) { if (on) settingsPage.setCursorTarget(snoozeBudgetField) }
     onModified: function(next) { settingsPage.persistSettings({ snoozeBudget: next }) }
   }
 
@@ -512,9 +531,9 @@ ColumnLayout {
     description: qsTr("Minutes before a protected break must begin")
     value: settingsPage.settings && settingsPage.settings.maximumDelayMinutes !== undefined ? Number(settingsPage.settings.maximumDelayMinutes) : 15
     from: 0; to: 180; stepSize: 5
-    hasCursor: settingsPage.cursorActive && settingsPage.cursorIndex === 5
+    hasCursor: settingsPage.hasCursorFor(maximumDelayField)
     foreground: settingsPage.foreground; muted: settingsPage.muted; accent: settingsPage.accent; fontFamily: settingsPage.fontFamily
-    onHovered: function(on) { if (on) settingsPage.setCursor(5) }
+    onHovered: function(on) { if (on) settingsPage.setCursorTarget(maximumDelayField) }
     onModified: function(next) { settingsPage.persistSettings({ maximumDelayMinutes: next }) }
   }
 
@@ -550,10 +569,10 @@ ColumnLayout {
       foreground: settingsPage.foreground
       accent: settingsPage.accent
       fontFamily: settingsPage.fontFamily
-      hasCursor: settingsPage.cursorActive && settingsPage.cursorIndex === 6
+      hasCursor: settingsPage.hasCursorFor(enforcementDropdown)
       onPopupOpenChanged: if (!popupOpen && settingsPage.active)
         Qt.callLater(function() { settingsPage.focusProxy.forceActiveFocus() })
-      onHovered: function(on) { if (on) settingsPage.setCursor(6) }
+      onHovered: function(on) { if (on) settingsPage.setCursorTarget(enforcementDropdown) }
       onChanged: function(next) { settingsPage.persistSettings({ enforcement: next }) }
     }
   }
@@ -582,14 +601,38 @@ ColumnLayout {
     foreground: settingsPage.foreground
     accent: settingsPage.accent
     fontFamily: settingsPage.fontFamily
-    hasCursor: settingsPage.cursorActive && settingsPage.cursorIndex === 0
+    hasCursor: settingsPage.hasCursorFor(reduceMotionRow)
     Accessible.role: Accessible.CheckBox
     Accessible.name: label
     Accessible.checked: checked
     Accessible.onPressAction: clicked()
-    onHovered: function(on) { if (on) settingsPage.setCursor(0) }
+    onHovered: function(on) { if (on) settingsPage.setCursorTarget(reduceMotionRow) }
     KeyNavigation.tab: soundRow
     onClicked: settingsPage.persistSettings({ reducedMotion: !checked })
+  }
+
+  PanelSeparator { Layout.fillWidth: true; foreground: settingsPage.foreground }
+
+  LookUi.DropdownSettingRow {
+    id: panelPatternDropdown
+    Layout.fillWidth: true
+    label: qsTr("Panel background")
+    description: qsTr("Add a subtle pattern behind the plugin panel")
+    value: settingsPage.settings && settingsPage.settings.panelPattern !== undefined
+      ? String(settingsPage.settings.panelPattern) : "off"
+    options: [
+      { value: "off", label: qsTr("Off") },
+      { value: "topography", label: qsTr("Topography") },
+      { value: "graph-paper", label: qsTr("Graph paper") },
+      { value: "wiggle", label: qsTr("Wiggle") },
+      { value: "bank-note", label: qsTr("Bank note") },
+      { value: "diagonal-lines", label: qsTr("Diagonal lines") }
+    ]
+    hasCursor: settingsPage.hasCursorFor(panelPatternDropdown)
+    foreground: settingsPage.foreground; muted: settingsPage.muted; accent: settingsPage.accent; fontFamily: settingsPage.fontFamily
+    onHovered: function(on) { if (on) settingsPage.setCursorTarget(panelPatternDropdown) }
+    onPopupClosed: if (settingsPage.active) Qt.callLater(function() { settingsPage.focusProxy.forceActiveFocus() })
+    onChanged: function(next) { settingsPage.persistSettings({ panelPattern: next }) }
   }
 
   PanelSeparator { Layout.fillWidth: true; foreground: settingsPage.foreground }
@@ -603,12 +646,12 @@ ColumnLayout {
     foreground: settingsPage.foreground
     accent: settingsPage.accent
     fontFamily: settingsPage.fontFamily
-    hasCursor: settingsPage.cursorActive && settingsPage.cursorIndex === 1
+    hasCursor: settingsPage.hasCursorFor(soundRow)
     Accessible.role: Accessible.CheckBox
     Accessible.name: label
     Accessible.checked: checked
     Accessible.onPressAction: clicked()
-    onHovered: function(on) { if (on) settingsPage.setCursor(1) }
+    onHovered: function(on) { if (on) settingsPage.setCursorTarget(soundRow) }
     KeyNavigation.tab: soundVolumeField
     KeyNavigation.backtab: reduceMotionRow
     onClicked: settingsPage.persistSettings({ soundEnabled: !checked })
@@ -623,9 +666,9 @@ ColumnLayout {
     description: qsTr("Volume for LookElsewhere break cues")
     value: settingsPage.settings && settingsPage.settings.soundVolume !== undefined ? Number(settingsPage.settings.soundVolume) : 65
     from: 0; to: 100; stepSize: 5
-    hasCursor: settingsPage.cursorActive && settingsPage.cursorIndex === 2
+    hasCursor: settingsPage.hasCursorFor(soundVolumeField)
     foreground: settingsPage.foreground; muted: settingsPage.muted; accent: settingsPage.accent; fontFamily: settingsPage.fontFamily
-    onHovered: function(on) { if (on) settingsPage.setCursor(2) }
+    onHovered: function(on) { if (on) settingsPage.setCursorTarget(soundVolumeField) }
     onModified: function(next) { settingsPage.persistSettings({ soundVolume: next }) }
   }
 
@@ -638,8 +681,8 @@ ColumnLayout {
     description: qsTr("Play a cue when a break begins")
     checked: !settingsPage.settings || settingsPage.settings.startSoundEnabled === undefined || settingsPage.settings.startSoundEnabled === true
     foreground: settingsPage.foreground; accent: settingsPage.accent; fontFamily: settingsPage.fontFamily
-    hasCursor: settingsPage.cursorActive && settingsPage.cursorIndex === 3
-    onHovered: function(on) { if (on) settingsPage.setCursor(3) }
+    hasCursor: settingsPage.hasCursorFor(startSoundRow)
+    onHovered: function(on) { if (on) settingsPage.setCursorTarget(startSoundRow) }
     onClicked: settingsPage.persistSettings({ startSoundEnabled: !checked })
   }
 
@@ -652,8 +695,8 @@ ColumnLayout {
     description: qsTr("Play a cue when a break finishes")
     checked: !settingsPage.settings || settingsPage.settings.completionSoundEnabled === undefined || settingsPage.settings.completionSoundEnabled === true
     foreground: settingsPage.foreground; accent: settingsPage.accent; fontFamily: settingsPage.fontFamily
-    hasCursor: settingsPage.cursorActive && settingsPage.cursorIndex === 4
-    onHovered: function(on) { if (on) settingsPage.setCursor(4) }
+    hasCursor: settingsPage.hasCursorFor(completionSoundRow)
+    onHovered: function(on) { if (on) settingsPage.setCursorTarget(completionSoundRow) }
     onClicked: settingsPage.persistSettings({ completionSoundEnabled: !checked })
   }
 
@@ -666,9 +709,9 @@ ColumnLayout {
     description: qsTr("Choose where full-screen breaks appear")
     value: settingsPage.settings && settingsPage.settings.outputMode !== undefined ? String(settingsPage.settings.outputMode) : "all"
     options: [{ value: "all", label: qsTr("All displays") }, { value: "focused", label: qsTr("Focused display") }]
-    hasCursor: settingsPage.cursorActive && settingsPage.cursorIndex === 5
+    hasCursor: settingsPage.hasCursorFor(outputModeDropdown)
     foreground: settingsPage.foreground; muted: settingsPage.muted; accent: settingsPage.accent; fontFamily: settingsPage.fontFamily
-    onHovered: function(on) { if (on) settingsPage.setCursor(5) }
+    onHovered: function(on) { if (on) settingsPage.setCursorTarget(outputModeDropdown) }
     onPopupClosed: if (settingsPage.active) Qt.callLater(function() { settingsPage.focusProxy.forceActiveFocus() })
     onChanged: function(next) { settingsPage.persistSettings({ outputMode: next }) }
   }
@@ -686,9 +729,9 @@ ColumnLayout {
       { value: "icon", label: qsTr("Icon only") },
       { value: "time", label: qsTr("Time only") }
     ]
-    hasCursor: settingsPage.cursorActive && settingsPage.cursorIndex === 6
+    hasCursor: settingsPage.hasCursorFor(displayModeDropdown)
     foreground: settingsPage.foreground; muted: settingsPage.muted; accent: settingsPage.accent; fontFamily: settingsPage.fontFamily
-    onHovered: function(on) { if (on) settingsPage.setCursor(6) }
+    onHovered: function(on) { if (on) settingsPage.setCursorTarget(displayModeDropdown) }
     onPopupClosed: if (settingsPage.active) Qt.callLater(function() { settingsPage.focusProxy.forceActiveFocus() })
     onChanged: function(next) { settingsPage.persistSettings({ displayMode: next }) }
   }
@@ -704,12 +747,12 @@ ColumnLayout {
     foreground: settingsPage.foreground
     accent: settingsPage.accent
     fontFamily: settingsPage.fontFamily
-    hasCursor: settingsPage.cursorActive && settingsPage.cursorIndex === 7
+    hasCursor: settingsPage.hasCursorFor(keyboardHintRow)
     Accessible.role: Accessible.CheckBox
     Accessible.name: label
     Accessible.checked: checked
     Accessible.onPressAction: clicked()
-    onHovered: function(on) { if (on) settingsPage.setCursor(7) }
+    onHovered: function(on) { if (on) settingsPage.setCursorTarget(keyboardHintRow) }
     KeyNavigation.tab: settingsPage.shortcutsButtonTarget
     KeyNavigation.backtab: soundRow
     onClicked: settingsPage.persistSettings({ showKeyboardHints: !checked })

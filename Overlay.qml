@@ -8,7 +8,7 @@ import Quickshell.Hyprland
 import Quickshell.Wayland
 import qs.Commons
 import qs.Ui
-import "Ui" as LookUi
+import "vendor/qmlpack/oma-ui/Ui" as LookUi
 
 Item {
   id: root
