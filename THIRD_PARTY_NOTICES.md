@@ -27,7 +27,8 @@ SOFTWARE.
 
 ## Omarchy Dropdown
 
-`Ui/SettingDropdown.qml` is derived from Omarchy Shell's `Ui/Dropdown.qml` with
+`vendor/qmlpack/oma-ui/Ui/SettingDropdown.qml` is derived from Omarchy Shell's
+`Ui/Dropdown.qml` with
 Space-key selection added for an open list. Omarchy is released under the MIT
 License reproduced above.
 
