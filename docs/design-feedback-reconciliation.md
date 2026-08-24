@@ -23,7 +23,7 @@ installed-runtime check are required.
 |---|---|---|
 | Use a narrow, portrait composition instead of a wide status card | `KeyboardPanel` target width of 260 theme-space units and vertical hierarchy | Live-verified |
 | Remove the progress bar and explanatory filler | No progress component or generic active-time notice in `Panel.qml` | Source-inspected and live-verified |
-| Center the supplied break/bed symbol above the heading | `BreakIcon.qml` plus centered icon item | Live-verified across the active theme |
+| Center the supplied break/bed symbol above the heading | `BedIcon.qml` plus centered icon item | Live-verified across the active theme |
 | Use “Break starts in,” directly over and close to the timer; switch it to “LookElsewhere is paused” during idle | Centered state-aware heading with negative bottom margin | Live-verified; working wording regression-tested |
 | Show a large native-looking `MM:SS` clock | Two rolling numbers and one colon at display scale | Live-verified |
 | Make colon spacing follow the active font's metrics | `TextMetrics` removes only the colon's unused side bearings | Live-verified with the active Omarchy font |

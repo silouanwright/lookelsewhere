@@ -217,7 +217,7 @@ Item {
             blurMultiplier: 1
           }
 
-          BreakIcon {
+          BedIcon {
             Layout.alignment: Qt.AlignHCenter
             Layout.preferredWidth: Style.space(64)
             Layout.preferredHeight: Layout.preferredWidth
@@ -353,7 +353,7 @@ Item {
           RowLayout {
             Layout.fillWidth: true
             spacing: Style.space(12)
-            BreakIcon {
+            BedIcon {
               Layout.preferredWidth: Style.space(38)
               Layout.preferredHeight: Layout.preferredWidth
               color: Color.accent
@@ -436,7 +436,7 @@ Item {
           anchors.leftMargin: Style.space(14)
           anchors.rightMargin: Style.space(14)
           spacing: Style.space(10)
-          BreakIcon {
+          BedIcon {
             Layout.preferredWidth: Style.space(24)
             Layout.preferredHeight: Layout.preferredWidth
             color: Color.accent

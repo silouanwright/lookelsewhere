@@ -184,31 +184,17 @@ Item {
   }
 
   function pauseMinutes(minutes) {
-    var next = JSON.parse(JSON.stringify(snapshot))
-    next.state = Model.State.Waiting
-    next.pauseReason = "manual"
-    next.postponedUntilMs = Date.now() + Math.max(1, Number(minutes || 60)) * 60000
-    snapshot = next
+    snapshot = Model.pause(snapshot, Date.now(), Math.max(1, Number(minutes || 60)) * 60000)
     scheduleSave()
   }
 
   function pauseBreaks() {
-    var next = JSON.parse(JSON.stringify(snapshot))
-    next.state = Model.State.Waiting
-    next.pauseReason = "manual"
-    next.postponedUntilMs = 0
-    next.lastObservedAtMs = Date.now()
-    snapshot = next
+    snapshot = Model.pause(snapshot, Date.now(), 0)
     scheduleSave()
   }
 
   function resume() {
-    var next = JSON.parse(JSON.stringify(snapshot))
-    next.state = Model.State.Working
-    next.pauseReason = ""
-    next.postponedUntilMs = 0
-    next.lastObservedAtMs = Date.now()
-    snapshot = next
+    snapshot = Model.resume(snapshot, Date.now())
     scheduleSave()
   }
 

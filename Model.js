@@ -419,6 +419,24 @@ function canTogglePause(state) {
   return state !== State.Breaking
 }
 
+function pause(snapshot, nowMs, durationMs) {
+  var next = copySnapshot(snapshot)
+  next.state = State.Waiting
+  next.pauseReason = "manual"
+  next.postponedUntilMs = durationMs > 0 ? Number(nowMs) + Number(durationMs) : 0
+  next.lastObservedAtMs = Number(nowMs)
+  return next
+}
+
+function resume(snapshot, nowMs) {
+  var next = copySnapshot(snapshot)
+  next.state = State.Working
+  next.pauseReason = ""
+  next.postponedUntilMs = 0
+  next.lastObservedAtMs = Number(nowMs)
+  return next
+}
+
 function soundCueForTransition(beforeState, afterState) {
   if (beforeState !== State.Breaking && afterState === State.Breaking) return "start"
   if (beforeState === State.Breaking && afterState === State.Working) return "complete"

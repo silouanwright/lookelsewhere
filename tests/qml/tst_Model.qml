@@ -431,6 +431,27 @@ TestCase {
     verify(!Model.canTogglePause(Model.State.Breaking))
   }
 
+  function test_manualPauseAndResumeTransitions() {
+    var original = Model.defaultSnapshot(1000)
+    original.accumulatedActiveMs = 42000
+
+    var timed = Model.pause(original, 2000, 60000)
+    compare(timed.state, Model.State.Waiting)
+    compare(timed.pauseReason, "manual")
+    compare(timed.postponedUntilMs, 62000)
+    compare(timed.accumulatedActiveMs, 42000)
+    compare(original.state, Model.State.Working)
+
+    var indefinite = Model.pause(timed, 3000, 0)
+    compare(indefinite.postponedUntilMs, 0)
+
+    var resumed = Model.resume(indefinite, 4000)
+    compare(resumed.state, Model.State.Working)
+    compare(resumed.pauseReason, "")
+    compare(resumed.postponedUntilMs, 0)
+    compare(resumed.lastObservedAtMs, 4000)
+  }
+
   function test_legacyEnforcementNamesMigrate() {
     compare(config({ enforcement: "gentle" }).enforcement, "casual")
     compare(config({ enforcement: "focused" }).enforcement, "hardcore")

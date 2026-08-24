@@ -21,20 +21,22 @@ Item {
   signal modified(int value)
   signal hovered(bool on)
 
-  function focusEditor() { field.field.forceActiveFocus() }
+  function activate() { if (enabled) field.field.forceActiveFocus() }
+  function focusEditor() { activate() }
 
   implicitHeight: Math.max(labels.implicitHeight, field.implicitHeight)
 
-  Column {
+  SettingLabels {
     id: labels
     anchors.left: parent.left
     anchors.right: field.left
     anchors.rightMargin: Style.space(12)
     anchors.verticalCenter: parent.verticalCenter
-    spacing: Style.space(2)
-
-    Text { width: parent.width; text: root.label; color: root.foreground; font.family: root.fontFamily; font.pixelSize: Style.font.body; font.weight: Font.DemiBold; elide: Text.ElideRight }
-    Text { width: parent.width; text: root.description; color: root.muted; font.family: root.fontFamily; font.pixelSize: Style.font.bodySmall; wrapMode: Text.WordWrap }
+    label: root.label
+    description: root.description
+    foreground: root.foreground
+    muted: root.muted
+    fontFamily: root.fontFamily
   }
 
   NumberField {

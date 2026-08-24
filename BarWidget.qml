@@ -95,13 +95,14 @@ BarWidget {
       anchors.centerIn: parent
       spacing: root.showIcon && root.showTime ? Style.space(5) : 0
 
-      BarBreakIcon {
+      BedIcon {
         visible: root.showIcon
         // Keep the compact 256-unit SVG on a clean 1/16 scale. Using the
         // nearby font-derived ~18px size makes the rounded bed corner land on
         // an isolated antialiased pixel that reads as a rendering defect.
         width: Style.space(16)
         height: width
+        solid: true
         color: button.active && button.useActiveColor ? button.activeColor : button.foreground
         opacity: root.showingStatus ? 0.62 : 1
         anchors.verticalCenter: parent.verticalCenter

@@ -10,6 +10,8 @@ Button {
   property bool actionEnabled: true
   property string disabledTooltipText: ""
 
+  function activate() { if (actionEnabled && enabled) clicked() }
+
   text: ""
   verticalPadding: Style.space(4)
   radius: Math.min(height / 2, Style.cornerRadius + Style.space(2))

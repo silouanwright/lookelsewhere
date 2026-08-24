@@ -13,32 +13,38 @@ Item {
   property color muted: Color.muted
   property color accent: Color.accent
   property string fontFamily: Style.font.family
+  readonly property real controlX: toggle.x
+  readonly property real controlY: toggle.y
+  readonly property real controlHeight: toggle.height
 
   signal clicked()
   signal hovered(bool on)
 
+  function activate() { if (enabled) clicked() }
+
   activeFocusOnTab: true
   implicitHeight: Math.max(labels.implicitHeight, toggle.implicitHeight)
 
-  Keys.onReturnPressed: root.clicked()
-  Keys.onEnterPressed: root.clicked()
-  Keys.onSpacePressed: root.clicked()
+  Keys.onReturnPressed: root.activate()
+  Keys.onEnterPressed: root.activate()
+  Keys.onSpacePressed: root.activate()
 
   Accessible.role: Accessible.CheckBox
   Accessible.name: label
   Accessible.checked: checked
   Accessible.onPressAction: clicked()
 
-  Column {
+  SettingLabels {
     id: labels
     anchors.left: parent.left
     anchors.right: toggle.left
     anchors.rightMargin: Style.space(12)
     anchors.verticalCenter: parent.verticalCenter
-    spacing: Style.space(2)
-
-    Text { width: parent.width; text: root.label; color: root.foreground; font.family: root.fontFamily; font.pixelSize: Style.font.body; font.weight: Font.DemiBold; elide: Text.ElideRight }
-    Text { width: parent.width; text: root.description; color: root.muted; font.family: root.fontFamily; font.pixelSize: Style.font.bodySmall; wrapMode: Text.WordWrap }
+    label: root.label
+    description: root.description
+    foreground: root.foreground
+    muted: root.muted
+    fontFamily: root.fontFamily
   }
 
   ToggleSwitch {

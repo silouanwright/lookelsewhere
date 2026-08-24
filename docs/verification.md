@@ -19,6 +19,10 @@ Test formatting, state-to-copy mapping, action availability, focus order, overla
 - JSON schema/version checks for configuration and state fixtures
 - No symlinks or undeclared entry points in the distributable repository
 
+The panel shortcut check also guards the extracted settings boundary: window
+shortcuts remain inside `KeyboardPanel`, settings use a single ordered target
+model, and controls activate through the shared UI contract.
+
 ### Runtime integration
 
 - Discover, enable, open, close, disable, and re-enable

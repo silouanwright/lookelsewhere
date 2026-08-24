@@ -18,9 +18,6 @@ Panel {
   property var anchorItem: null
   property var hostWidget: null
   property string page: "now"
-  property string settingsTab: "general"
-  property int optionsCursorIndex: 0
-  property bool optionsCursorActive: false
 
   // Popup roles are independent from bar roles in an Omarchy theme.
   readonly property color foreground: Color.popups.text
@@ -32,19 +29,8 @@ Panel {
   readonly property bool delayActionsVisible: !manuallyPaused && service
   readonly property bool delayActionsEnabled: !!delayActionsVisible && !!service.canPostpone
   readonly property bool shortcutsActive: opened
-  readonly property bool numberEditorActive: root.page === "options"
-    && (focusMinutesField.field.activeFocus
-      || focusMinutesField.field.contentItem.activeFocus
-      || shortBreakField.field.activeFocus
-      || shortBreakField.field.contentItem.activeFocus
-      || longBreakEveryField.editorActive
-      || longBreakSecondsField.editorActive
-      || snoozeBudgetField.editorActive
-      || maximumDelayField.editorActive
-      || soundVolumeField.editorActive)
-  readonly property bool dropdownOpen: enforcementDropdown.popupOpen
-    || officeStartDropdown.popupOpen || officeEndDropdown.popupOpen
-    || outputModeDropdown.popupOpen || displayModeDropdown.popupOpen
+  readonly property bool numberEditorActive: root.page === "options" && settingsPage.editorActive
+  readonly property bool dropdownOpen: root.page === "options" && settingsPage.dropdownOpen
   readonly property var shortcuts: Model.panelShortcuts(settings)
   readonly property bool keyboardHintsVisible: !!(settings && settings.showKeyboardHints === true)
   readonly property int snoozesRemaining: service
@@ -101,103 +87,16 @@ Panel {
   function toggleKeyboardHints() {
     persistSettings({ showKeyboardHints: !keyboardHintsVisible })
   }
-  function clockOptions() {
-    var values = []
-    for (var halfHour = 0; halfHour < 48; halfHour++) {
-      var hour = Math.floor(halfHour / 2)
-      var minute = halfHour % 2 ? "30" : "00"
-      var value = (hour < 10 ? "0" : "") + hour + ":" + minute
-      values.push({ value: value, label: value })
-    }
-    return values
-  }
   function dismissHintsOrClose() { close() }
-  function optionsTabStart() {
-    return settingsTab === "general" ? 0
-      : settingsTab === "context" ? 5
-      : settingsTab === "breaks" ? 10 : 17
-  }
-  function optionsTabEnd() {
-    return settingsTab === "general" ? 4
-      : settingsTab === "context" ? 9
-      : settingsTab === "breaks" ? 16 : 24
-  }
-  function setOptionsCursor(index) {
-    optionsCursorIndex = Math.max(optionsTabStart(), Math.min(optionsTabEnd(), index))
-    optionsCursorActive = true
-    var targets = [pauseBreaksButton, editSettingsButton,
-      officeHoursRow, officeStartDropdown, officeEndDropdown,
-      idleDetectionRow, fullscreenDetectionRow, mediaDetectionRow,
-      microphoneDetectionRow, dictationDetectionRow, focusMinutesField,
-      shortBreakField, longBreakEveryField, longBreakSecondsField,
-      snoozeBudgetField, maximumDelayField, enforcementDropdown,
-      reduceMotionRow, soundRow, soundVolumeField, startSoundRow,
-      completionSoundRow, outputModeDropdown, displayModeDropdown,
-      keyboardHintRow]
-    ensureOptionsCursorVisible(targets[optionsCursorIndex])
-  }
-  function moveOptionsCursor(delta) {
-    if (optionsCursorActive && delta < 0 && optionsCursorIndex <= optionsTabStart()) {
-      optionsCursorActive = false
-      settingsTabs.forceActiveFocus()
-      ensureOptionsCursorVisible(settingsTabs)
-      return
-    }
-    setOptionsCursor(optionsCursorActive ? optionsCursorIndex + delta : optionsTabStart())
-  }
-  function activateOptionsCursor() {
-    if (!optionsCursorActive) { setOptionsCursor(0); return }
-    switch (optionsCursorIndex) {
-    case 0: if (pauseBreaksButton.enabled) pauseBreaksButton.clicked(); break
-    case 1: editSettingsButton.clicked(); break
-    case 2: officeHoursRow.clicked(); break
-    case 3: officeStartDropdown.toggle(); break
-    case 4: officeEndDropdown.toggle(); break
-    case 5: idleDetectionRow.clicked(); break
-    case 6: fullscreenDetectionRow.clicked(); break
-    case 7: mediaDetectionRow.clicked(); break
-    case 8: microphoneDetectionRow.clicked(); break
-    case 9: dictationDetectionRow.clicked(); break
-    case 10: focusMinutesField.field.forceActiveFocus(); break
-    case 11: shortBreakField.field.forceActiveFocus(); break
-    case 12: longBreakEveryField.focusEditor(); break
-    case 13: longBreakSecondsField.focusEditor(); break
-    case 14: snoozeBudgetField.focusEditor(); break
-    case 15: maximumDelayField.focusEditor(); break
-    case 16: enforcementDropdown.toggle(); break
-    case 17: reduceMotionRow.clicked(); break
-    case 18: soundRow.clicked(); break
-    case 19: soundVolumeField.focusEditor(); break
-    case 20: startSoundRow.clicked(); break
-    case 21: completionSoundRow.clicked(); break
-    case 22: outputModeDropdown.toggle(); break
-    case 23: displayModeDropdown.toggle(); break
-    case 24: keyboardHintRow.clicked(); break
-    }
-  }
-  function ensureOptionsCursorVisible(item) {
-    if (!item || !panelScroll || !panelScroll.contentItem) return
-    var flick = panelScroll.contentItem
-    if (flick.contentY === undefined) return
-    var point = item.mapToItem(flick.contentItem || flick, 0, 0)
-    var margin = Style.space(6)
-    if (point.y < flick.contentY + margin)
-      flick.contentY = Math.max(0, point.y - margin)
-    else if (point.y + item.height > flick.contentY + flick.height - margin)
-      flick.contentY = Math.min(Math.max(0, flick.contentHeight - flick.height),
-        point.y + item.height + margin - flick.height)
-  }
   onSettingsChanged: syncSettings()
   onServiceChanged: syncSettings()
   onPageChanged: if (opened) Qt.callLater(function() {
-    if (root.page === "options") settingsTabs.forceActiveFocus()
+    if (root.page === "options") settingsPage.focusInitial()
     else neutralFocus.forceActiveFocus()
   })
   onOpenedChanged: if (opened) {
     page = "now"
-    settingsTab = "general"
-    optionsCursorActive = false
-    optionsCursorIndex = 0
+    settingsPage.reset()
   }
 
   KeyboardPanel {
@@ -206,10 +105,10 @@ Panel {
     owner: root.hostWidget || root
     bar: root.bar
     open: root.opened
-    // The control surface belongs spatially to the eye button. Warning and
+    // The control surface belongs spatially to the bed button. Warning and
     // break surfaces are separate and intentionally centered by Overlay.qml.
     centerOnBar: false
-    focusTarget: root.page === "options" ? settingsTabs : neutralFocus
+    focusTarget: root.page === "options" ? settingsPage.initialFocusTarget : neutralFocus
     contentWidth: popup.fittedContentWidth(Style.space(root.page === "options" ? 440 : 260))
     contentHeight: popup.fittedContentHeight(content.implicitHeight)
 
@@ -227,10 +126,10 @@ Panel {
       Shortcut { sequence: root.shortcuts.history; context: Qt.WindowShortcut; enabled: root.shortcutsActive; onActivated: root.togglePage("stats") }
       Shortcut { sequence: root.shortcuts.options; context: Qt.WindowShortcut; enabled: root.shortcutsActive; onActivated: root.togglePage("options") }
       Shortcut { sequence: root.shortcuts.edit; context: Qt.WindowShortcut; enabled: root.shortcutsActive && root.page === "options"; onActivated: { root.close(); settingsEditor.running = true } }
-      Shortcut { sequence: root.shortcuts.generalTab; context: Qt.WindowShortcut; enabled: root.shortcutsActive && root.page === "options"; onActivated: root.settingsTab = "general" }
-      Shortcut { sequence: root.shortcuts.breaksTab; context: Qt.WindowShortcut; enabled: root.shortcutsActive && root.page === "options"; onActivated: root.settingsTab = "breaks" }
-      Shortcut { sequence: root.shortcuts.contextTab; context: Qt.WindowShortcut; enabled: root.shortcutsActive && root.page === "options"; onActivated: root.settingsTab = "context" }
-      Shortcut { sequence: root.shortcuts.experienceTab; context: Qt.WindowShortcut; enabled: root.shortcutsActive && root.page === "options"; onActivated: root.settingsTab = "experience" }
+      Shortcut { sequence: root.shortcuts.generalTab; context: Qt.WindowShortcut; enabled: root.shortcutsActive && root.page === "options"; onActivated: settingsPage.settingsTab = "general" }
+      Shortcut { sequence: root.shortcuts.breaksTab; context: Qt.WindowShortcut; enabled: root.shortcutsActive && root.page === "options"; onActivated: settingsPage.settingsTab = "breaks" }
+      Shortcut { sequence: root.shortcuts.contextTab; context: Qt.WindowShortcut; enabled: root.shortcutsActive && root.page === "options"; onActivated: settingsPage.settingsTab = "context" }
+      Shortcut { sequence: root.shortcuts.experienceTab; context: Qt.WindowShortcut; enabled: root.shortcutsActive && root.page === "options"; onActivated: settingsPage.settingsTab = "experience" }
       Shortcut {
         sequence: root.shortcuts.close
         context: Qt.WindowShortcut
@@ -252,7 +151,7 @@ Panel {
       Keys.onPressed: function(event) {
         if (event.key === Qt.Key_Down || event.text === "j") {
           if (root.page === "now") breakNowButton.forceActiveFocus()
-          else if (root.page === "options") settingsTabs.forceActiveFocus()
+          else if (root.page === "options") settingsPage.focusInitial()
           else shortcutsButton.forceActiveFocus()
           event.accepted = true
         } else if (event.key === Qt.Key_Right || event.text === "l") {
@@ -270,16 +169,16 @@ Panel {
       blocked: root.page !== "options"
         || root.numberEditorActive
         || root.dropdownOpen
-        || settingsTabs.activeFocus
+        || settingsPage.initialFocusTarget.activeFocus
         || shortcutsButton.activeFocus
         || statsButton.activeFocus
         || settingsButton.activeFocus
       onMoveRequested: function(dx, dy) {
-        if (dy !== 0) root.moveOptionsCursor(dy)
+        if (dy !== 0) settingsPage.moveCursor(dy)
       }
-      onActivateRequested: root.activateOptionsCursor()
+      onActivateRequested: settingsPage.activateCursor()
       onCloseRequested: root.close()
-      onTabRequested: function(direction) { root.moveOptionsCursor(direction) }
+      onTabRequested: function(direction) { settingsPage.moveCursor(direction) }
 
       Item {
         id: optionsFocus
@@ -334,7 +233,7 @@ Panel {
             : (root.page === "options" ? editSettingsButton
               : (root.delayActionsEnabled ? postpone15Button : breakNowButton))
           KeyNavigation.right: statsButton
-          KeyNavigation.down: root.page === "options" ? settingsTabs
+          KeyNavigation.down: root.page === "options" ? settingsPage.initialFocusTarget
             : (root.page === "now" ? breakNowButton : shortcutsButton)
           Keys.onEscapePressed: root.dismissHintsOrClose()
           Accessible.role: Accessible.Button
@@ -371,7 +270,7 @@ Panel {
             KeyNavigation.backtab: shortcutsButton
             KeyNavigation.left: shortcutsButton
             KeyNavigation.right: settingsButton
-            KeyNavigation.down: root.page === "options" ? settingsTabs
+            KeyNavigation.down: root.page === "options" ? settingsPage.initialFocusTarget
               : (root.page === "now" ? breakNowButton : statsButton)
             Keys.onEscapePressed: root.dismissHintsOrClose()
             Accessible.role: Accessible.Button
@@ -400,11 +299,11 @@ Panel {
             accent: root.accent
             iconSize: Style.font.icon
             KeyNavigation.tab: root.page === "stats" ? shortcutsButton
-              : (root.page === "options" ? settingsTabs : breakNowButton)
+              : (root.page === "options" ? settingsPage.initialFocusTarget : breakNowButton)
             KeyNavigation.backtab: statsButton
             KeyNavigation.left: statsButton
             KeyNavigation.right: shortcutsButton
-            KeyNavigation.down: root.page === "options" ? settingsTabs
+            KeyNavigation.down: root.page === "options" ? settingsPage.initialFocusTarget
               : (root.page === "now" ? breakNowButton : settingsButton)
             Keys.onEscapePressed: root.dismissHintsOrClose()
             Accessible.role: Accessible.Button
@@ -434,7 +333,7 @@ Panel {
             Layout.bottomMargin: Style.space(3)
             Accessible.ignored: true
 
-            BreakIcon {
+            BedIcon {
               anchors.fill: parent
               color: root.accent
             }
@@ -565,611 +464,31 @@ Panel {
           }
         }
 
-        ColumnLayout {
-          Layout.fillWidth: true
-          Layout.topMargin: Style.space(8)
+        SettingsPage {
+          id: settingsPage
           visible: root.page === "options"
-          spacing: Style.space(10)
-
-          LookUi.SettingsTabBar {
-            id: settingsTabs
-            Layout.alignment: Qt.AlignHCenter
-            Layout.topMargin: toolbarSurface.height + Style.space(8)
-            options: [
-              { value: "general", label: qsTr("General"), key: Model.panelShortcutLabel(root.shortcuts.generalTab) },
-              { value: "breaks", label: qsTr("Breaks"), key: Model.panelShortcutLabel(root.shortcuts.breaksTab) },
-              { value: "context", label: qsTr("Context"), key: Model.panelShortcutLabel(root.shortcuts.contextTab) },
-              { value: "experience", label: qsTr("Experience"), key: Model.panelShortcutLabel(root.shortcuts.experienceTab) }
-            ]
-            value: root.settingsTab
-            hintsVisible: root.keyboardHintsVisible
-            foreground: root.foreground
-            background: Color.popups.background
-            accent: root.accent
-            fontFamily: root.fontFamily
-            fontSize: Style.font.bodySmall
-            KeyNavigation.tab: root.settingsTab === "general" ? pauseBreaksButton
-              : root.settingsTab === "context" ? idleDetectionRow
-              : root.settingsTab === "breaks" ? focusMinutesField.field
-              : reduceMotionRow
-            Keys.onEscapePressed: root.dismissHintsOrClose()
-            onDownRequested: {
-              optionsFocus.forceActiveFocus()
-              root.setOptionsCursor(root.optionsTabStart())
-            }
-            onUpRequested: settingsButton.forceActiveFocus()
-            onChanged: function(next) {
-              root.settingsTab = next
-              root.optionsCursorActive = false
-              panelScroll.contentItem.contentY = 0
-            }
+          active: root.opened && visible
+          service: root.service
+          settings: root.settings
+          shortcuts: root.shortcuts
+          keyboardHintsVisible: root.keyboardHintsVisible
+          manuallyPaused: root.manuallyPaused
+          foreground: root.foreground
+          muted: root.muted
+          accent: root.accent
+          fontFamily: root.fontFamily
+          focusProxy: optionsFocus
+          settingsButtonTarget: settingsButton
+          shortcutsButtonTarget: shortcutsButton
+          scrollFlickable: panelScroll.contentItem
+          topInset: toolbarSurface.height
+          onPersistRequested: function(values) { root.persistSettings(values) }
+          onPauseRequested: root.toggleManualPause()
+          onEditRequested: {
+            root.close()
+            settingsEditor.running = true
           }
-
-          ColumnLayout {
-            Layout.fillWidth: true
-            spacing: Style.space(10)
-            visible: root.settingsTab === "general"
-
-          LookUi.SectionHeader {
-            Layout.fillWidth: true
-            label: qsTr("App controls")
-            foreground: root.muted
-            fontFamily: root.fontFamily
-          }
-
-          LookUi.ToggleSettingRow {
-            id: pauseBreaksButton
-            Layout.fillWidth: true
-            label: qsTr("Break reminders")
-            description: qsTr("Temporarily pause break reminders")
-            checked: !!root.service && !root.manuallyPaused
-            enabled: !!root.service && Model.canTogglePause(root.service.phase)
-            foreground: root.foreground
-            muted: root.muted
-            accent: root.accent
-            fontFamily: root.fontFamily
-            hasCursor: root.optionsCursorActive && root.optionsCursorIndex === 0
-            onHovered: function(on) { if (on) root.setOptionsCursor(0) }
-            KeyNavigation.tab: editSettingsButton
-            Keys.onEscapePressed: root.dismissHintsOrClose()
-            onClicked: root.toggleManualPause()
-
-            LookUi.KeyHintBadge {
-              visible: root.keyboardHintsVisible
-              keyText: Model.panelShortcutLabel(root.shortcuts.pause)
-              available: pauseBreaksButton.enabled
-              x: parent.width - width
-              y: -height / 2
-            }
-          }
-
-          PanelSeparator { Layout.fillWidth: true; foreground: root.foreground }
-
-          Item {
-            Layout.fillWidth: true
-            Layout.preferredHeight: Math.max(editSettingsLabels.implicitHeight, editSettingsButton.implicitHeight)
-
-            Column {
-              id: editSettingsLabels
-              anchors.left: parent.left
-              anchors.right: editSettingsButton.left
-              anchors.rightMargin: Style.space(12)
-              anchors.verticalCenter: parent.verticalCenter
-              spacing: Style.space(2)
-              Text { width: parent.width; text: qsTr("Omarchy configuration"); color: root.foreground; font.family: root.fontFamily; font.pixelSize: Style.font.body; font.weight: Font.DemiBold; elide: Text.ElideRight }
-              Text { width: parent.width; text: qsTr("Open the Omarchy Shell configuration file"); color: root.muted; font.family: root.fontFamily; font.pixelSize: Style.font.bodySmall; wrapMode: Text.WordWrap }
-            }
-
-            LookUi.WeightedButton {
-              id: editSettingsButton
-              anchors.right: parent.right
-              anchors.verticalCenter: parent.verticalCenter
-              label: qsTr("Open file")
-              labelWeight: Font.DemiBold
-              bordered: true
-              focusable: true
-              foreground: root.foreground
-              accent: root.accent
-              fontFamily: root.fontFamily
-              hasCursor: root.optionsCursorActive && root.optionsCursorIndex === 1
-              onHovered: function(on) { if (on) root.setOptionsCursor(1) }
-              KeyNavigation.backtab: pauseBreaksButton
-              Keys.onEscapePressed: root.dismissHintsOrClose()
-              Accessible.role: Accessible.Button
-              Accessible.name: qsTr("Open Omarchy Shell configuration file")
-              Accessible.onPressAction: clicked()
-              onClicked: {
-                root.close()
-                settingsEditor.running = true
-              }
-
-            }
-
-            LookUi.KeyHintBadge {
-              visible: root.keyboardHintsVisible
-              keyText: Model.panelShortcutLabel(root.shortcuts.edit)
-              x: parent.width - width
-              y: editSettingsButton.y - height / 2
-            }
-          }
-
-          }
-
-          ColumnLayout {
-            Layout.fillWidth: true
-            spacing: Style.space(10)
-            visible: root.settingsTab === "general"
-
-          LookUi.SectionHeader {
-            Layout.fillWidth: true
-            Layout.topMargin: Style.space(8)
-            label: qsTr("Office hours")
-            foreground: root.muted
-            fontFamily: root.fontFamily
-          }
-
-          LookUi.ToggleSettingRow {
-            id: officeHoursRow
-            Layout.fillWidth: true
-            label: qsTr("Use office hours")
-            description: qsTr("Show break reminders only during these hours")
-            checked: root.settings && root.settings.officeHoursEnabled === true
-            foreground: root.foreground; accent: root.accent; fontFamily: root.fontFamily
-            hasCursor: root.optionsCursorActive && root.optionsCursorIndex === 2
-            onHovered: function(on) { if (on) root.setOptionsCursor(2) }
-            onClicked: root.persistSettings({ officeHoursEnabled: !checked })
-          }
-
-          PanelSeparator { Layout.fillWidth: true; foreground: root.foreground }
-
-          LookUi.DropdownSettingRow {
-            id: officeStartDropdown
-            Layout.fillWidth: true
-            label: qsTr("Starts")
-            description: qsTr("Beginning of the active schedule")
-            value: root.settings && root.settings.officeStart !== undefined ? String(root.settings.officeStart) : "08:00"
-            options: root.clockOptions()
-            hasCursor: root.optionsCursorActive && root.optionsCursorIndex === 3
-            foreground: root.foreground; muted: root.muted; accent: root.accent; fontFamily: root.fontFamily
-            onHovered: function(on) { if (on) root.setOptionsCursor(3) }
-            onPopupClosed: if (root.opened && root.page === "options") Qt.callLater(function() { optionsFocus.forceActiveFocus() })
-            onChanged: function(next) { root.persistSettings({ officeStart: next }) }
-          }
-
-          PanelSeparator { Layout.fillWidth: true; foreground: root.foreground }
-
-          LookUi.DropdownSettingRow {
-            id: officeEndDropdown
-            Layout.fillWidth: true
-            label: qsTr("Ends")
-            description: qsTr("End of the active schedule; overnight is supported")
-            value: root.settings && root.settings.officeEnd !== undefined ? String(root.settings.officeEnd) : "18:00"
-            options: root.clockOptions()
-            hasCursor: root.optionsCursorActive && root.optionsCursorIndex === 4
-            foreground: root.foreground; muted: root.muted; accent: root.accent; fontFamily: root.fontFamily
-            onHovered: function(on) { if (on) root.setOptionsCursor(4) }
-            onPopupClosed: if (root.opened && root.page === "options") Qt.callLater(function() { optionsFocus.forceActiveFocus() })
-            onChanged: function(next) { root.persistSettings({ officeEnd: next }) }
-          }
-
-          }
-
-          ColumnLayout {
-            Layout.fillWidth: true
-            spacing: Style.space(10)
-            visible: root.settingsTab === "context"
-
-          LookUi.SectionHeader {
-            Layout.fillWidth: true
-            Layout.topMargin: Style.space(8)
-            label: qsTr("Smart context")
-            foreground: root.muted
-            fontFamily: root.fontFamily
-          }
-
-          LookUi.ToggleSettingRow {
-            id: idleDetectionRow
-            Layout.fillWidth: true
-            label: qsTr("Pause while idle")
-            description: qsTr("Count active screen time instead of time away")
-            checked: !root.settings || root.settings.idleDetection === undefined || root.settings.idleDetection === true
-            foreground: root.foreground; accent: root.accent; fontFamily: root.fontFamily
-            hasCursor: root.optionsCursorActive && root.optionsCursorIndex === 5
-            onHovered: function(on) { if (on) root.setOptionsCursor(5) }
-            onClicked: root.persistSettings({ idleDetection: !checked })
-          }
-          PanelSeparator { Layout.fillWidth: true; foreground: root.foreground }
-          LookUi.ToggleSettingRow {
-            id: fullscreenDetectionRow
-            Layout.fillWidth: true
-            label: qsTr("Protect fullscreen work")
-            description: qsTr("Delay a due break while fullscreen")
-            checked: !root.settings || root.settings.fullscreenDetection === undefined || root.settings.fullscreenDetection === true
-            foreground: root.foreground; accent: root.accent; fontFamily: root.fontFamily
-            hasCursor: root.optionsCursorActive && root.optionsCursorIndex === 6
-            onHovered: function(on) { if (on) root.setOptionsCursor(6) }
-            onClicked: root.persistSettings({ fullscreenDetection: !checked })
-          }
-          PanelSeparator { Layout.fillWidth: true; foreground: root.foreground }
-          LookUi.ToggleSettingRow {
-            id: mediaDetectionRow
-            Layout.fillWidth: true
-            label: qsTr("Protect focused video")
-            description: qsTr("Delay while the focused app is playing media")
-            checked: !root.settings || root.settings.mediaDetection === undefined || root.settings.mediaDetection === true
-            foreground: root.foreground; accent: root.accent; fontFamily: root.fontFamily
-            hasCursor: root.optionsCursorActive && root.optionsCursorIndex === 7
-            onHovered: function(on) { if (on) root.setOptionsCursor(7) }
-            onClicked: root.persistSettings({ mediaDetection: !checked })
-          }
-          PanelSeparator { Layout.fillWidth: true; foreground: root.foreground }
-          LookUi.ToggleSettingRow {
-            id: microphoneDetectionRow
-            Layout.fillWidth: true
-            label: qsTr("Protect microphone use")
-            description: qsTr("Delay during calls without recording audio")
-            checked: !root.settings || root.settings.microphoneDetection === undefined || root.settings.microphoneDetection === true
-            foreground: root.foreground; accent: root.accent; fontFamily: root.fontFamily
-            hasCursor: root.optionsCursorActive && root.optionsCursorIndex === 8
-            onHovered: function(on) { if (on) root.setOptionsCursor(8) }
-            onClicked: root.persistSettings({ microphoneDetection: !checked })
-          }
-          PanelSeparator { Layout.fillWidth: true; foreground: root.foreground }
-          LookUi.ToggleSettingRow {
-            id: dictationDetectionRow
-            Layout.fillWidth: true
-            label: qsTr("Protect dictation")
-            description: qsTr("Delay while Omarchy dictation is active")
-            checked: !root.settings || root.settings.dictationDetection === undefined || root.settings.dictationDetection === true
-            foreground: root.foreground; accent: root.accent; fontFamily: root.fontFamily
-            hasCursor: root.optionsCursorActive && root.optionsCursorIndex === 9
-            onHovered: function(on) { if (on) root.setOptionsCursor(9) }
-            onClicked: root.persistSettings({ dictationDetection: !checked })
-          }
-
-          }
-
-          ColumnLayout {
-            Layout.fillWidth: true
-            spacing: Style.space(10)
-            visible: root.settingsTab === "breaks"
-
-          LookUi.SectionHeader {
-            Layout.fillWidth: true
-            Layout.topMargin: Style.space(8)
-            label: qsTr("Break schedule")
-            foreground: root.muted
-            fontFamily: root.fontFamily
-          }
-
-          Item {
-            Layout.fillWidth: true
-            Layout.preferredHeight: Math.max(focusLabels.implicitHeight, focusMinutesField.implicitHeight)
-
-            Column {
-              id: focusLabels
-              anchors.left: parent.left
-              anchors.right: focusMinutesField.left
-              anchors.rightMargin: Style.space(12)
-              anchors.verticalCenter: parent.verticalCenter
-              spacing: Style.space(2)
-              Text { width: parent.width; text: qsTr("Focus interval"); color: root.foreground; font.family: root.fontFamily; font.pixelSize: Style.font.body; font.weight: Font.DemiBold; elide: Text.ElideRight }
-              Text { width: parent.width; text: qsTr("Minutes of active screen time between breaks"); color: root.muted; font.family: root.fontFamily; font.pixelSize: Style.font.bodySmall; wrapMode: Text.WordWrap }
-            }
-
-            NumberField {
-              id: focusMinutesField
-              width: Style.space(72)
-              anchors.right: parent.right
-              anchors.verticalCenter: parent.verticalCenter
-              value: root.settings && root.settings.focusMinutes !== undefined ? Number(root.settings.focusMinutes) : 20
-              from: 1
-              to: 180
-              fieldWidth: Style.space(72)
-              foreground: root.foreground
-              accent: root.accent
-              fontFamily: root.fontFamily
-              hasCursor: root.optionsCursorActive && root.optionsCursorIndex === 10
-              onHovered: function(on) { if (on) root.setOptionsCursor(10) }
-              onModified: function(next) { root.persistSettings({ focusMinutes: next }) }
-            }
-          }
-
-          PanelSeparator { Layout.fillWidth: true; foreground: root.foreground }
-
-          Item {
-            Layout.fillWidth: true
-            Layout.preferredHeight: Math.max(shortBreakLabels.implicitHeight, shortBreakField.implicitHeight)
-
-            Column {
-              id: shortBreakLabels
-              anchors.left: parent.left
-              anchors.right: shortBreakField.left
-              anchors.rightMargin: Style.space(12)
-              anchors.verticalCenter: parent.verticalCenter
-              spacing: Style.space(2)
-              Text { width: parent.width; text: qsTr("Short break"); color: root.foreground; font.family: root.fontFamily; font.pixelSize: Style.font.body; font.weight: Font.DemiBold; elide: Text.ElideRight }
-              Text { width: parent.width; text: qsTr("Seconds for an ordinary eye break"); color: root.muted; font.family: root.fontFamily; font.pixelSize: Style.font.bodySmall; wrapMode: Text.WordWrap }
-            }
-
-            NumberField {
-              id: shortBreakField
-              width: Style.space(72)
-              anchors.right: parent.right
-              anchors.verticalCenter: parent.verticalCenter
-              value: root.settings && root.settings.breakSeconds !== undefined ? Number(root.settings.breakSeconds) : 20
-              from: 5
-              to: 600
-              stepSize: 5
-              fieldWidth: Style.space(72)
-              foreground: root.foreground
-              accent: root.accent
-              fontFamily: root.fontFamily
-              hasCursor: root.optionsCursorActive && root.optionsCursorIndex === 11
-              onHovered: function(on) { if (on) root.setOptionsCursor(11) }
-              onModified: function(next) { root.persistSettings({ breakSeconds: next }) }
-            }
-          }
-
-          PanelSeparator { Layout.fillWidth: true; foreground: root.foreground }
-
-          LookUi.NumberSettingRow {
-            id: longBreakEveryField
-            Layout.fillWidth: true
-            label: qsTr("Long-break cadence")
-            description: qsTr("Make every Nth break long; 0 disables it")
-            value: root.settings && root.settings.longBreakEvery !== undefined ? Number(root.settings.longBreakEvery) : 4
-            from: 0; to: 20
-            hasCursor: root.optionsCursorActive && root.optionsCursorIndex === 12
-            foreground: root.foreground; muted: root.muted; accent: root.accent; fontFamily: root.fontFamily
-            onHovered: function(on) { if (on) root.setOptionsCursor(12) }
-            onModified: function(next) { root.persistSettings({ longBreakEvery: next }) }
-          }
-
-          PanelSeparator { Layout.fillWidth: true; foreground: root.foreground }
-
-          LookUi.NumberSettingRow {
-            id: longBreakSecondsField
-            Layout.fillWidth: true
-            label: qsTr("Long break")
-            description: qsTr("Seconds for each long break")
-            value: root.settings && root.settings.longBreakSeconds !== undefined ? Number(root.settings.longBreakSeconds) : 180
-            from: 5; to: 3600; stepSize: 30
-            hasCursor: root.optionsCursorActive && root.optionsCursorIndex === 13
-            foreground: root.foreground; muted: root.muted; accent: root.accent; fontFamily: root.fontFamily
-            onHovered: function(on) { if (on) root.setOptionsCursor(13) }
-            onModified: function(next) { root.persistSettings({ longBreakSeconds: next }) }
-          }
-
-          PanelSeparator { Layout.fillWidth: true; foreground: root.foreground }
-
-          LookUi.NumberSettingRow {
-            id: snoozeBudgetField
-            Layout.fillWidth: true
-            label: qsTr("Snooze budget")
-            description: qsTr("Snoozes allowed during each focus cycle")
-            value: root.settings && root.settings.snoozeBudget !== undefined ? Number(root.settings.snoozeBudget) : 3
-            from: 0; to: 10
-            hasCursor: root.optionsCursorActive && root.optionsCursorIndex === 14
-            foreground: root.foreground; muted: root.muted; accent: root.accent; fontFamily: root.fontFamily
-            onHovered: function(on) { if (on) root.setOptionsCursor(14) }
-            onModified: function(next) { root.persistSettings({ snoozeBudget: next }) }
-          }
-
-          PanelSeparator { Layout.fillWidth: true; foreground: root.foreground }
-
-          LookUi.NumberSettingRow {
-            id: maximumDelayField
-            Layout.fillWidth: true
-            label: qsTr("Maximum smart delay")
-            description: qsTr("Minutes before a protected break must begin")
-            value: root.settings && root.settings.maximumDelayMinutes !== undefined ? Number(root.settings.maximumDelayMinutes) : 15
-            from: 0; to: 180; stepSize: 5
-            hasCursor: root.optionsCursorActive && root.optionsCursorIndex === 15
-            foreground: root.foreground; muted: root.muted; accent: root.accent; fontFamily: root.fontFamily
-            onHovered: function(on) { if (on) root.setOptionsCursor(15) }
-            onModified: function(next) { root.persistSettings({ maximumDelayMinutes: next }) }
-          }
-
-          PanelSeparator { Layout.fillWidth: true; foreground: root.foreground }
-
-          Item {
-            Layout.fillWidth: true
-            Layout.preferredHeight: Math.max(enforcementLabels.implicitHeight, enforcementDropdown.implicitHeight)
-
-            Column {
-              id: enforcementLabels
-              anchors.left: parent.left
-              anchors.right: enforcementDropdown.left
-              anchors.rightMargin: Style.space(12)
-              anchors.verticalCenter: parent.verticalCenter
-              spacing: Style.space(2)
-              Text { width: parent.width; text: qsTr("Break enforcement"); color: root.foreground; font.family: root.fontFamily; font.pixelSize: Style.font.body; font.weight: Font.DemiBold; elide: Text.ElideRight }
-              Text { width: parent.width; text: qsTr("Choose when an active break may be skipped"); color: root.muted; font.family: root.fontFamily; font.pixelSize: Style.font.bodySmall; wrapMode: Text.WordWrap }
-            }
-
-            Dropdown {
-              id: enforcementDropdown
-              width: Style.space(132)
-              anchors.right: parent.right
-              anchors.verticalCenter: parent.verticalCenter
-              showLabel: false
-              value: root.settings && root.settings.enforcement !== undefined ? String(root.settings.enforcement) : "balanced"
-              options: [
-                { value: "casual", label: qsTr("Casual") },
-                { value: "balanced", label: qsTr("Balanced") },
-                { value: "hardcore", label: qsTr("Hardcore") }
-              ]
-              foreground: root.foreground
-              accent: root.accent
-              fontFamily: root.fontFamily
-              hasCursor: root.optionsCursorActive && root.optionsCursorIndex === 16
-              onPopupOpenChanged: if (!popupOpen && root.opened && root.page === "options")
-                Qt.callLater(function() { optionsFocus.forceActiveFocus() })
-              onHovered: function(on) { if (on) root.setOptionsCursor(16) }
-              onChanged: function(next) { root.persistSettings({ enforcement: next }) }
-            }
-          }
-
-          }
-
-          ColumnLayout {
-            Layout.fillWidth: true
-            spacing: Style.space(10)
-            visible: root.settingsTab === "experience"
-
-          LookUi.SectionHeader {
-            Layout.fillWidth: true
-            Layout.topMargin: Style.space(8)
-            label: qsTr("Experience")
-            foreground: root.muted
-            fontFamily: root.fontFamily
-          }
-
-          LookUi.ToggleSettingRow {
-            id: reduceMotionRow
-            Layout.fillWidth: true
-            label: qsTr("Reduce motion")
-            description: qsTr("Remove movement and soft-focus reveals")
-            checked: root.settings && root.settings.reducedMotion === true
-            foreground: root.foreground
-            accent: root.accent
-            fontFamily: root.fontFamily
-            hasCursor: root.optionsCursorActive && root.optionsCursorIndex === 17
-            Accessible.role: Accessible.CheckBox
-            Accessible.name: label
-            Accessible.checked: checked
-            Accessible.onPressAction: clicked()
-            onHovered: function(on) { if (on) root.setOptionsCursor(17) }
-            KeyNavigation.tab: soundRow
-            onClicked: root.persistSettings({ reducedMotion: !checked })
-          }
-
-          PanelSeparator { Layout.fillWidth: true; foreground: root.foreground }
-
-          LookUi.ToggleSettingRow {
-            id: soundRow
-            Layout.fillWidth: true
-            label: qsTr("Play break sounds")
-            description: qsTr("Use the quiet start and completion cues")
-            checked: !root.settings || root.settings.soundEnabled === undefined || root.settings.soundEnabled === true
-            foreground: root.foreground
-            accent: root.accent
-            fontFamily: root.fontFamily
-            hasCursor: root.optionsCursorActive && root.optionsCursorIndex === 18
-            Accessible.role: Accessible.CheckBox
-            Accessible.name: label
-            Accessible.checked: checked
-            Accessible.onPressAction: clicked()
-            onHovered: function(on) { if (on) root.setOptionsCursor(18) }
-            KeyNavigation.tab: soundVolumeField
-            KeyNavigation.backtab: reduceMotionRow
-            onClicked: root.persistSettings({ soundEnabled: !checked })
-          }
-
-          PanelSeparator { Layout.fillWidth: true; foreground: root.foreground }
-
-          LookUi.NumberSettingRow {
-            id: soundVolumeField
-            Layout.fillWidth: true
-            label: qsTr("Sound volume")
-            description: qsTr("Volume for LookElsewhere break cues")
-            value: root.settings && root.settings.soundVolume !== undefined ? Number(root.settings.soundVolume) : 65
-            from: 0; to: 100; stepSize: 5
-            hasCursor: root.optionsCursorActive && root.optionsCursorIndex === 19
-            foreground: root.foreground; muted: root.muted; accent: root.accent; fontFamily: root.fontFamily
-            onHovered: function(on) { if (on) root.setOptionsCursor(19) }
-            onModified: function(next) { root.persistSettings({ soundVolume: next }) }
-          }
-
-          PanelSeparator { Layout.fillWidth: true; foreground: root.foreground }
-
-          LookUi.ToggleSettingRow {
-            id: startSoundRow
-            Layout.fillWidth: true
-            label: qsTr("Break-start sound")
-            description: qsTr("Play a cue when a break begins")
-            checked: !root.settings || root.settings.startSoundEnabled === undefined || root.settings.startSoundEnabled === true
-            foreground: root.foreground; accent: root.accent; fontFamily: root.fontFamily
-            hasCursor: root.optionsCursorActive && root.optionsCursorIndex === 20
-            onHovered: function(on) { if (on) root.setOptionsCursor(20) }
-            onClicked: root.persistSettings({ startSoundEnabled: !checked })
-          }
-
-          PanelSeparator { Layout.fillWidth: true; foreground: root.foreground }
-
-          LookUi.ToggleSettingRow {
-            id: completionSoundRow
-            Layout.fillWidth: true
-            label: qsTr("Break-completion sound")
-            description: qsTr("Play a cue when a break finishes")
-            checked: !root.settings || root.settings.completionSoundEnabled === undefined || root.settings.completionSoundEnabled === true
-            foreground: root.foreground; accent: root.accent; fontFamily: root.fontFamily
-            hasCursor: root.optionsCursorActive && root.optionsCursorIndex === 21
-            onHovered: function(on) { if (on) root.setOptionsCursor(21) }
-            onClicked: root.persistSettings({ completionSoundEnabled: !checked })
-          }
-
-          PanelSeparator { Layout.fillWidth: true; foreground: root.foreground }
-
-          LookUi.DropdownSettingRow {
-            id: outputModeDropdown
-            Layout.fillWidth: true
-            label: qsTr("Break outputs")
-            description: qsTr("Choose where full-screen breaks appear")
-            value: root.settings && root.settings.outputMode !== undefined ? String(root.settings.outputMode) : "all"
-            options: [{ value: "all", label: qsTr("All displays") }, { value: "focused", label: qsTr("Focused display") }]
-            hasCursor: root.optionsCursorActive && root.optionsCursorIndex === 22
-            foreground: root.foreground; muted: root.muted; accent: root.accent; fontFamily: root.fontFamily
-            onHovered: function(on) { if (on) root.setOptionsCursor(22) }
-            onPopupClosed: if (root.opened && root.page === "options") Qt.callLater(function() { optionsFocus.forceActiveFocus() })
-            onChanged: function(next) { root.persistSettings({ outputMode: next }) }
-          }
-
-          PanelSeparator { Layout.fillWidth: true; foreground: root.foreground }
-
-          LookUi.DropdownSettingRow {
-            id: displayModeDropdown
-            Layout.fillWidth: true
-            label: qsTr("Bar display")
-            description: qsTr("Choose what LookElsewhere shows in the bar")
-            value: root.settings && root.settings.displayMode !== undefined ? String(root.settings.displayMode) : "icon-and-time"
-            options: [
-              { value: "icon-and-time", label: qsTr("Icon and time") },
-              { value: "icon", label: qsTr("Icon only") },
-              { value: "time", label: qsTr("Time only") }
-            ]
-            hasCursor: root.optionsCursorActive && root.optionsCursorIndex === 23
-            foreground: root.foreground; muted: root.muted; accent: root.accent; fontFamily: root.fontFamily
-            onHovered: function(on) { if (on) root.setOptionsCursor(23) }
-            onPopupClosed: if (root.opened && root.page === "options") Qt.callLater(function() { optionsFocus.forceActiveFocus() })
-            onChanged: function(next) { root.persistSettings({ displayMode: next }) }
-          }
-
-          PanelSeparator { Layout.fillWidth: true; foreground: root.foreground }
-
-          LookUi.ToggleSettingRow {
-            id: keyboardHintRow
-            Layout.fillWidth: true
-            label: qsTr("Show keyboard hints")
-            description: qsTr("Show action keys whenever the panel opens")
-            checked: root.settings && root.settings.showKeyboardHints === true
-            foreground: root.foreground
-            accent: root.accent
-            fontFamily: root.fontFamily
-            hasCursor: root.optionsCursorActive && root.optionsCursorIndex === 24
-            Accessible.role: Accessible.CheckBox
-            Accessible.name: label
-            Accessible.checked: checked
-            Accessible.onPressAction: clicked()
-            onHovered: function(on) { if (on) root.setOptionsCursor(24) }
-            KeyNavigation.tab: shortcutsButton
-            KeyNavigation.backtab: soundRow
-            onClicked: root.persistSettings({ showKeyboardHints: !checked })
-          }
-
-          }
-
+          onCloseRequested: root.close()
         }
 
         Text {

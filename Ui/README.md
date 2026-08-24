@@ -16,6 +16,11 @@ It exists to add Space-key selection and should return to `qs.Ui.Dropdown`
 when that behavior is available upstream. The remaining components are
 LookElsewhere-owned compositions extracted from the working plugin.
 
+Setting controls share two small contracts: `SettingLabels` owns their common
+title/subtitle treatment, and `activate()` performs the control's keyboard
+action. `SettingsPage.qml` can therefore navigate one ordered list without
+knowing whether a target is a toggle, dropdown, number editor, or button.
+
 Product-specific surfaces and visuals stay at the repository root. A control
 belongs here only after LookElsewhere already uses it and owns its interaction
 contract.

@@ -11,18 +11,24 @@ break visuals remain outside it. See `Ui/README.md` for the ownership boundary.
 Omarchy Shell / Quickshell process
 └── LookElsewhere plugin
     ├── Service.qml
-    │   ├── authoritative timestamps and state transitions
+    │   ├── runtime observation and pure-model transition adapter
     │   ├── persistence/recovery adapter
     │   ├── idle/fullscreen/media/microphone/dictation evidence
     │   └── IPC and deterministic demo fixtures
     ├── BarWidget.qml
     │   └── bar presentation + quick-panel loader
     ├── Panel.qml
-    │   └── status, immediate actions, and summary
+    │   └── popup shell, toolbar, status, immediate actions, and summary
+    ├── SettingsPage.qml
+    │   └── settings tabs, scrolling, persistence signals, and keyboard navigation
+    ├── Ui/
+    │   └── reusable themed controls and shared setting-row contracts
     ├── Overlay.qml
     │   └── top-center warning, final chip, and per-output break presentation
     ├── Model.js
     │   └── pure transitions, policies, formatting
+    ├── BedIcon.qml
+    │   └── shared full and compact-solid bed artwork
     └── scheduler/history JSON under XDG state
 ```
 
@@ -53,6 +59,11 @@ Omarchy Shell's `updateEntryInline()`, which rewrites the LookElsewhere entry in
 widget, `Model.configFromSettings()` rebuilds a complete normalized
 configuration from manifest defaults plus the stored overrides, and `Service`
 applies it immediately.
+
+Settings navigation is local to `SettingsPage.qml`. Each tab exposes one
+ordered target list, and every reusable setting control implements the same
+`activate()` method. This keeps visual cursor movement, hover selection, and
+keyboard activation on one source of truth instead of parallel index tables.
 
 `manifest.json` defines machine-readable defaults and field metadata.
 `CONFIGURATION.md` is the human-readable reference for every supported option.
