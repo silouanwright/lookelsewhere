@@ -15,12 +15,12 @@ omarchy plugin add https://github.com/silouanwright/lookelsewhere.git --enable
 ## Why LookElsewhere?
 
 Let's face it: many of us look at screens for most of the day, whether for
-work, entertainment, or staying close to the people we love. Extended screen
-use can contribute to digital eye strain, dry eyes, headaches, and fatigue.
+work, entertainment, or staying close to the people we love. That can mean
+digital eye strain, dry eyes, headaches, and fatigue.
 
 The [American Optometric Association](https://www.aoa.org/healthy-eyes/eye-and-vision-conditions/computer-vision-syndrome)
 recommends the 20-20-20 rule: every 20 minutes, look at something 20 feet away
-for 20 seconds. It is a simple habit, but how do you remember it? What if you
+for 20 seconds. It is a simple habit, but remembering it is not. What if you
 are in a meeting, watching a video, using dictation, or finishing something
 important? What if you need another minute without abandoning the habit?
 
@@ -38,12 +38,12 @@ rebuilt with Omarchy and Linux flair.
 
 ## Features
 
-- First-class Omarchy integration with automatic support for installed themes
+- First-class Omarchy integration that automatically follows your theme
 - A self-contained Quickshell/QML plugin, not an Electron app
-- Lightweight, responsive, and built for Hyprland and Wayland
+- Lightweight and responsive, built for Hyprland and Wayland
 - Complete keyboard-first navigation, with full pointer support too
-- Active-use scheduling that waits through typing, dictation, focused video,
-  meetings, fullscreen apps, protected apps, and away time
+- Active-use scheduling that can wait through typing, dictation, focused video,
+  meetings, full-screen apps, protected apps, and away time
 - Progressive warnings, short breaks, periodic long breaks, snoozing, office
   hours, enforcement modes, and configurable sounds
 - Private by design: no account, telemetry, screen capture, audio recording, or
@@ -69,8 +69,8 @@ shows why instead of leaving you to wonder whether the timer stopped.
 ![LookElsewhere long-break overlay](docs/assets/long-break.png)
 
 When it is time, LookElsewhere becomes a calm, theme-aware full-screen
-intermission. Short breaks can last only a few seconds. After a configurable
-number of short breaks, a longer break gives you time to walk, stretch, and
+intermission. A short break gives your eyes a moment away. After a configurable
+number of short breaks, a longer one gives you time to walk, stretch, and
 properly leave the screen.
 
 The title, guidance, duration, long-break cadence, sounds, output behavior,
@@ -87,7 +87,7 @@ LookElsewhere inherits your Omarchy theme and looks beautiful on all of them.
 
 ![LookElsewhere across six Omarchy themes](docs/assets/theme-grid.png)
 
-### Fullscreen
+### Full-screen
 
 ![LookElsewhere full-screen breaks across six Omarchy themes](docs/assets/theme-fullscreen-grid.png)
 
