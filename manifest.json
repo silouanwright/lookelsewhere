@@ -6,7 +6,7 @@
   "author": "Silouan Wright",
   "license": "MIT",
   "homepage": "https://github.com/silouanwright/lookelsewhere",
-  "description": "A context-aware break coach built for Omarchy.",
+  "description": "A thoughtful screen-break coach that knows when not to interrupt.",
   "kinds": ["service", "bar-widget", "overlay"],
   "keepLoaded": true,
   "entryPoints": {

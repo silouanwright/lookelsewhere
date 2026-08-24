@@ -5,7 +5,7 @@
 <h1 align="center">LookElsewhere</h1>
 
 <p align="center">
-  A private, context-aware break coach built natively for Omarchy.
+  A thoughtful screen-break coach that knows when not to interrupt.
 </p>
 
 <p align="center">
