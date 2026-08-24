@@ -40,14 +40,6 @@ rebuilt with Omarchy and Linux flair.
   retained window and media titles
 - Free and open source
 
-## Themes
-
-LookElsewhere inherits your Omarchy theme and looks beautiful on all of them.
-
-![LookElsewhere across six Omarchy themes](docs/assets/theme-grid.png)
-
-![LookElsewhere full-screen breaks across six Omarchy themes](docs/assets/theme-fullscreen-grid.png)
-
 ## The menubar
 
 LookElsewhere starts in the bar. At a glance, you can see how much active time
@@ -89,13 +81,25 @@ snoozing, and enforcement policy are all configurable.
 [Watch the 23-second warning-to-break demo](docs/assets/demo.mp4). It uses
 synthetic state and restores the real schedule when it finishes.
 
+## Themes
+
+LookElsewhere inherits your Omarchy theme and looks beautiful on all of them.
+
+### Panel
+
+![LookElsewhere across six Omarchy themes](docs/assets/theme-grid.png)
+
+### Fullscreen
+
+![LookElsewhere full-screen breaks across six Omarchy themes](docs/assets/theme-fullscreen-grid.png)
+
 ## Keyboard first
 
 Press `?` to reveal the relevant key directly on every action. Inspired by
 [Godspeed](https://godspeedapp.com/), these theme-aware labels help you learn to
 drive the entire panel without reaching for a pointer.
 
-![LookElsewhere keyboard shortcut hints](docs/assets/keyboard-shortcuts.png)
+![LookElsewhere keyboard-first panel navigation](docs/assets/keyboard-first.gif)
 
 The entire interface is controllable with the arrow keys. Tab and Shift+Tab
 traverse every control, Enter or Space activates it, and Escape closes the
