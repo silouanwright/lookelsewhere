@@ -2,7 +2,7 @@
 
 # LookElsewhere
 
-A private, context-aware break coach built natively for Omarchy.
+Reduce eye strain without breaking your flow.
 
 ## Why LookElsewhere?
 
@@ -179,35 +179,19 @@ in [Upstream Opportunities](docs/upstream-opportunities.md).
 - Clean foundations for other Quickshell and Wayland desktops
 
 New features should stay private, explainable, keyboard-accessible, and native
-to Omarchy. A calm break tool should not become another dashboard demanding
+to Omarchy. Helping your eyes should not require another dashboard demanding
 attention.
 
-## A note from the developer
+## About the developer
 
 I'm Silouan Wright, a lead frontend engineer who has been building software for
-over 20 years. I've used Omarchy since its first release, and building
-LookElsewhere reminded me how much I want to come back to work on something I
-genuinely love.
+over 20 years. I built LookElsewhere in close collaboration with an AI coding
+agent, combining its speed with research, product judgment, precise feedback,
+testing, and the visual refinement that turns working software into a product.
 
-I built this plugin in close collaboration with an AI coding agent. What
-interests me is not just generating code. It is directing a long-running effort
-with judgment: doing the research, making product decisions, communicating
-precise feedback, testing assumptions, and noticing the difference between
-something that technically works and something that actually feels right.
-
-The agent made me much faster, but it did not decide what good looked like. In
-roughly 14 hours of sustained work, I moved from competitive research through
-architecture, implementation, visual refinement, accessibility, documentation,
-runtime testing, and release hardening. I care as much about the state machine
-under an interface as I do about the last few pixels people experience.
-
-Working on Omarchy with agentic development has made building software exciting
-for me again. If LookElsewhere wins, the thing I would most like to win is not
-the money. It is a job building plugins and bringing more of the thoughtful
-tools people love on the Mac to Omarchy, making it easier for them to switch.
-
-If this reaches DHH or the Omarchy team, I would genuinely love to talk. I want
-to work again, and I would love for this to be the work I get to do.
+LookElsewhere represents the work I want to keep doing: building native plugins
+and bringing more of the thoughtful tools people love on the Mac to Omarchy and
+Linux. If you're working toward that future, I'd be glad to talk.
 
 ## Development
 

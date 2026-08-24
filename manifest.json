@@ -6,7 +6,7 @@
   "author": "Silouan Wright",
   "license": "MIT",
   "homepage": "https://github.com/silouanwright/lookelsewhere",
-  "description": "A thoughtful screen-break coach that knows when not to interrupt.",
+  "description": "Reduce eye strain without breaking your flow.",
   "kinds": ["service", "bar-widget", "overlay"],
   "keepLoaded": true,
   "entryPoints": {
@@ -16,7 +16,7 @@
   },
   "barWidget": {
     "displayName": "LookElsewhere",
-    "description": "Context-aware active-use breaks with native warnings and overlays.",
+    "description": "Context-aware eye breaks with native warnings and overlays.",
     "category": "Wellbeing",
     "aliases": ["break", "eyes", "20-20-20", "wellbeing"],
     "allowMultiple": false,
