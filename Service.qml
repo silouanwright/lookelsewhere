@@ -15,7 +15,10 @@ Item {
 
   property var shell: null
   readonly property string pluginId: "io.github.silouanwright.look-elsewhere"
-  readonly property string stateDir: Quickshell.env("HOME") + "/.local/state/look-elsewhere"
+  readonly property string configuredStateHome: Quickshell.env("XDG_STATE_HOME")
+  readonly property string stateHome: configuredStateHome.indexOf("/") === 0
+    ? configuredStateHome : Quickshell.env("HOME") + "/.local/state"
+  readonly property string stateDir: stateHome + "/look-elsewhere"
   readonly property string statePath: stateDir + "/state.json"
   readonly property int stateReadLimit: 64 * 1024
   readonly property string boundedReaderPath: decodeURIComponent(
@@ -376,7 +379,11 @@ Item {
       var parsed = raw ? JSON.parse(raw) : null
       if (parsed && Number(parsed.version || 0) !== 1) throw new Error("unsupported state version")
       if (parsed && !parsed.snapshot) throw new Error("state snapshot is missing")
-      if (parsed && parsed.snapshot) snapshot = parsed.snapshot
+      if (parsed && parsed.snapshot) {
+        var recovered = Model.recoverSnapshot(parsed.snapshot, Date.now())
+        if (!recovered) throw new Error("state timestamps are outside the recovery window")
+        snapshot = recovered
+      }
       // State files written before 0.1 may contain `config`. Ignore it:
       // Omarchy's shell.json entry is the sole configuration authority.
     } catch (error) {
@@ -483,9 +490,17 @@ Item {
 
   Process {
     id: ensureStateDir
-    command: ["mkdir", "-p", service.stateDir]
+    property bool timedOut: false
+    command: ["bash", "-c",
+      "set -e; [[ ! -L $1 ]]; umask 077; exec install -d -m 700 -- \"$1\"",
+      "lookelsewhere-state-dir", service.stateDir]
     onExited: function(exitCode) {
-      if (exitCode === 0) {
+      if (ensureStateDir.timedOut) {
+        ensureStateDir.timedOut = false
+        service.recoveryWarning = "Local state storage did not respond in time. Changes will not be saved."
+        service.persistenceBlocked = true
+        service.stateLoaded = true
+      } else if (exitCode === 0) {
         service.stateStorageReady = true
         stateLoader.running = true
       } else {
@@ -496,8 +511,18 @@ Item {
     }
   }
 
+  Timer {
+    interval: 5000
+    running: ensureStateDir.running
+    onTriggered: {
+      ensureStateDir.timedOut = true
+      ensureStateDir.signal(9)
+    }
+  }
+
   Process {
     id: stateLoader
+    property bool timedOut: false
     command: [service.boundedReaderPath, "--max-bytes",
       String(service.stateReadLimit), service.statePath]
     stdout: StdioCollector {
@@ -505,7 +530,10 @@ Item {
       waitForEnd: true
     }
     onExited: function(exitCode) {
-      if (exitCode === 0) {
+      if (stateLoader.timedOut) {
+        stateLoader.timedOut = false
+        service.blockStateLoad("Saved state did not respond in time. The original file has been preserved.")
+      } else if (exitCode === 0) {
         service.loadState(stateReaderOutput.text)
       } else if (exitCode === 65) {
         service.blockStateLoad("Saved state is too large to read safely. The original file has been preserved.")
@@ -514,6 +542,15 @@ Item {
       } else {
         service.blockStateLoad("Saved state could not be read safely. The original file has been preserved.")
       }
+    }
+  }
+
+  Timer {
+    interval: 5000
+    running: stateLoader.running
+    onTriggered: {
+      stateLoader.timedOut = true
+      stateLoader.signal(9)
     }
   }
 

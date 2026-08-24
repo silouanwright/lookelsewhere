@@ -12,6 +12,9 @@ var State = {
   Breaking: "breaking"
 }
 
+var ValidStates = Object.keys(State).map(function(key) { return State[key] })
+var MaximumPersistedFutureMs = 24 * 60 * 60 * 1000
+
 function clamp(value, low, high) {
   return Math.max(low, Math.min(high, Number(value)))
 }
@@ -198,31 +201,49 @@ function strongestEvidence(evidence, config) {
 function copySnapshot(snapshot) {
   var value = snapshot || defaultSnapshot(0)
   var totals = value.totals || {}
+  var state = String(value.state || State.Working)
+  if (ValidStates.indexOf(state) < 0) state = State.Working
+  function nonnegative(number) {
+    number = Number(number)
+    return isFinite(number) ? Math.max(0, number) : 0
+  }
   return {
-    version: Number(value.version || 1),
-    state: String(value.state || State.Working),
-    accumulatedActiveMs: Number(value.accumulatedActiveMs || 0),
-    stateEnteredAtMs: Number(value.stateEnteredAtMs || 0),
-    lastObservedAtMs: Number(value.lastObservedAtMs || 0),
-    dueAtMs: Number(value.dueAtMs || 0),
-    postponedUntilMs: Number(value.postponedUntilMs || 0),
-    cooldownUntilMs: Number(value.cooldownUntilMs || 0),
-    warningEndsAtMs: Number(value.warningEndsAtMs || 0),
-    breakEndsAtMs: Number(value.breakEndsAtMs || 0),
-    activeBreakDurationMs: Number(value.activeBreakDurationMs || 0),
+    version: 1,
+    state: state,
+    accumulatedActiveMs: nonnegative(value.accumulatedActiveMs),
+    stateEnteredAtMs: nonnegative(value.stateEnteredAtMs),
+    lastObservedAtMs: nonnegative(value.lastObservedAtMs),
+    dueAtMs: nonnegative(value.dueAtMs),
+    postponedUntilMs: nonnegative(value.postponedUntilMs),
+    cooldownUntilMs: nonnegative(value.cooldownUntilMs),
+    warningEndsAtMs: nonnegative(value.warningEndsAtMs),
+    breakEndsAtMs: nonnegative(value.breakEndsAtMs),
+    activeBreakDurationMs: nonnegative(value.activeBreakDurationMs),
     activeBreakIsLong: value.activeBreakIsLong === true,
-    breaksSinceLong: Math.max(0, Number(value.breaksSinceLong || 0)),
+    breaksSinceLong: nonnegative(value.breaksSinceLong),
     protectedCategory: String(value.protectedCategory || ""),
     pauseReason: String(value.pauseReason || ""),
-    snoozesUsed: Number(value.snoozesUsed || 0),
+    snoozesUsed: nonnegative(value.snoozesUsed),
     totals: {
-      prompted: Number(totals.prompted || 0),
-      completed: Number(totals.completed || 0),
-      postponed: Number(totals.postponed || 0),
-      skipped: Number(totals.skipped || 0),
-      delayed: Number(totals.delayed || 0)
+      prompted: nonnegative(totals.prompted),
+      completed: nonnegative(totals.completed),
+      postponed: nonnegative(totals.postponed),
+      skipped: nonnegative(totals.skipped),
+      delayed: nonnegative(totals.delayed)
     }
   }
+}
+
+function recoverSnapshot(snapshot, nowMs) {
+  var next = copySnapshot(snapshot)
+  var latest = Number(nowMs) + MaximumPersistedFutureMs
+  var timestamps = [
+    "stateEnteredAtMs", "lastObservedAtMs", "dueAtMs", "postponedUntilMs",
+    "cooldownUntilMs", "warningEndsAtMs", "breakEndsAtMs"
+  ]
+  for (var i = 0; i < timestamps.length; i++)
+    if (next[timestamps[i]] > latest) return null
+  return next
 }
 
 function observe(snapshot, input, config) {

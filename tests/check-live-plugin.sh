@@ -14,6 +14,13 @@ fi
 
 grep -q 'boundedReaderPath' "$plugin/Service.qml"
 grep -q 'os.O_NOFOLLOW | os.O_NONBLOCK' "$plugin/tools/bounded-read"
+grep -q 'dir_fd=directory_fd' "$plugin/tools/bounded-read"
+test "$(head -n 1 "$plugin/tools/bounded-read")" = '#!/usr/bin/python3'
+grep -q 'Model.recoverSnapshot' "$plugin/Service.qml"
+grep -q 'exec install -d -m 700' "$plugin/Service.qml"
 grep -q 'blockAllReads: true' "$plugin/Service.qml"
+
+state_home=${XDG_STATE_HOME:-$HOME/.local/state}
+test "$(stat -c %a "$state_home/look-elsewhere")" = 700
 
 echo "LookElsewhere loads and opens in the running Omarchy Shell."

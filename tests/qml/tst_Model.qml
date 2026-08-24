@@ -545,6 +545,32 @@ TestCase {
     compare(Model.stateLabel(snapshot), "Breaks paused")
   }
 
+  function test_copySnapshot_rejects_invalid_persisted_values() {
+    var snapshot = Model.copySnapshot({
+      version: 99,
+      state: "surprise",
+      accumulatedActiveMs: "1e999",
+      snoozesUsed: -4,
+      totals: { completed: "nope" }
+    })
+    compare(snapshot.version, 1)
+    compare(snapshot.state, Model.State.Working)
+    compare(snapshot.accumulatedActiveMs, 0)
+    compare(snapshot.snoozesUsed, 0)
+    compare(snapshot.totals.completed, 0)
+  }
+
+  function test_recoverSnapshot_rejects_implausible_future_deadline() {
+    var now = 1000000
+    var snapshot = Model.defaultSnapshot(now)
+    snapshot.state = Model.State.Breaking
+    snapshot.breakEndsAtMs = 1e308
+    compare(Model.recoverSnapshot(snapshot, now), null)
+
+    snapshot.breakEndsAtMs = now + 60000
+    verify(Model.recoverSnapshot(snapshot, now) !== null)
+  }
+
   function test_workingLabelMatchesPanelLanguage() {
     compare(Model.stateLabel(Model.defaultSnapshot(0)), "Break starts in")
   }

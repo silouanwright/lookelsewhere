@@ -12,6 +12,7 @@ on a particular workstation or chat history.
 - [State model](state-model.md)
 - [Experience and surfaces](experience.md)
 - [Privacy and trust](privacy.md)
+- [State I/O security review](state-io-security.md)
 - [Verification strategy](verification.md)
 - [Showcase renderer](showcase-renderer.md)
 - [Upstream opportunities](upstream-opportunities.md)

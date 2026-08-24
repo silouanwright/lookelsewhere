@@ -249,15 +249,18 @@ cannot safely ingest replaceable files or application-influenced command output
 without bounding the producer before QML receives it.
 
 **Current workaround.** LookElsewhere reads state through its reusable
-`tools/bounded-read` helper, which uses `O_NOFOLLOW | O_NONBLOCK`, verifies regular-file type and
-current-user ownership with `fstat`, and emits at most 64 KiB. `FileView`
+`tools/bounded-read` helper, which walks path components through directory
+descriptors without following symlinks, verifies regular-file type and
+current-user ownership with `fstat`, and emits at most 64 KiB. A timeout covers
+regular filesystems for which `O_NONBLOCK` provides no guarantee. `FileView`
 remains write-only. Its `hyprctl activewindow` fallback caps the JSON stream
 and uses `jq` to return only a bounded application identifier and fullscreen
 boolean.
 
-**Proposed upstream work.** Add byte-limited file reads and process collectors
-that stop or reject input at a caller-defined maximum before allocating the
-complete payload. Expose truncation as an explicit error. A typed, bounded
+**Proposed upstream work.** Add descriptor-based, byte-limited file reads and
+process collectors that stop or reject input at a caller-defined maximum before
+allocating the complete payload. Expose file-type, ownership, truncation, and
+timeout failures explicitly; support a no-symlink path-resolution policy. A typed, bounded
 Hyprland active-window service would remove this plugin's subprocess fallback
 entirely.
 
