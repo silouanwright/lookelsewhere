@@ -42,6 +42,29 @@ rebuilt with Omarchy and Linux flair.
   retained window and media titles
 - Free and open source
 
+## Install
+
+```bash
+omarchy plugin add https://github.com/silouanwright/lookelsewhere.git --enable
+```
+
+LookElsewhere requires Omarchy Quattro with Omarchy Shell. It has no installer
+hook, privileged operation, external daemon, account, or network dependency.
+
+Pause reminders from the Options page. To disable or later restore the entire
+plugin, use Omarchy's plugin manager or:
+
+```bash
+omarchy plugin disable io.github.silouanwright.look-elsewhere
+omarchy plugin enable io.github.silouanwright.look-elsewhere right
+```
+
+To remove it:
+
+```bash
+omarchy plugin remove io.github.silouanwright.look-elsewhere
+```
+
 ## The menubar
 
 LookElsewhere starts in the bar. At a glance, you can see how much active time
@@ -118,29 +141,6 @@ omarchy bar set io.github.silouanwright.look-elsewhere enforcement '"balanced"' 
 
 See [Configuration](CONFIGURATION.md) for every setting, default, accepted
 value, behavior, and a complete JSONC reference.
-
-## Install
-
-```bash
-omarchy plugin add https://github.com/silouanwright/lookelsewhere.git --enable
-```
-
-LookElsewhere requires Omarchy Quattro with Omarchy Shell. It has no installer
-hook, privileged operation, external daemon, account, or network dependency.
-
-Pause reminders from the Options page. To disable or later restore the entire
-plugin, use Omarchy's plugin manager or:
-
-```bash
-omarchy plugin disable io.github.silouanwright.look-elsewhere
-omarchy plugin enable io.github.silouanwright.look-elsewhere right
-```
-
-To remove it:
-
-```bash
-omarchy plugin remove io.github.silouanwright.look-elsewhere
-```
 
 ## Limitations
 
