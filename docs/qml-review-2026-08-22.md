@@ -63,4 +63,4 @@ The process-lifetime investigation is closed: the actual keyboard-accessible
 **Stop LookElsewhere** control was invoked in the installed shell. Its child
 process completed after the panel and plugin objects were unloaded, the plugin
 became disabled, no orphan remained, and re-enabling restored the persisted
-non-demo schedule without a Look Elsewhere error or coredump.
+non-demo schedule without a LookElsewhere error or coredump.

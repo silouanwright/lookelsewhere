@@ -5,7 +5,7 @@ imported as `LookUi.*`. The module composes Omarchy primitives rather than
 forking the shell design system; product-specific scheduling, overlays, and
 break visuals remain outside it. See `Ui/README.md` for the ownership boundary.
 
-## Competition architecture
+## Current architecture
 
 ```text
 Omarchy Shell / Quickshell process
@@ -32,7 +32,9 @@ Omarchy Shell / Quickshell process
     └── scheduler/history JSON under XDG state
 ```
 
-The competition release is self-contained to preserve one-command installation. Durable state is timestamp-based so the plugin can rehydrate after Quickshell reloads instead of trusting in-memory countdown values.
+The plugin is self-contained to preserve one-command installation. Durable
+state is timestamp-based so it can rehydrate after Quickshell reloads instead
+of trusting in-memory countdown values.
 
 ## Future extraction boundary
 
@@ -40,13 +42,11 @@ If reliability, history volume, cross-shell support, or scheduling complexity ou
 
 ## Plugin contract
 
-Provisional manifest kinds:
-
 - `service` for resident scheduling/context observation
 - `bar-widget` for the bar and nested quick panel
-- `overlay` only if a separately summoned/loaded entry point is required by the final runtime design
+- `overlay` for warnings and full-screen break presentation
 
-The prototype must validate whether the overlay is best owned by the resident service or declared independently. The manifest must describe actual loading behavior, not conceptual surfaces.
+These are the three kinds declared by `manifest.json`.
 
 ## Data paths
 

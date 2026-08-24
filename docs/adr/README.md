@@ -16,6 +16,7 @@ ADRs use `Accepted`, `Proposed`, or `Superseded` status. Accepted decisions gove
 | [0010](0010-dedicated-settings-surface.md) | Keep deep settings out of the bar popup | Superseded by 0013 |
 | [0011](0011-deterministic-demo-and-fixtures.md) | Make every state deterministically stageable | Accepted |
 | [0012](0012-public-plugin-packaging.md) | Package as a public, dependency-light marketplace plugin | Accepted |
-| [0013](0013-config-first-competition-mvp.md) | Use manifest-backed configuration for the competition MVP | Accepted |
+| [0013](0013-config-first-competition-mvp.md) | Use manifest-backed configuration for the competition MVP | Superseded by 0016 |
 | [0014](0014-wayland-natural-pause-gate.md) | Gate due breaks on a short Wayland input pause | Accepted |
 | [0015](0015-explicit-protected-applications.md) | Protect explicitly configured applications | Accepted |
+| [0016](0016-integrated-manifest-backed-settings.md) | Add integrated manifest-backed settings pages | Accepted |

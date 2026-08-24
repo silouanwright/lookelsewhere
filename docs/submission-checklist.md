@@ -1,4 +1,8 @@
-# Final Submission Checklist
+# Competition Submission Checklist
+
+Historical release record from 2026-08-24. The repository and marketplace
+issue now supersede unchecked pre-submission items below; do not use this file
+as the current marketplace status.
 
 Run this checklist against one exact commit. If the commit changes after any
 release gate, repeat the affected checks before publication or marketplace

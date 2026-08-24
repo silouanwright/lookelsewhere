@@ -48,7 +48,7 @@ rebuilt with Omarchy and Linux flair.
   hours, enforcement modes, and configurable sounds
 - Private by design: no account, telemetry, screen capture, audio recording, or
   retained window and media titles
-- Free and open source; comparable Mac apps charge about $15 per year
+- Free and open source; [LookAway charges $14.99 per year](https://apps.apple.com/us/app/lookaway-break-reminder/id6747192301)
 
 ## The menubar
 
@@ -115,9 +115,11 @@ o.bind("SUPER + ALT + L", "LookElsewhere", "omarchy-shell look-elsewhere-panel t
 
 ## Configuration
 
-LookElsewhere follows Omarchy's config-first convention. The plugin manifest
-defines and validates every setting, while Omarchy stores your choices in its
-own configuration file.
+Open the gear in the plugin panel for categorized General, Breaks, Context, and
+Experience settings. Changes are saved directly to Omarchy's configuration;
+LookElsewhere does not maintain a second settings file.
+
+For scripting or direct configuration, use Omarchy's CLI:
 
 ```bash
 omarchy bar set io.github.silouanwright.look-elsewhere focusMinutes 25 --json
@@ -150,7 +152,7 @@ in [Upstream Opportunities](docs/upstream-opportunities.md).
 - Stronger meeting, screen-sharing, recording, video, and per-app signals
 - Optional glanceable break ideas and more short- and long-break routines
 - More sound choices, previews, and optional start/end hooks
-- A graphical settings experience after the config-first release
+- Deeper private statistics and trend views
 - Clean foundations for other Quickshell and Wayland desktops
 
 New features should stay private, explainable, keyboard-accessible, and native

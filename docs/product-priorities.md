@@ -29,7 +29,6 @@ This is a competition and portfolio quality plan, not a LookAway parity list. Pr
 - Additional sound packs and an in-panel sound preview.
 - Automatic lock on break as an explicit opt-in.
 - Diagnostics export and a richer support surface.
-- Dedicated graphical settings UI restored from the archived QML prototype.
 - Optional statistics/history exploration without a manipulative score.
 - Cross-device synchronization.
 

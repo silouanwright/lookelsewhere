@@ -4,7 +4,7 @@
 
 There is room for a dedicated Omarchy/Wayland break coach, but visual polish alone is not sufficient differentiation. The product opportunity is **excellent interruption judgment, several calm recovery modalities over time, and first-class Omarchy integration**.
 
-The strongest existing product insight is that users do not reject breaks because the timer lacks features; they reject them because the reminder arrives at a bad moment, loses context, provides poor control, or feels unreliable. Look Elsewhere therefore treats timing policy, recovery behavior, and transparent context reasoning as core product design.
+The strongest existing product insight is that users do not reject breaks because the timer lacks features; they reject them because the reminder arrives at a bad moment, loses context, provides poor control, or feels unreliable. LookElsewhere therefore treats timing policy, recovery behavior, and transparent context reasoning as core product design.
 
 ## How the idea evolved
 
@@ -40,7 +40,7 @@ Products reviewed included LookAway, Sane Break, Workrave, RSIBreak, Stretchly, 
 
 ### Adversarial conclusion
 
-A generic 20-20-20 timer would not justify a new project. Look Elsewhere must demonstrate materially better interruption timing and Omarchy integration in its first release. Dashboards, themes, streaks, exercise libraries, and AI coaching are not substitutes for this core.
+A generic 20-20-20 timer would not justify a new project. LookElsewhere must demonstrate materially better interruption timing and Omarchy integration in its first release. Dashboards, themes, streaks, exercise libraries, and AI coaching are not substitutes for this core.
 
 See the preserved [competitive matrix](archive/competitive-matrix.md).
 
@@ -55,7 +55,7 @@ The reference warning uses two stages:
 1. A top-centered action card with exact countdown, reassurance, `Start now`, and several postponement choices.
 2. A smaller top-centered “Starting break in N” chip immediately before the break.
 
-This is more deliberate than a normal desktop notification and less jarring than jumping straight to fullscreen. Look Elsewhere adopts the progression but renders it with Omarchy tokens and its own information hierarchy.
+This is more deliberate than a normal desktop notification and less jarring than jumping straight to fullscreen. LookElsewhere adopts the progression but renders it with Omarchy tokens and its own information hierarchy.
 
 ### Settings clarity
 
@@ -157,7 +157,7 @@ bar state → native quick panel → top-center warning → final countdown chip
 
 - Quiet, warm, and spatially stable
 - Inherit active Omarchy typography, palette, spacing, borders, radius, and control states
-- One recognizable Look Elsewhere symbol rather than a fixed brand skin
+- One recognizable LookElsewhere symbol rather than a fixed brand skin
 - One primary action per surface
 - Hierarchy through spacing and type before nested cards
 - Stable geometry during timer ticks
@@ -227,7 +227,7 @@ This is a delivery tradeoff, not a claim that Quickshell is always the ideal dur
 
 ## Naming research
 
-`GlanceAway` was rejected after discovering an active 2026 iPhone/Mac eye-break product with that exact name. `Look Elsewhere` was selected because it describes the desired action, supports calm natural copy, and had no direct software/Omarchy collision found during the search. The team should still avoid implying affiliation with LookAway and maintain a clearly independent identity.
+`GlanceAway` was rejected after discovering an active 2026 iPhone/Mac eye-break product with that exact name. `LookElsewhere` was selected because it describes the desired action, supports calm natural copy, and had no direct software/Omarchy collision found during the search. The team should still avoid implying affiliation with LookAway and maintain a clearly independent identity.
 
 ## Remaining validation questions
 

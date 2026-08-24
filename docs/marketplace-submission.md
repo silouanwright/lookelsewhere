@@ -1,8 +1,9 @@
-# Marketplace Submission Draft
+# Marketplace Submission Record
 
-This draft follows the community marketplace submission contract verified on
-2026-08-23. Do not create the external issue until Silouan Wright has reviewed
-the exact validated commit, preview rights, and all five checklist statements.
+This document preserves the submission copy prepared on 2026-08-23. The plugin
+was submitted as
+[marketplace issue #1785](https://github.com/HANCORE-linux/omarchy-plugin-marketplace/issues/1785);
+the issue is the source of truth for its current review status.
 
 ## Proposed listing
 

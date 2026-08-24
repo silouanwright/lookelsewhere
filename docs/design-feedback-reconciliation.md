@@ -9,7 +9,7 @@ installed-runtime check are required.
 
 | Direction | Implementation evidence | Verification |
 |---|---|---|
-| Keep the panel anchored to the Look Elsewhere bar item | `BarWidget.panelLoader`, `Panel.anchorItem`, and `KeyboardPanel.centerOnBar: false` | Exercised at every bar edge |
+| Keep the panel anchored to the LookElsewhere bar item | `BarWidget.panelLoader`, `Panel.anchorItem`, and `KeyboardPanel.centerOnBar: false` | Exercised at every bar edge |
 | Offer icon, time, or icon-and-time without hover | Manifest `displayMode`; `BarWidget.showIcon/showTime` | Exercised horizontally; vertical bars intentionally use the icon |
 | Keep icon/time spacing stable as digits change | Natural-width `barContent` centered inside a content-derived `fixedWidth` | Live captures at one- and two-digit minute values |
 | Center the active underline under icon and time together | The host `WidgetButton` owns the full content-derived width | Live-verified after width correction |

@@ -1,6 +1,6 @@
 # Research Archive and Synthesis
 
-This directory preserves the discovery work that preceded Look Elsewhere so future contributors and agent sessions do not repeat it or lose the reasoning behind product decisions.
+This directory preserves the discovery work that preceded LookElsewhere so future contributors and agent sessions do not repeat it or lose the reasoning behind product decisions.
 
 ## Start here
 

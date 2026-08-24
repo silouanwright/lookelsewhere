@@ -86,7 +86,7 @@ one focused `HDMI-A-2` output at 3840×2160 with scale 2.
   advancing, then returned to working only at natural completion. The disabled
   pointer action is guarded by the same `canSkipBreak` authority. Clearing the
   fixture restored the real non-demo schedule and Hardcore configuration.
-- The shell journal contained no Look Elsewhere QML errors during the checks.
+- The shell journal contained no LookElsewhere QML errors during the checks.
 
 ## Rolling countdown continuity
 
@@ -146,7 +146,7 @@ one focused `HDMI-A-2` output at 3840×2160 with scale 2.
   retained its persisted working schedule, and produced no coredump. Future
   lifecycle staging should run with no user shell active or use a separately
   namespaced fixture ID.
-- The installed quick panel's real **Stop Look Elsewhere** action was reached
+- The installed quick panel's real **Stop LookElsewhere** action was reached
   through keyboard navigation and invoked. The plugin became disabled, its IPC
   target disappeared, and the panel-owned process left no orphan even though
   its action unloaded the owning component.
@@ -154,13 +154,13 @@ one focused `HDMI-A-2` output at 3840×2160 with scale 2.
   after `omarchy.tray`, recreated the IPC service, and loaded the preserved
   pre-demo break state. The break was then exited through the documented
   emergency action, leaving a real 20-minute working schedule with demo mode
-  off, persistence unblocked, and no Look Elsewhere error or coredump.
+  off, persistence unblocked, and no LookElsewhere error or coredump.
 
 ## Corrupt-state recovery
 
 - The running shell was stopped before the persisted snapshot was replaced
   with deliberately invalid JSON, preventing a race with the periodic writer.
-- On restart, Look Elsewhere entered a safe default working state, exposed the
+- On restart, LookElsewhere entered a safe default working state, exposed the
   recovery warning through status and the quick panel, set persistence blocked,
   logged the parse failure, and left the invalid source file unchanged.
 - The exact pre-test snapshot was restored, including accumulated focus time
@@ -174,7 +174,7 @@ one focused `HDMI-A-2` output at 3840×2160 with scale 2.
 - A transient Hyprland headless output was created while the real service was
   already in the breaking state, exercising delegate creation after the state
   transition rather than before it.
-- The new `HEADLESS-1` output immediately received one Look Elsewhere layer and
+- The new `HEADLESS-1` output immediately received one LookElsewhere layer and
   rendered the complete themed break surface; it did not become a transparent
   input-blocking window.
 - The output was removed cleanly, the original display remained active, demo

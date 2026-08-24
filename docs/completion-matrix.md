@@ -27,12 +27,9 @@ Status reflects inspected repository and installed-runtime evidence on 2026-08-2
 | Theme and bar-position QA | Implemented | Osaka Jade and Catppuccin Latte plus top/bottom/left/right were exercised live and restored; transient panel IPC lifecycle issue found and fixed |
 | Automated tests and QML review | Implemented | 53 passing model/component tests, including protected applications, focused-player matching, typing holds, protected-context bar labels, configurable shortcuts, missed-tick sequencing, long-break cadence, policy migration, Hardcore skip policy, and lead-timed sound transitions; the latest diff review found one SectionHeader sizing conflict, which was fixed and rechecked |
 | Public packaging | Implemented | Manifest, rights notices, release README, exact final-UI preview/panel/warning/long-break assets and 23-second demo, marketplace draft, clean provenance audit, isolated add/validate/remove proof, and live panel-owned disable/re-enable proof exist |
-| Competition submission | Missing | External publication and marketplace submission require final authorization |
+| Competition submission | Submitted | Public repository and [marketplace issue #1785](https://github.com/HANCORE-linux/omarchy-plugin-marketplace/issues/1785) exist; review status lives on the issue |
 
-## Immediate release sequence
+## Current status
 
-1. Re-run the complete automated, packaging, runtime-log, and artifact gates
-   against the exact distributable commit.
-2. Present that exact commit for publication approval.
-3. After approval, create the public repository, verify installation from its
-   URL, and request final approval of the marketplace issue body.
+This matrix is a release snapshot from 2026-08-22. Current marketplace review
+status lives on [issue #1785](https://github.com/HANCORE-linux/omarchy-plugin-marketplace/issues/1785).

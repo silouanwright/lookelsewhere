@@ -1,7 +1,7 @@
-# Upstream Opportunities Exposed by Look Elsewhere
+# Upstream Opportunities Exposed by LookElsewhere
 
 This document records platform boundaries encountered while building Look
-Elsewhere. It distinguishes generally useful upstream work from application
+LookElsewhere. It distinguishes generally useful upstream work from application
 heuristics, local hardware failures, and features that belong in this plugin.
 
 ## Priority summary
@@ -22,7 +22,7 @@ heuristics, local hardware failures, and features that belong in this plugin.
 | Research | Privacy-safe recent-input categories | Wayland compositors / protocol ecosystem |
 
 Priorities describe value to the wider plugin ecosystem, not requirements for
-shipping Look Elsewhere.
+shipping LookElsewhere.
 
 ## 1. Current-item audio/video types
 
@@ -32,7 +32,7 @@ audio, video, or both. `SupportedMimeTypes` describes player capabilities rather
 than the active item. Chromium exports browser media sessions without a video
 track signal.
 
-**Current workaround.** Look Elsewhere treats playback as video only when the
+**Current workaround.** LookElsewhere treats playback as video only when the
 MPRIS player's application matches the focused Hyprland application. This
 ignores background music but can misclassify a focused music player or tab.
 
@@ -64,7 +64,7 @@ other shell state, but third-party plugins lack a documented service-to-service
 contract. Each plugin must rediscover processes, PipeWire nodes, MPRIS players,
 and compositor state.
 
-**Current workaround.** Look Elsewhere owns separate Quickshell detectors and
+**Current workaround.** LookElsewhere owns separate Quickshell detectors and
 normalizes them into coarse evidence.
 
 **Proposed upstream work.** Expose a stable read-only service containing coarse
@@ -83,7 +83,7 @@ plugins.
 reliable enough for the plugin to guarantee a final state flush before shell
 replacement.
 
-**Current workaround.** Look Elsewhere checkpoints state every five seconds,
+**Current workaround.** LookElsewhere checkpoints state every five seconds,
 which bounds but does not eliminate a visible countdown rollback after restart.
 
 **Proposed upstream work.** Provide documented `aboutToReload` and
@@ -99,7 +99,7 @@ less disk activity.
 `shell.json` entry but does not merge manifest defaults before delivering the
 settings object.
 
-**Current workaround.** Look Elsewhere rebuilds configuration from defaults on
+**Current workaround.** LookElsewhere rebuilds configuration from defaults on
 every reconciliation, then applies supplied values and validation.
 
 **Proposed upstream work.** Resolve manifest defaults and validate declared
@@ -115,8 +115,9 @@ fewer stale-value bugs.
 options, defaults, and descriptions, but Omarchy does not automatically render
 that schema as a graphical settings surface.
 
-**Current workaround.** The MVP uses `omarchy bar set`; an experimental QML
-settings view remains archived rather than duplicating configuration authority.
+**Current workaround.** LookElsewhere provides its own categorized settings
+pages. They write through Omarchy's persistence API and consume the same
+manifest-backed contract, but the UI and schema mapping remain plugin-owned.
 
 **Proposed upstream work.** Render a native Omarchy settings page from the
 manifest schema, supporting booleans, numbers, enums, durations, paths,
@@ -132,7 +133,7 @@ applications or theme drift.
 **Problem.** A plugin cannot safely request an optional global Hyprland binding
 with installation consent and conflict detection.
 
-**Current workaround.** Look Elsewhere documents commands users can add
+**Current workaround.** LookElsewhere documents commands users can add
 manually. Panel-local shortcuts remain fully functional once the panel has
 focus.
 
@@ -151,7 +152,7 @@ changes. Transient panel-owned IPC handlers can remain briefly authoritative,
 and plugins must manually coordinate focus and mutual exclusion with other bar
 popouts.
 
-**Current workaround.** Look Elsewhere keeps IPC authority in the resident bar
+**Current workaround.** LookElsewhere keeps IPC authority in the resident bar
 widget, reinjects panel dependencies after reconstruction, and participates in
 the shell's current popout coordination behavior.
 
@@ -170,7 +171,7 @@ handler or focus defects.
 set. The ScreenCast portal manages sessions created by its caller and does not
 promise a global registry of other applications' sessions.
 
-**Current workaround.** Look Elsewhere combines microphone, fullscreen,
+**Current workaround.** LookElsewhere combines microphone, fullscreen,
 dictation, application, and PipeWire evidence with confidence thresholds. It
 cannot claim exact semantics.
 
@@ -191,7 +192,7 @@ and [PipeWire properties](https://pipewire.pages.freedesktop.org/pipewire/page_m
 lock flow. Shell-command indirection couples plugins to command names and makes
 completion semantics unclear.
 
-**Current workaround.** Look Elsewhere enforces Hardcore breaks inside its
+**Current workaround.** LookElsewhere enforces Hardcore breaks inside its
 layer-shell surface. Layer-shell keyboard interactivity cannot override every
 compositor or session action by design.
 
@@ -208,7 +209,7 @@ building its ALSA stream and immediately returned to `idle`. The status stream
 did not distinguish an available idle recorder from an unavailable or failed
 one.
 
-**Current workaround.** Look Elsewhere consumes `omarchy-voxtype-status` as an
+**Current workaround.** LookElsewhere consumes `omarchy-voxtype-status` as an
 idle/recording stream and reports only coarse capability. Failed audio setup
 cannot be represented accurately.
 
@@ -226,7 +227,7 @@ device failures for Voxtype itself.
 not whether that input was typing, pointing, or dragging. Ordinary clients
 correctly cannot observe global keys or pointer coordinates.
 
-**Current workaround.** During the final ten seconds, Look Elsewhere uses a
+**Current workaround.** During the final ten seconds, LookElsewhere uses a
 one-second idle monitor and labels recent keyboard-or-pointer activity as
 `Typing..`. It never reads or stores key values or coordinates.
 
@@ -241,7 +242,7 @@ privacy.
 
 ## What should not move upstream
 
-The following remain Look Elsewhere policy or optional adapters:
+The following remain LookElsewhere policy or optional adapters:
 
 - break timing, enforcement modes, snooze budgets, and wellness copy;
 - meeting-vendor and application-class databases;

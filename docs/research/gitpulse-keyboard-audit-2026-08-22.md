@@ -15,16 +15,16 @@ Reference: `AzambekDev/omarchy-gitpulse`, inspected at commit
 
 ## What should not be copied wholesale
 
-- GitPulse manually establishes focus from a `PopupCard`. Look Elsewhere
+- GitPulse manually establishes focus from a `PopupCard`. LookElsewhere
   already uses Omarchy's `KeyboardPanel`, which gives its small action surface
   a stronger native focus and dismissal foundation.
 - A visual list cursor is useful for a repository list, but would add state and
-  noise to Look Elsewhere's compact set of direct actions. Native Tab traversal
+  noise to LookElsewhere's compact set of direct actions. Native Tab traversal
   and mnemonic shortcuts are the simpler semantic fit.
 - Its monolithic panel and bespoke color treatments are not a model for this
   plugin's component boundaries or theme integration.
 
-## Decisions adopted by Look Elsewhere
+## Decisions adopted by LookElsewhere
 
 - While the quick panel is open: `B` starts a break; `1`, `2`, and `3` select
   the three snooze durations; `P` pauses or resumes; `H` and `O` open history
@@ -40,6 +40,6 @@ Reference: `AzambekDev/omarchy-gitpulse`, inspected at commit
 ## Result
 
 The useful lesson from GitPulse is the completeness of its keyboard contract,
-not its exact UI machinery. Look Elsewhere adopts direct, memorable actions and
+not its exact UI machinery. LookElsewhere adopts direct, memorable actions and
 scriptable IPC while retaining the smaller Omarchy-native architecture that
 fits an anchored wellness panel.

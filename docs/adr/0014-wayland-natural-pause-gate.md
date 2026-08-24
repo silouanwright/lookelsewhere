@@ -5,7 +5,7 @@
 
 ## Context
 
-Look Elsewhere promises to interrupt at a better moment, but protected-context
+LookElsewhere promises to interrupt at a better moment, but protected-context
 detection alone cannot distinguish the middle of an active typing burst from a
 natural transition. The previous scheduler entered its warning immediately
 when focus time became due unless a protected context or cooldown was active.

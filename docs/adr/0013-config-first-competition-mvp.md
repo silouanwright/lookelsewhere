@@ -1,6 +1,6 @@
 # ADR 0013: Use Manifest-Backed Configuration for the Competition MVP
 
-- Status: Accepted
+- Status: Superseded by ADR 0016
 - Date: 2026-08-22
 
 ## Context

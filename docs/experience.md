@@ -17,7 +17,11 @@ Surface roles remain distinct so themes can shape them independently:
 - the full-screen break consumes modal/lock roles;
 - shared controls consume Omarchy control-state tokens for normal, hover, pressed, selected, focus, border, and fill treatment.
 
-Borders use Omarchy border specifications rather than flat `Rectangle.border` styling. This preserves gradient, per-side, sharp-corner, rounded, spacing-scale, typography-scale, and user `shell.toml` overrides. Look Elsewhere may add semantic iconography and hierarchy, but it does not introduce a parallel theme system.
+Borders use Omarchy border specifications rather than flat `Rectangle.border`
+styling. This preserves gradient, per-side, sharp-corner, rounded,
+spacing-scale, typography-scale, and user `shell.toml` overrides.
+LookElsewhere may add semantic iconography and hierarchy, but it does not
+introduce a parallel theme system.
 
 ## Bar widget
 
@@ -47,7 +51,9 @@ Order:
 5. Small today summary
 6. Pause action
 
-The panel must not contain full detector thresholds, routine construction, history charts, or onboarding.
+The main panel page must not contain full detector thresholds, routine
+construction, history charts, or onboarding. Deeper controls belong on the
+categorized settings pages.
 
 ## Warning card
 
@@ -80,11 +86,17 @@ The panel must not contain full detector thresholds, routine construction, histo
 
 The overlay exits cleanly, optionally plays a soft sound, records the local outcome, and resumes the next active-use interval. It does not demand a survey or celebratory modal.
 
-## Configuration for the competition MVP
+## Settings
 
-Configuration is declared by the typed manifest schema and stored by Omarchy in `shell.json`. The README documents safe `omarchy bar set` commands for common changes. The quick panel exposes a small set of frequent settings and writes them through Omarchy's own persistence API, so it does not create a second source of truth.
+Configuration is declared by the typed manifest schema and stored by Omarchy in
+`shell.json`. The panel provides categorized General, Breaks, Context, and
+Experience pages. Changes use Omarchy's persistence API and flow back through
+the same manifest-backed configuration contract, so the graphical controls do
+not create a second source of truth.
 
-A post-MVP graphical client may organize settings into Overview, Breaks, Smart Context, Enforcement, Experience, and System/Privacy. It must consume the same manifest-backed contract rather than introduce a second source of truth.
+The README documents safe `omarchy bar set` commands for scripting and direct
+configuration. [`CONFIGURATION.md`](../CONFIGURATION.md) remains the complete
+human-facing reference.
 
 ## Copy voice
 
@@ -93,4 +105,4 @@ A post-MVP graphical client may organize settings into Overview, Breaks, Smart C
 - Prefer “Waiting until your meeting ends” over internal terminology
 - Prefer “Take break now” over vague “Start”
 - Never claim medical outcomes
-- Use “Look Elsewhere” as an instruction sparingly enough to remain meaningful
+- Use “Look elsewhere” as an instruction sparingly enough to remain meaningful

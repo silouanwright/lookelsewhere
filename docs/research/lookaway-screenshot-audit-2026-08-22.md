@@ -2,12 +2,12 @@
 
 ## Purpose and provenance
 
-This audit records the behavior visible in 15 unique LookAway screenshots supplied by Silouan Wright from his licensed Mac installation. The captures are product references, not Look Elsewhere assets or a mandate to reproduce macOS chrome. Look Elsewhere should transfer useful hierarchy and interaction ideas into Omarchy's own components, theme tokens, typography, bar anchoring, and Wayland behavior.
+This audit records the behavior visible in 15 unique LookAway screenshots supplied by Silouan Wright from his licensed Mac installation. The captures are product references, not LookElsewhere assets or a mandate to reproduce macOS chrome. LookElsewhere should transfer useful hierarchy and interaction ideas into Omarchy's own components, theme tokens, typography, bar anchoring, and Wayland behavior.
 
 The original third-party captures were reviewed locally and deliberately
 excluded from the public repository. This document preserves the resulting
 observations without redistributing LookAway's interface assets. The plugin
-preview and marketplace media use only original Look Elsewhere captures.
+preview and marketplace media use only original LookElsewhere captures.
 
 ## Transfer rule
 
@@ -15,7 +15,7 @@ Adopt information hierarchy and proven interaction patterns. Adapt them to Omarc
 
 ## Surface inventory
 
-| Capture | Visible behavior | Look Elsewhere decision |
+| Capture | Visible behavior | LookElsewhere decision |
 |---|---|---|
 | `01-menu-now.png` | Tall anchored popover; dominant countdown; Start break and +1/+5/+15 actions; three compact status facts | Adopt the countdown hierarchy, economical vertical composition, and bounded +1/+5/+15 snooze choices. Keep Omarchy buttons, policy limits, and bar anchoring. |
 | `02-menu-stats.png` | Daily screen score, date navigation, score ring and explanation | Defer. A score is gamification and does not improve the core break transition. |
@@ -35,7 +35,7 @@ Adopt information hierarchy and proven interaction patterns. Adapt them to Omarc
 
 ## Quick-panel design conclusion
 
-The old Look Elsewhere panel allocated roughly 390 theme-space units horizontally to a heading, secondary timer, progress bar, two actions, and one history line. The width added little comprehension. LookAway's menu demonstrates a stronger order:
+The old LookElsewhere panel allocated roughly 390 theme-space units horizontally to a heading, secondary timer, progress bar, two actions, and one history line. The width added little comprehension. LookAway's menu demonstrates a stronger order:
 
 1. current state;
 2. a very large time value;
@@ -43,7 +43,7 @@ The old Look Elsewhere panel allocated roughly 390 theme-space units horizontall
 4. secondary actions;
 5. compact supporting facts.
 
-Look Elsewhere adopts that order in a narrower, vertically composed anchored panel. It removes the progress bar because the explicit countdown communicates the same information more precisely and with less visual noise. The panel remains attached to the bar icon; only warnings and break surfaces are top-centered/full-screen.
+LookElsewhere adopts that order in a narrower, vertically composed anchored panel. It removes the progress bar because the explicit countdown communicates the same information more precisely and with less visual noise. The panel remains attached to the bar icon; only warnings and break surfaces are top-centered/full-screen.
 
 ## Configuration conclusion
 
