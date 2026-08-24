@@ -4,6 +4,15 @@
 
 Reduce eye strain without breaking your flow.
 
+## Install
+
+```bash
+omarchy plugin add https://github.com/silouanwright/lookelsewhere.git --enable
+```
+
+LookElsewhere requires Omarchy Quattro with Omarchy Shell. It has no installer
+hook, privileged operation, external daemon, account, or network dependency.
+
 ## Why LookElsewhere?
 
 Let's face it: many of us look at screens for most of the day, whether for
@@ -40,17 +49,7 @@ rebuilt with Omarchy and Linux flair.
   hours, enforcement modes, and configurable sounds
 - Private by design: no account, telemetry, screen capture, audio recording, or
   retained window and media titles
-- Free and open source, while comparable apps require a paid license or
-  subscription
-
-## Install
-
-```bash
-omarchy plugin add https://github.com/silouanwright/lookelsewhere.git --enable
-```
-
-LookElsewhere requires Omarchy Quattro with Omarchy Shell. It has no installer
-hook, privileged operation, external daemon, account, or network dependency.
+- Free and open source; comparable Mac apps charge about $15 per year
 
 ## The menubar
 
