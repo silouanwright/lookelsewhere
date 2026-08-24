@@ -41,6 +41,12 @@ rebuilt with Omarchy and Linux flair.
   retained window and media titles
 - Free and open source
 
+## At home in every theme
+
+LookElsewhere inherits your Omarchy theme automatically.
+
+![LookElsewhere across six Omarchy themes](docs/assets/theme-grid.png)
+
 ## The menubar
 
 LookElsewhere starts in the bar. At a glance, you can see how much active time
