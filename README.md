@@ -48,23 +48,11 @@ shows why instead of leaving you to wonder whether the timer stopped.
 
 ## The plugin panel
 
-Click the menubar item or invoke your global Omarchy shortcut to open the
-anchored panel. The countdown gently ticks away while you start a break early,
-snooze for a few minutes, see your remaining snoozes, pause scheduling, or open
-history and options.
-
-The default panel stays calm and uncluttered. Keyboard labels appear only when
-you ask for them.
-
-![LookElsewhere quick panel](docs/assets/quick-panel.png)
+<img src="docs/assets/quick-panel.png" alt="LookElsewhere quick panel" width="560">
 
 ## A gentle warning
 
-As a break approaches, LookElsewhere begins with a top-centered warning rather
-than immediately taking over your screen. You can start now or use an available
-snooze without losing your place.
-
-![LookElsewhere top-centered warning](docs/assets/progressive-warning.png)
+<img src="docs/assets/progressive-warning.png" alt="LookElsewhere top-centered warning" width="760">
 
 ## Full-screen breaks
 
