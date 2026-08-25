@@ -14,6 +14,7 @@ var State = {
 
 var ValidStates = Object.keys(State).map(function(key) { return State[key] })
 var MaximumPersistedFutureMs = 24 * 60 * 60 * 1000
+var SessionResetInactivityMs = 60 * 60 * 1000
 
 function clamp(value, low, high) {
   return Math.max(low, Math.min(high, Number(value)))
@@ -155,6 +156,7 @@ function defaultSnapshot(nowMs) {
     accumulatedActiveMs: 0,
     stateEnteredAtMs: Number(nowMs || 0),
     lastObservedAtMs: Number(nowMs || 0),
+    lastActiveAtMs: Number(nowMs || 0),
     dueAtMs: 0,
     postponedUntilMs: 0,
     cooldownUntilMs: 0,
@@ -217,6 +219,8 @@ function copySnapshot(snapshot) {
     accumulatedActiveMs: nonnegative(value.accumulatedActiveMs),
     stateEnteredAtMs: nonnegative(value.stateEnteredAtMs),
     lastObservedAtMs: nonnegative(value.lastObservedAtMs),
+    lastActiveAtMs: nonnegative(value.lastActiveAtMs === undefined
+      ? value.lastObservedAtMs : value.lastActiveAtMs),
     dueAtMs: nonnegative(value.dueAtMs),
     postponedUntilMs: nonnegative(value.postponedUntilMs),
     cooldownUntilMs: nonnegative(value.cooldownUntilMs),
@@ -242,11 +246,18 @@ function recoverSnapshot(snapshot, nowMs) {
   var next = copySnapshot(snapshot)
   var latest = Number(nowMs) + MaximumPersistedFutureMs
   var timestamps = [
-    "stateEnteredAtMs", "lastObservedAtMs", "dueAtMs", "postponedUntilMs",
+    "stateEnteredAtMs", "lastObservedAtMs", "lastActiveAtMs", "dueAtMs", "postponedUntilMs",
     "cooldownUntilMs", "warningEndsAtMs", "breakEndsAtMs"
   ]
   for (var i = 0; i < timestamps.length; i++)
     if (next[timestamps[i]] > latest) return null
+  return next
+}
+
+function resetSession(snapshot, nowMs) {
+  var previous = copySnapshot(snapshot)
+  var next = defaultSnapshot(nowMs)
+  next.totals = previous.totals
   return next
 }
 
@@ -256,7 +267,15 @@ function observe(snapshot, input, config) {
   var now = Number(input.nowMs)
   var previous = Number(next.lastObservedAtMs || now)
   var elapsed = clamp(now - previous, 0, 5 * 60 * 1000)
+  var activeNow = input.active === true && input.idle !== true
+  var manuallyPaused = next.state === State.Waiting && next.pauseReason === "manual"
+  if (activeNow && !manuallyPaused
+      && now - Number(next.lastActiveAtMs || previous) >= SessionResetInactivityMs) {
+    next = resetSession(next, now)
+    elapsed = 0
+  }
   next.lastObservedAtMs = now
+  if (activeNow) next.lastActiveAtMs = now
 
   if (!cfg.enabled) {
     next.state = State.Disabled
@@ -305,7 +324,7 @@ function observe(snapshot, input, config) {
     return next
   }
 
-  if (input.active === true && input.idle !== true) next.accumulatedActiveMs += elapsed
+  if (activeNow) next.accumulatedActiveMs += elapsed
   var remaining = Math.max(0, cfg.focusMs - next.accumulatedActiveMs)
   // The pre-break warning is part of the focus interval, not an additional
   // countdown after it. Enter it as soon as the configured warning window is

@@ -239,7 +239,7 @@ TestCase {
   function test_longSuspendDoesNotCountAsActiveUse() {
     var c = config({ focusMs: 60 * 60 * 1000 })
     var s = Model.defaultSnapshot(1000)
-    s = Model.observe(s, { nowMs: 8 * 60 * 60 * 1000, active: true, idle: false, evidence: [] }, c)
+    s = Model.observe(s, { nowMs: 30 * 60 * 1000, active: true, idle: false, evidence: [] }, c)
     // A missing observation is capped so suspend, hibernate, and clock jumps
     // cannot manufacture an entire focus session.
     compare(s.accumulatedActiveMs, 5 * 60 * 1000)
@@ -302,6 +302,43 @@ TestCase {
     s.breaksSinceLong = 3
     s = Model.startBreak(s, 1000, c)
     compare(s.activeBreakDurationMs, 5000)
+  }
+
+  function test_longInactivityStartsFreshBreakCycle() {
+    var c = config()
+    var s = Model.defaultSnapshot(1000)
+    s.accumulatedActiveMs = c.focusMs - 3 * 60 * 1000
+    s.breaksSinceLong = 3
+    s.snoozesUsed = 2
+    s.totals.completed = 7
+
+    s = Model.observe(s, {
+      nowMs: 1000 + 60 * 60 * 1000,
+      active: true,
+      idle: false,
+      evidence: []
+    }, c)
+
+    compare(s.state, Model.State.Working)
+    compare(s.accumulatedActiveMs, 0)
+    compare(s.breaksSinceLong, 0)
+    compare(s.snoozesUsed, 0)
+    compare(s.totals.completed, 7)
+  }
+
+  function test_shortInactivityPreservesBreakCycle() {
+    var c = config()
+    var s = Model.defaultSnapshot(1000)
+    s.breaksSinceLong = 2
+
+    s = Model.observe(s, {
+      nowMs: 1000 + 59 * 60 * 1000,
+      active: true,
+      idle: false,
+      evidence: []
+    }, c)
+
+    compare(s.breaksSinceLong, 2)
   }
 
   function test_restartReconcilesExpiredBreakWithoutDuplication() {

@@ -33,6 +33,9 @@ The persisted model records semantic state and timestamps. UI surfaces derive pr
 - Count time only while the user is considered actively using the desktop.
 - Idle periods do not accrue focus time.
 - A sufficiently long idle period may satisfy some or all of a pending break according to explicit thresholds.
+- Returning after one hour without active use starts a fresh work session:
+  the focus interval, long-break cadence, and snooze cycle reset while lifetime
+  statistics and an explicit manual pause remain intact.
 - Short ambiguous idle may receive partial credit or ask for classification only after the MVP if a nonannoying design is proven.
 - Protected context may continue active-use accumulation while delaying interruption.
 
