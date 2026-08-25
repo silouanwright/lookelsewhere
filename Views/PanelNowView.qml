@@ -15,6 +15,8 @@ ColumnLayout {
   property color accent: Color.accent
   property string fontFamily: Style.font.family
   property bool idlePaused: false
+  property bool manuallyPaused: false
+  readonly property bool timerPaused: idlePaused || manuallyPaused
   property bool nextBreakIsLong: false
   property int minutes: 20
   property int seconds: 0
@@ -69,7 +71,8 @@ ColumnLayout {
     Text {
       Layout.fillWidth: true
       Layout.bottomMargin: -Style.space(10)
-      text: root.idlePaused ? qsTr("LookElsewhere is paused")
+      text: root.manuallyPaused ? qsTr("Breaks paused")
+        : root.idlePaused ? qsTr("LookElsewhere is paused")
         : root.nextBreakIsLong ? qsTr("Long break starts in") : qsTr("Break starts in")
       color: root.foreground
       font.family: root.fontFamily
@@ -83,14 +86,15 @@ ColumnLayout {
       Layout.preferredWidth: Math.max(clockRow.implicitWidth, idleClock.implicitWidth)
       Layout.preferredHeight: Math.max(clockRow.implicitHeight, idleClock.implicitHeight)
       Accessible.role: Accessible.StaticText
-      Accessible.name: root.idlePaused
-        ? qsTr("Idle; focus timer paused") : qsTr("Time remaining: %1").arg(root.remainingText)
+      Accessible.name: root.manuallyPaused ? qsTr("Break reminders paused")
+        : root.idlePaused ? qsTr("Idle; focus timer paused")
+        : qsTr("Time remaining: %1").arg(root.remainingText)
 
       Row {
         id: clockRow
         anchors.centerIn: parent
         spacing: -root.clockSeparatorOverlap
-        opacity: root.idlePaused ? 0 : 1
+        opacity: root.timerPaused ? 0 : 1
         Accessible.ignored: true
 
         ProductUi.RollingNumber {
@@ -101,7 +105,7 @@ ColumnLayout {
           fontSize: Style.font.display * 1.55
           fontWeight: Font.Bold
           reducedMotion: root.reducedMotion
-          animationActive: root.animationActive && !root.idlePaused
+          animationActive: root.animationActive && !root.timerPaused
         }
 
         Text {
@@ -121,7 +125,7 @@ ColumnLayout {
           fontSize: Style.font.display * 1.55
           fontWeight: Font.Bold
           reducedMotion: root.reducedMotion
-          animationActive: root.animationActive && !root.idlePaused
+          animationActive: root.animationActive && !root.timerPaused
         }
 
         Behavior on opacity { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
@@ -130,12 +134,12 @@ ColumnLayout {
       Text {
         id: idleClock
         anchors.centerIn: parent
-        text: qsTr("Idle")
+        text: root.manuallyPaused ? qsTr("Paused") : qsTr("Idle")
         color: root.foreground
         font.family: root.fontFamily
         font.pixelSize: Style.font.display * 1.55
         font.weight: Font.Bold
-        opacity: root.idlePaused ? 1 : 0
+        opacity: root.timerPaused ? 1 : 0
         Accessible.ignored: true
 
         Behavior on opacity { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }

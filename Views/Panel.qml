@@ -336,6 +336,7 @@ Panel {
           accent: root.accent
           fontFamily: root.fontFamily
           idlePaused: root.idlePaused
+          manuallyPaused: root.manuallyPaused
           nextBreakIsLong: root.service && root.service.nextBreakIsLong
           minutes: root.remainingMinutesPart
           seconds: root.remainingSecondsPart

@@ -193,7 +193,7 @@ ColumnLayout {
     id: pauseBreaksButton
     Layout.fillWidth: true
     label: qsTr("Break reminders")
-    description: qsTr("Temporarily pause break reminders")
+    description: qsTr("Show scheduled break reminders")
     checked: !!settingsPage.service && !settingsPage.manuallyPaused
     enabled: !!settingsPage.service && Model.canTogglePause(settingsPage.service.phase)
     foreground: settingsPage.foreground
