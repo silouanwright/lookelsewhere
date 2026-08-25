@@ -7,6 +7,28 @@ the documentation and every feature-release post was reviewed. Licensing,
 installation, comparison/SEO, and general eye-health articles were inventoried
 but excluded when they did not describe application behavior.
 
+## Coverage ledger
+
+Reviewed in full for product behavior or philosophy:
+
+- Homepage, manifesto, press kit, privacy policy, documentation index, and all
+  ten non-licensing documentation pages.
+- The complete changelog through 2.4.2.
+- Every feature-release post from custom messages (1.8) through LookAway 2.4,
+  including the 1.10–1.14 and 2.0–2.4 release essays.
+- The developer essay on making reminders less annoying, the 20-20-20 guide,
+  the eye-care-product positioning essay, the micro-break routine, and the
+  break-reminder/Pomodoro distinction.
+- The public feedback board's visible roadmap summary. It is external and
+  paginated, so it is supporting demand evidence rather than a complete product
+  specification.
+
+Intentionally excluded after inventory: download/install mechanics, licensing,
+pricing, refunds, terms, Setapp distribution, competitor SEO pages, and generic
+health/ergonomics articles that add no application behavior. The press-kit ZIP
+contains marketing assets rather than additional behavior and was not treated
+as a requirements source.
+
 ## Product lesson
 
 LookAway’s strongest differentiation is accumulated interruption judgment. Many individually small rules combine to make the application tolerable over long-term use:
@@ -24,6 +46,32 @@ LookAway’s strongest differentiation is accumulated interruption judgment. Man
 - Budget snoozes by day or session.
 
 These behaviors are more important to the proposed product than recreating Liquid Glass, animated backgrounds, a numerical wellness score, or website statistics.
+
+## Product and communication principles
+
+- **Biology, not productivity theater.** A break reminder protects eyes,
+  posture, and sustainable energy; it is not a Pomodoro timer or task manager.
+- **Retention is the quality metric.** A theoretically healthy timer that gets
+  disabled after a week has failed. Correct interruption judgment matters more
+  than adding another modality.
+- **Friendly software is firm and gentle.** It adapts to cadence, protects
+  attention, explains itself, makes leaving easy, and gives control without
+  turning every reminder into a negotiation.
+- **The interface should disappear.** Quiet native surfaces, good defaults,
+  sparse notification volume, slow transitions, and soft sounds are functional
+  retention features rather than decoration.
+- **Stats should answer questions, not shame.** Prefer active time, sessions,
+  break outcomes, and policy-tuning feedback over a raw screen-time total or an
+  engagement scoreboard.
+- **Break quality matters.** A short cue can suggest looking far away, blinking
+  fully, relaxing the jaw, or moving the shoulders without becoming a library
+  of instructions that keeps the user looking at the screen.
+- **Claims should stay honest.** The exact 20-20-20 numbers are memorable rather
+  than magical; the defensible promise is regular distance focus and blinking,
+  not treatment or guaranteed prevention.
+- **Privacy can be a LookElsewhere differentiator.** LookAway's policy describes
+  opt-out anonymous Mixpanel usage analytics. LookElsewhere currently needs no
+  product telemetry and should keep local behavioral data local.
 
 ## Highest-leverage gaps for LookElsewhere
 
@@ -43,6 +91,12 @@ These behaviors are more important to the proposed product than recreating Liqui
 
 Custom backgrounds, more sounds, wellness content, mobile sync, website usage,
 and scoring remain lower leverage than these five behaviors.
+
+The public feedback board adds demand signals for customizable reminder types,
+settings sync, multi-computer timer sync, sit/stand reminders, meeting-adjacent
+breaks, and broader device support. Of these, customizable reminders fit the
+existing routine direction; synchronization and new platforms remain separate
+products and should not distort the near-term plugin.
 
 ## Public feature inventory and disposition
 
@@ -209,3 +263,12 @@ The proposed product can be stronger in several areas:
 - LookAway 2.4: https://lookaway.com/blog/2026/08/07/lookaway-24-live-activities-on-mac-and-iphone/
 - Full changelog: https://lookaway.com/changelog/
 - Sitemap coverage index: https://lookaway.com/sitemap.xml
+- Homepage: https://lookaway.com/
+- Manifesto: https://lookaway.com/manifesto/
+- Press kit page: https://lookaway.com/press-kit/
+- Privacy policy: https://lookaway.com/privacy/
+- Public feedback board: https://lookaway.userjot.com/
+- 20-20-20 guide and evidence discussion: https://lookaway.com/20-20-20-rule/
+- Micro-break routine: https://lookaway.com/blog/2025/11/12/the-9-minute-fix-for-your-eyes-focus-and-posture/
+- Break reminders versus Pomodoro: https://lookaway.com/blog/2025/11/16/break-reminders-vs-pomodoro-apps-for-mac/
+- Product-retention principles: https://lookaway.com/blog/2026/04/13/the-best-eye-care-app-for-mac-is-the-one-youll-keep-on/
