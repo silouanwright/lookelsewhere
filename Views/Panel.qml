@@ -259,6 +259,7 @@ Panel {
           OmaCommands.CommandHint {
             commandLayer: commandLayer
             keyText: CommandModel.label(root.shortcuts.hints)
+            placeRight: true
           }
         }
 
