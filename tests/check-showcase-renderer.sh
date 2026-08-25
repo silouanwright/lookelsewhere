@@ -16,9 +16,9 @@ test "$(identify -format '%w' "$output")" -gt 200
 test "$(identify -format '%h' "$output")" -gt 150
 difference=$(compare -metric AE "$output" "$pattern_output" null: 2>&1 || true)
 awk '{ exit !($1 > 0) }' <<<"$difference"
-grep -q 'PanelNowView {' "$repo/Panel.qml"
+grep -q 'PanelNowView {' "$repo/Views/Panel.qml"
 grep -q 'BreakContent {' "$repo/Overlay.qml"
-grep -q 'PanelPattern {' "$repo/Panel.qml"
+grep -q 'PanelPattern {' "$repo/Views/Panel.qml"
 grep -q 'vendor/qmlpack/oma-showcase/bin/oma-showcase' "$repo/tools/render-showcase"
 
 echo "Showcase rendering is offscreen, themed, and shared with production views."

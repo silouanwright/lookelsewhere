@@ -1,11 +1,12 @@
 {
   "schemaVersion": 1,
-  "name": "oma-ui",
+  "name": "oma-ui-kit",
   "license": "MIT",
   "files": [
     "Ui/DropdownSettingRow.qml",
     "Ui/KeyHintBadge.qml",
     "Ui/NumberSettingRow.qml",
+    "Ui/PanelPattern.qml",
     "Ui/PhosphorIconButton.qml",
     "Ui/SectionHeader.qml",
     "Ui/SettingDropdown.qml",

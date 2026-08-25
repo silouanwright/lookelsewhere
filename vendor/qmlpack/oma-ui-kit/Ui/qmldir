@@ -6,6 +6,7 @@ WeightedButton 1.0 WeightedButton.qml
 SectionHeader 1.0 SectionHeader.qml
 SettingsTabBar 1.0 SettingsTabBar.qml
 NumberSettingRow 1.0 NumberSettingRow.qml
+PanelPattern 1.0 PanelPattern.qml
 SettingLabels 1.0 SettingLabels.qml
 ToggleSettingRow 1.0 ToggleSettingRow.qml
 DropdownSettingRow 1.0 DropdownSettingRow.qml

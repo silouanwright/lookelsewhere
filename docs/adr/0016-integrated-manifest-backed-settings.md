@@ -24,8 +24,8 @@ Enter and Space activation, and Escape back-navigation.
 
 Configuration is discoverable without sacrificing scriptability or creating a
 second source of truth. The plugin owns more QML and accessibility behavior,
-which is contained in `SettingsPage.qml` and the Qmlpack-managed reusable
-controls under `vendor/qmlpack/oma-ui/Ui`.
+which is contained in `Views/SettingsPage.qml` and the Qmlpack-managed reusable
+controls under `vendor/qmlpack/oma-ui-kit/Ui`.
 
 ADR 0013 remains the record of the earlier MVP boundary and is superseded by
 this decision.

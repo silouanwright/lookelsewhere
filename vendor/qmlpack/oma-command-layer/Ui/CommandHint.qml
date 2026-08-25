@@ -1,5 +1,5 @@
 import QtQuick
-import "../../oma-ui/Ui" as OmaUi
+import "../../oma-ui-kit/Ui" as OmaUi
 
 Item {
   id: root

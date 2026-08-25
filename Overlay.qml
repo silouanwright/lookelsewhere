@@ -8,7 +8,9 @@ import Quickshell.Hyprland
 import Quickshell.Wayland
 import qs.Commons
 import qs.Ui
-import "vendor/qmlpack/oma-ui/Ui" as LookUi
+import "Ui" as ProductUi
+import "Views" as ProductViews
+import "vendor/qmlpack/oma-ui-kit/Ui" as LookUi
 
 Item {
   id: root
@@ -207,7 +209,7 @@ Item {
         enabled: root.breaking && window.authoritative
         focus: enabled
 
-        BreakContent {
+        ProductViews.BreakContent {
           x: Math.round((parent.width - width) / 2)
           y: Math.round((parent.height - implicitHeight) / 2 + window.contentOffset)
           width: Math.min(parent.width - Style.space(48), Style.space(520))
@@ -272,7 +274,7 @@ Item {
           RowLayout {
             Layout.fillWidth: true
             spacing: Style.space(12)
-            BedIcon {
+            ProductUi.BedIcon {
               Layout.preferredWidth: Style.space(38)
               Layout.preferredHeight: Layout.preferredWidth
               color: Color.accent
@@ -286,7 +288,7 @@ Item {
                 Accessible.name: qsTr("%1 minutes and %2 seconds until break")
                   .arg(root.remainingMinutesPart).arg(root.remainingSecondsPart)
 
-                RollingNumber {
+                ProductUi.RollingNumber {
                   value: root.remainingMinutesPart
                   minimumDigits: 2
                   color: Color.popups.text
@@ -306,7 +308,7 @@ Item {
                   Accessible.ignored: true
                 }
 
-                RollingNumber {
+                ProductUi.RollingNumber {
                   value: root.remainingSecondsPart
                   minimumDigits: 2
                   color: Color.popups.text
@@ -385,7 +387,7 @@ Item {
           anchors.leftMargin: Style.space(14)
           anchors.rightMargin: Style.space(14)
           spacing: Style.space(10)
-          BedIcon {
+          ProductUi.BedIcon {
             Layout.preferredWidth: Style.space(24)
             Layout.preferredHeight: Layout.preferredWidth
             color: Color.accent

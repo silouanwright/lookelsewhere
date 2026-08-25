@@ -3,8 +3,8 @@
   "profile": "omarchy",
   "dependencies": {
     "bounded-read": "github:silouanwright/omatools/packages/bounded-read@0.2.0",
-    "oma-command-layer": "github:silouanwright/omatools/packages/oma-command-layer@0.1.2",
+    "oma-command-layer": "github:silouanwright/omatools/packages/oma-command-layer@0.2.1",
     "oma-showcase": "github:silouanwright/omatools/packages/oma-showcase@0.1.0",
-    "oma-ui": "github:silouanwright/omatools/packages/oma-ui@0.2.0"
+    "oma-ui-kit": "github:silouanwright/omatools/packages/oma-ui-kit@0.1.1"
   }
 }

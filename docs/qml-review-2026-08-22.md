@@ -1,7 +1,7 @@
 # QML Code Review Report
 
 **Scope:** runtime QML and model tests at the competition MVP boundary  
-**Files reviewed:** `BarWidget.qml`, `Panel.qml`, `Overlay.qml`, `Service.qml`, rolling-number components, and QML tests
+**Files reviewed:** `BarWidget.qml`, `Views/Panel.qml`, `Overlay.qml`, `Service.qml`, rolling-number components, and QML tests
 **Method:** deterministic Qt/QML lint, system `qmllint`, and six semantic passes covering bindings, layout, lifecycle, delegates, states, and performance
 
 The competition-boundary implementation through commit `635bcb8` received a

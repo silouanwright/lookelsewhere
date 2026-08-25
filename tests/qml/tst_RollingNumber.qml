@@ -1,7 +1,7 @@
 import QtQuick
 import QtTest
 
-import "../.."
+import "../../Ui"
 
 Item {
   id: root

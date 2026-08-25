@@ -21,22 +21,22 @@
       }
     },
     "oma-command-layer": {
-      "source": "github:silouanwright/omatools/packages/oma-command-layer@0.1.2",
+      "source": "github:silouanwright/omatools/packages/oma-command-layer@0.2.1",
       "resolution": {
         "transport": "github",
         "repository_id": 1345448296,
         "repository_name": "silouanwright/omatools",
         "package_path": "packages/oma-command-layer",
-        "requested": "0.1.2",
-        "version": "0.1.2",
-        "tag": "packages/oma-command-layer/v0.1.2",
-        "commit": "e47aedec3601276381af31744748db24cedcc100"
+        "requested": "0.2.1",
+        "version": "0.2.1",
+        "tag": "packages/oma-command-layer/v0.2.1",
+        "commit": "8bedbb2d3c7cf3c301626c8142d0b0d6f39f3b4b"
       },
-      "digest": "sha256:55010c363e4bdd3f371bc70f268d6daace0b68f82954dbc4f411a6cf4022107b",
+      "digest": "sha256:99a87a8e4553d3b689b58b6e8e5c07cedbc32778bfbfeb3c2e7dfae079847fc5",
       "files": {
         "LICENSE": "sha256:0c088bc264e3ae0398a852410ed879ead024daa8806895963f83ce1fc688d317",
-        "README.md": "sha256:59d9755662f8329fdfc323bef0046d11956ceb0ecb4b6d05b5fa8d37fc62ff87",
-        "Ui/CommandHint.qml": "sha256:2b0dd029d28d4a1ec0679d12bf7c138ab212e23b42d95da11ea0b5ae0f523574",
+        "README.md": "sha256:60380aa1fe0b61eb0395ff9536c21ea3384fa406897204ad77f830b56389ea50",
+        "Ui/CommandHint.qml": "sha256:e7de67b29055717bf8aaa3fdd7ac70cbbd1e44dd4e783e0f8de35b4f2bb2ebe0",
         "Ui/CommandLayer.qml": "sha256:ba13057f84f51f01173ca8a57566ad37f0932c7e3ed6f3941324be5f8cfcd1a3",
         "Ui/CommandModel.js": "sha256:c41f1dd61f1dfe717e4666317ae16088eaa75f27145f24f34985e66aa3e1ab2f",
         "Ui/WindowCommand.qml": "sha256:f332b61c7c94d0815a51924eb4ba4e3363920db6927cc5fc7750367ad86f245e",
@@ -62,26 +62,27 @@
         "qml/Capture.qml": "sha256:6c08286c1bd80c845005471b93b1e5143aa4bc34eb16d4a7bd2c90aff5ad95bc"
       }
     },
-    "oma-ui": {
-      "source": "github:silouanwright/omatools/packages/oma-ui@0.2.0",
+    "oma-ui-kit": {
+      "source": "github:silouanwright/omatools/packages/oma-ui-kit@0.1.1",
       "resolution": {
         "transport": "github",
         "repository_id": 1345448296,
         "repository_name": "silouanwright/omatools",
-        "package_path": "packages/oma-ui",
-        "requested": "0.2.0",
-        "version": "0.2.0",
-        "tag": "packages/oma-ui/v0.2.0",
-        "commit": "d23300955bbd847a9abead2f90025a7589684f63"
+        "package_path": "packages/oma-ui-kit",
+        "requested": "0.1.1",
+        "version": "0.1.1",
+        "tag": "packages/oma-ui-kit/v0.1.1",
+        "commit": "8bedbb2d3c7cf3c301626c8142d0b0d6f39f3b4b"
       },
-      "digest": "sha256:3a0a786b81db1b2bd81983cc77b701698b72a14c33e0a14808aabdd19156490f",
+      "digest": "sha256:efcc9b2d9a58933369a81caa8ed8604b194639e3821ea65b3fbbe49328931c65",
       "files": {
         "LICENSE": "sha256:0c088bc264e3ae0398a852410ed879ead024daa8806895963f83ce1fc688d317",
-        "README.md": "sha256:92e70445da4c35deca843486f18a3c0778ba1728227fa9648663e86245066467",
+        "README.md": "sha256:850106579635c8fa9d9cad1ebc70a3e3ebb9e70668d4aec879c44c980331f072",
         "THIRD_PARTY_NOTICES.md": "sha256:4b9d048b2a51fe9e2aeb980bb084e8e4cb8fe967e6606710e52910ff00461fab",
         "Ui/DropdownSettingRow.qml": "sha256:d8eeffac4fde978873a5d2d476ef4639651f1a63d1671e35d9ed23a7f00fd82b",
         "Ui/KeyHintBadge.qml": "sha256:30b77c1eefc95ea1c1a559b2043c2c51f92968196f4eeea62bdec1c5773e435c",
         "Ui/NumberSettingRow.qml": "sha256:e250d1e7c382424b30caeaed759ff4801b3c68bdb5aa9db80dbcf5e6e21e89b2",
+        "Ui/PanelPattern.qml": "sha256:5a84f85f2d0643f48101e4b01ca9460809d4e64a5473a5015def40b41aa14574",
         "Ui/PhosphorIconButton.qml": "sha256:3d8e92e2196cafb1bb5e90c1f667c4e695e71410e23efb4c179e9a403da71668",
         "Ui/SectionHeader.qml": "sha256:859a91a9ea00444c3f211a11531ba4529e3e7f4b857404436e58d8b90e1c4f86",
         "Ui/SettingDropdown.qml": "sha256:5cb774eba063968a5819ae89426d4df2db0cdc07b39e1561b1bd6922dc6911c9",
@@ -89,7 +90,7 @@
         "Ui/SettingsTabBar.qml": "sha256:f010d884896cb7a3db09a167695af095e4cebbf5510804e1dfdfa7c88a73f43f",
         "Ui/ToggleSettingRow.qml": "sha256:bc1b03cb85526a1b357715a4937aee4876dbcee5ef6efbf53ff3f30c8ace8c11",
         "Ui/WeightedButton.qml": "sha256:778078209ca0de0511e7939b934148ea4124eaef43917aca5ff729529a1ada75",
-        "Ui/qmldir": "sha256:0297f27bf7834247e08759fa098c982a1936045d144bb0fe9ca35ee2ada593b3"
+        "Ui/qmldir": "sha256:d1879933e0ffa7e77007c73e74013e8262f394a0c21bd785a69fdf61a69375d7"
       }
     }
   }

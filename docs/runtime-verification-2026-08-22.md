@@ -121,7 +121,7 @@ one focused `HDMI-A-2` output at 3840×2160 with scale 2.
   panel, avoiding an unreadable rotated or crowded countdown.
 - The original top position was restored after the matrix.
 - Rapid bar reconstruction exposed an obsolete panel IPC handler. IPC
-  ownership was moved from transient `Panel.qml` instances to the resident
+  ownership was moved from transient `Views/Panel.qml` instances to the resident
   `BarWidget.qml`, matching current first-party plugin practice. Repeating the
   bottom/top reconstruction then opened the correct panel with no duplicate
   handler warning.

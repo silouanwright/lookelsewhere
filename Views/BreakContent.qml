@@ -2,7 +2,8 @@ import QtQuick
 import QtQuick.Layouts
 import qs.Commons
 import qs.Ui
-import "vendor/qmlpack/oma-ui/Ui" as LookUi
+import "../Ui" as ProductUi
+import "../vendor/qmlpack/oma-ui-kit/Ui" as LookUi
 
 ColumnLayout {
   id: root
@@ -27,7 +28,7 @@ ColumnLayout {
   width: Math.min(parent ? parent.width - Style.space(48) : Style.space(520), Style.space(520))
   spacing: Style.space(18)
 
-  BedIcon {
+  ProductUi.BedIcon {
     Layout.alignment: Qt.AlignHCenter
     Layout.preferredWidth: Style.space(64)
     Layout.preferredHeight: Layout.preferredWidth
@@ -84,7 +85,7 @@ ColumnLayout {
     Accessible.role: Accessible.StaticText
     Accessible.name: qsTr("%1 minutes and %2 seconds remaining").arg(root.minutes).arg(root.seconds)
 
-    RollingNumber {
+    ProductUi.RollingNumber {
       value: root.minutes
       minimumDigits: 2
       color: Color.lock.text
@@ -104,7 +105,7 @@ ColumnLayout {
       Accessible.ignored: true
     }
 
-    RollingNumber {
+    ProductUi.RollingNumber {
       value: root.seconds
       minimumDigits: 2
       color: Color.lock.text

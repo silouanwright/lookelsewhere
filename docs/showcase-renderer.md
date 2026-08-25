@@ -33,7 +33,8 @@ themes in `/usr/share/omarchy/themes`.
 tools/render-showcase --columns 2 nord tokyo-night catppuccin-latte
 ```
 
-Panel and break previews reuse `PanelNowView.qml` and `BreakContent.qml`, the
+Panel and break previews reuse `Views/PanelNowView.qml` and
+`Views/BreakContent.qml`, the
 same visual components rendered by the installed plugin. The harness owns only
 static fixture data and offscreen capture; production windowing, focus, IPC,
 and service lifecycle remain outside it.

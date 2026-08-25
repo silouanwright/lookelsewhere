@@ -5,11 +5,11 @@ import Quickshell
 import Quickshell.Io
 import qs.Commons
 import qs.Ui
-import "Model.js" as Model
-import "Ui" as ProductUi
-import "vendor/qmlpack/oma-command-layer/Ui" as OmaCommands
-import "vendor/qmlpack/oma-command-layer/Ui/CommandModel.js" as CommandModel
-import "vendor/qmlpack/oma-ui/Ui" as LookUi
+import "../Model.js" as Model
+import "../Ui" as ProductUi
+import "../vendor/qmlpack/oma-command-layer/Ui" as OmaCommands
+import "../vendor/qmlpack/oma-command-layer/Ui/CommandModel.js" as CommandModel
+import "../vendor/qmlpack/oma-ui-kit/Ui" as LookUi
 
 Panel {
   id: root

@@ -1,10 +1,10 @@
 # Architecture
 
-Reusable presentation controls come from the Qmlpack-managed `oma-ui` source
-package under `vendor/qmlpack/oma-ui/Ui` and are imported as `LookUi.*`. The
-module composes Omarchy primitives rather than forking the shell design system;
-product-specific scheduling, overlays, patterns, and break visuals remain
-owned by LookElsewhere.
+Reusable presentation controls come from the Qmlpack-managed `oma-ui-kit` source
+package under `vendor/qmlpack/oma-ui-kit/Ui` and are imported as `LookUi.*`. The
+module composes Omarchy primitives rather than forking the shell design system.
+Its generic pattern renderer accepts caller-owned artwork; LookElsewhere keeps
+its SVG catalog, theme selection, scheduling, overlays, and break visuals.
 
 ## Current architecture
 
@@ -18,21 +18,24 @@ Omarchy Shell / Quickshell process
     │   └── IPC and deterministic demo fixtures
     ├── BarWidget.qml
     │   └── bar presentation + quick-panel loader
-    ├── Panel.qml
-    │   └── popup shell, toolbar, status, immediate actions, and summary
-    ├── SettingsPage.qml
-    │   └── settings tabs, scrolling, persistence signals, and keyboard navigation
+    ├── Views/
+    │   ├── Panel.qml: popup shell, toolbar, status, actions, and summary
+    │   ├── PanelNowView.qml: current-break status and actions
+    │   ├── SettingsPage.qml: settings, scrolling, and keyboard navigation
+    │   └── BreakContent.qml: reusable full-screen break content
     ├── Ui/
-    │   └── product-specific panel pattern
+    │   ├── product-owned pattern adapter and artwork selection
+    │   ├── shared bed icon
+    │   └── rolling digit and number controls
     ├── vendor/qmlpack/
-    │   ├── oma-ui/Ui: reusable themed controls and setting-row contracts
+    │   ├── oma-ui-kit/Ui: reusable themed controls and rendering primitives
+    │   ├── oma-command-layer/Ui: window-scoped shortcuts and key hints
+    │   ├── oma-showcase: offscreen themed capture support
     │   └── bounded-read: descriptor-safe state-file reader
     ├── Overlay.qml
     │   └── top-center warning, final chip, and per-output break presentation
     ├── Model.js
     │   └── pure transitions, policies, formatting
-    ├── BedIcon.qml
-    │   └── shared full and compact-solid bed artwork
     └── scheduler/history JSON under XDG state
 ```
 
@@ -66,7 +69,7 @@ widget, `Model.configFromSettings()` rebuilds a complete normalized
 configuration from manifest defaults plus the stored overrides, and `Service`
 applies it immediately.
 
-Settings navigation is local to `SettingsPage.qml`. Each tab exposes one
+Settings navigation is local to `Views/SettingsPage.qml`. Each tab exposes one
 ordered target list, and every reusable setting control implements the same
 `activate()` method. This keeps visual cursor movement, hover selection, and
 keyboard activation on one source of truth instead of parallel index tables.

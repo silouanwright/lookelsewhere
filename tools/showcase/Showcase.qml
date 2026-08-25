@@ -1,7 +1,7 @@
 import QtQuick
 import Quickshell
 import qs.Commons
-import "Project" as Product
+import "Project/Views" as ProductViews
 import "Project/tools/showcase" as Showcase
 
 Item {
@@ -46,7 +46,7 @@ Item {
       color: Color.lock.background
     }
 
-    Product.BreakContent {
+    ProductViews.BreakContent {
       anchors.centerIn: parent
       width: Math.min(parent.width - Style.space(48), Style.space(520))
       title: qsTr("Look elsewhere")

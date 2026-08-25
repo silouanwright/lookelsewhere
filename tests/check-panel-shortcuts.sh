@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-panel="${1:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/Panel.qml}"
+panel="${1:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/Views/Panel.qml}"
 repo=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
-settings_page="$repo/SettingsPage.qml"
-now_view="$repo/PanelNowView.qml"
-ui="$repo/vendor/qmlpack/oma-ui/Ui"
+settings_page="$repo/Views/SettingsPage.qml"
+now_view="$repo/Views/PanelNowView.qml"
+ui="$repo/vendor/qmlpack/oma-ui-kit/Ui"
 keyboard_line=$(grep -n -m1 '^  KeyboardPanel {' "$panel" | cut -d: -f1)
 first_shortcut_line=$(grep -n -m1 'OmaCommands.WindowCommand {' "$panel" | cut -d: -f1)
 window_shortcuts=$(grep -c 'OmaCommands.WindowCommand {' "$panel")

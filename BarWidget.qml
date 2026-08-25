@@ -3,6 +3,7 @@ import Quickshell.Io
 import qs.Commons
 import qs.Ui
 import "Model.js" as Model
+import "Ui" as ProductUi
 
 BarWidget {
   id: root
@@ -56,7 +57,7 @@ BarWidget {
   Loader {
     id: panelLoader
     active: true
-    source: Qt.resolvedUrl("Panel.qml")
+    source: Qt.resolvedUrl("Views/Panel.qml")
     visible: false
     onLoaded: { root.injectPanel(); Qt.callLater(root.injectPanel) }
   }
@@ -95,7 +96,7 @@ BarWidget {
       anchors.centerIn: parent
       spacing: root.showIcon && root.showTime ? Style.space(5) : 0
 
-      BedIcon {
+      ProductUi.BedIcon {
         visible: root.showIcon
         // Keep the compact 256-unit SVG on a clean 1/16 scale. Using the
         // nearby font-derived ~18px size makes the rounded bed corner land on

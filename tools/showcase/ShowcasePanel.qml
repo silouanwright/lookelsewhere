@@ -2,10 +2,10 @@ import QtQuick
 import QtQuick.Layouts
 import qs.Commons
 import qs.Ui
-import "../.." as Product
 import "../../Ui" as ProductUi
+import "../../Views" as ProductViews
 import "../../vendor/qmlpack/oma-command-layer/Ui" as OmaCommands
-import "../../vendor/qmlpack/oma-ui/Ui" as LookUi
+import "../../vendor/qmlpack/oma-ui-kit/Ui" as LookUi
 
 BorderSurface {
   id: root
@@ -87,7 +87,7 @@ BorderSurface {
       }
     }
 
-    Product.PanelNowView {
+    ProductViews.PanelNowView {
       id: nowView
       Layout.fillWidth: true
       foreground: Color.popups.text

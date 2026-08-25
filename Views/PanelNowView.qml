@@ -1,10 +1,11 @@
 import QtQuick
 import QtQuick.Layouts
 import qs.Commons
-import "Model.js" as Model
-import "vendor/qmlpack/oma-command-layer/Ui" as OmaCommands
-import "vendor/qmlpack/oma-command-layer/Ui/CommandModel.js" as CommandModel
-import "vendor/qmlpack/oma-ui/Ui" as LookUi
+import "../Model.js" as Model
+import "../Ui" as ProductUi
+import "../vendor/qmlpack/oma-command-layer/Ui" as OmaCommands
+import "../vendor/qmlpack/oma-command-layer/Ui/CommandModel.js" as CommandModel
+import "../vendor/qmlpack/oma-ui-kit/Ui" as LookUi
 
 ColumnLayout {
   id: root
@@ -59,7 +60,7 @@ ColumnLayout {
       Layout.bottomMargin: Style.space(3)
       Accessible.ignored: true
 
-      BedIcon {
+      ProductUi.BedIcon {
         anchors.fill: parent
         color: root.accent
       }
@@ -92,7 +93,7 @@ ColumnLayout {
         opacity: root.idlePaused ? 0 : 1
         Accessible.ignored: true
 
-        RollingNumber {
+        ProductUi.RollingNumber {
           value: root.minutes
           minimumDigits: 2
           color: root.foreground
@@ -112,7 +113,7 @@ ColumnLayout {
           Accessible.ignored: true
         }
 
-        RollingNumber {
+        ProductUi.RollingNumber {
           value: root.seconds
           minimumDigits: 2
           color: root.foreground
