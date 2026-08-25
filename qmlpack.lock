@@ -20,6 +20,25 @@
         "bin/bounded-read": "sha256:6a1fbfc7c1ab8811aa1a36b0222ec40d4ea7c6a2a49bfac03934ce38583b828b"
       }
     },
+    "oma-showcase": {
+      "source": "github:silouanwright/omatools/packages/oma-showcase@0.1.0",
+      "resolution": {
+        "transport": "github",
+        "repository_id": 1345448296,
+        "repository_name": "silouanwright/omatools",
+        "package_path": "packages/oma-showcase",
+        "requested": "0.1.0",
+        "version": "0.1.0",
+        "tag": "packages/oma-showcase/v0.1.0",
+        "commit": "8768dcf4f3b16b691dfacc8765d4012268b5ffd7"
+      },
+      "digest": "sha256:d810b8a950d6a69b2ba43d560086dfc34a915a947e8c13999c60c6043f4b92f3",
+      "files": {
+        "README.md": "sha256:70c3243a3d568c6723956e4399b26507ad78f7a099d5dbf7cdf2d1798893b958",
+        "bin/oma-showcase": "sha256:05286be74caedd8e03a96bfe7e0f9c411adeff56812b2a14e730ded7f57bdfbf",
+        "qml/Capture.qml": "sha256:6c08286c1bd80c845005471b93b1e5143aa4bc34eb16d4a7bd2c90aff5ad95bc"
+      }
+    },
     "oma-ui": {
       "source": "github:silouanwright/omatools/packages/oma-ui@0.2.0",
       "resolution": {

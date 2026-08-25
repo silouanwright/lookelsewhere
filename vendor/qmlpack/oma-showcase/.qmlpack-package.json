@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "name": "oma-showcase",
+  "license": "MIT",
+  "files": [
+    "README.md",
+    "bin/oma-showcase",
+    "qml/Capture.qml"
+  ],
+  "compatibility": {
+    "quickshell": ">=0.3",
+    "omarchy": ">=4"
+  },
+  "executables": [
+    "bin/oma-showcase"
+  ]
+}
