@@ -54,7 +54,7 @@ function defaultConfig() {
     panelPattern: "off",
     protectedApps: ["steam"],
     officeHours: { enabled: false, startMinute: 8 * 60, endMinute: 18 * 60 },
-    detectors: { idle: true, fullscreen: true, media: true, microphone: true, dictation: true, applications: true }
+    detectors: { idle: true, fullscreen: true, media: true, microphone: true, screenSharing: true, dictation: true, applications: true }
   }
 }
 
@@ -146,7 +146,7 @@ function configFromSettings(settings) {
   if (incoming.officeHoursEnabled !== undefined) next.officeHours.enabled = incoming.officeHoursEnabled === true
   if (incoming.officeStart !== undefined) next.officeHours.startMinute = parseClockMinute(incoming.officeStart, next.officeHours.startMinute)
   if (incoming.officeEnd !== undefined) next.officeHours.endMinute = parseClockMinute(incoming.officeEnd, next.officeHours.endMinute)
-  var detectorKeys = ["idle", "fullscreen", "media", "microphone", "dictation"]
+  var detectorKeys = ["idle", "fullscreen", "media", "microphone", "screenSharing", "dictation"]
   for (var i = 0; i < detectorKeys.length; i++) {
     var detector = detectorKeys[i]
     var settingKey = detector + "Detection"
@@ -315,12 +315,14 @@ function inOfficeHours(date, officeHours) {
 
 function strongestEvidence(evidence, config) {
   var enabled = config && config.detectors ? config.detectors : defaultConfig().detectors
-  var priority = ["dictation", "meeting", "microphone", "application", "media", "fullscreen"]
+  var priority = ["dictation", "screen-sharing", "meeting", "camera", "microphone", "application", "video", "media", "fullscreen"]
   var best = null
   for (var i = 0; i < (evidence || []).length; i++) {
     var item = evidence[i] || {}
     var category = String(item.category || "")
-    var detectorKey = category === "meeting" ? "microphone"
+    var detectorKey = category === "meeting" || category === "camera" ? "microphone"
+      : category === "screen-sharing" ? "screenSharing"
+      : category === "video" ? "media"
       : category === "application" ? "applications" : category
     if (enabled[detectorKey] !== true || item.active !== true) continue
     var confidence = clamp(item.confidence === undefined ? 0 : item.confidence, 0, 1)
@@ -802,8 +804,11 @@ function stateLabel(snapshot) {
 
 function protectedExplanation(category) {
   var labels = {
+    "screen-sharing": "screen sharing or recording is active",
     meeting: "your meeting is active",
+    camera: "your camera is active",
     microphone: "your microphone is active",
+    video: "video is playing",
     media: "media is playing",
     application: "a protected application is focused",
     fullscreen: "fullscreen work is active",
@@ -815,13 +820,34 @@ function protectedExplanation(category) {
 function contextShortLabel(category) {
   var labels = {
     dictation: "Dictation",
+    "screen-sharing": "Sharing",
     meeting: "Meeting",
+    camera: "Camera",
     microphone: "Mic",
-    media: "Video",
+    video: "Video",
+    media: "Media",
     application: "Focus",
     fullscreen: "Fullscreen"
   }
   return labels[String(category || "")] || ""
+}
+
+function pipewireRoleEvidence(record, focused) {
+  var value = record || {}
+  var role = String(value.role || "").toLowerCase()
+  if (role === "screen") return { category: "screen-sharing", confidence: 0.98, active: true }
+  if (role === "communication") return { category: "meeting", confidence: 0.95, active: true }
+  if (role === "camera") return { category: "camera", confidence: 0.9, active: true }
+  if (role === "movie" && focused === true) return { category: "video", confidence: 0.9, active: true }
+  if (value.captureAudio === true) return { category: "microphone", confidence: 0.85, active: true }
+  return null
+}
+
+function pipewireNodeMatchesApp(record, appId) {
+  var candidates = (record && Array.isArray(record.applications)) ? record.applications : []
+  for (var i = 0; i < candidates.length; i++)
+    if (appIdsMatch(candidates[i], appId)) return true
+  return false
 }
 
 function appIdsMatch(left, right) {

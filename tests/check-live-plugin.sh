@@ -20,6 +20,8 @@ test "$(head -n 1 "$reader")" = '#!/usr/bin/python3'
 grep -q 'Model.recoverSnapshot' "$plugin/Service.qml"
 grep -q 'exec install -d -m 700' "$plugin/Service.qml"
 grep -q 'blockAllReads: true' "$plugin/Service.qml"
+grep -q 'pipewireEvidencePath' "$plugin/Service.qml"
+test -x "$plugin/tools/pipewire-evidence"
 
 state_home=${XDG_STATE_HOME:-$HOME/.local/state}
 test "$(stat -c %a "$state_home/look-elsewhere")" = 700

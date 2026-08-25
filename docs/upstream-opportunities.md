@@ -16,6 +16,7 @@ heuristics, local hardware failures, and features that belong in this plugin.
 | P1 | First-class plugin keybindings | Omarchy |
 | P1 | Stable anchored-popover controller | Omarchy Shell |
 | P1 | Standard meeting, sharing, and recording state | XDG portals / desktop ecosystem |
+| P1 | Typed privacy-safe PipeWire properties | Quickshell |
 | P1 | Bounded file and process input for QML | Quickshell |
 | P2 | Public lock-service action | Omarchy Shell |
 | P2 | Keyboard-complete popup controls | Omarchy Shell |
@@ -33,9 +34,10 @@ audio, video, or both. `SupportedMimeTypes` describes player capabilities rather
 than the active item. Chromium exports browser media sessions without a video
 track signal.
 
-**Current workaround.** LookElsewhere treats playback as video only when the
-MPRIS player's application matches the focused Hyprland application. This
-ignores background music but can misclassify a focused music player or tab.
+**Current workaround.** LookElsewhere calls focused-app MPRIS playback `Media`,
+not `Video`. It upgrades the category only when an active PipeWire stream
+explicitly declares `media.role=Movie`. This ignores background music but can
+still defer for a focused music player or tab whose exporter supplies no type.
 
 **Proposed upstream work.**
 
@@ -56,7 +58,8 @@ and automation across Linux desktops.
 
 References: [MPRIS Player](https://specifications.freedesktop.org/mpris/latest/Player_Interface.html),
 [MPRIS metadata](https://specifications.freedesktop.org/mpris/latest/Track_List_Interface.html),
-[Chromium MPRIS](https://chromium.googlesource.com/chromium/src/+/b9c645c0b167a38b8f93b6c9e9f5a6a2f3e854ae/ui/base/mpris/mpris_service_impl.cc).
+[Chromium MPRIS](https://chromium.googlesource.com/chromium/src/+/main/components/mpris/mpris_service.cc),
+[Firefox MPRIS](https://searchfox.org/firefox-main/source/widget/gtk/MPRISServiceHandler.cpp).
 
 ## 2. Shared privacy-safe context service
 
@@ -173,13 +176,17 @@ set. The ScreenCast portal manages sessions created by its caller and does not
 promise a global registry of other applications' sessions.
 
 **Current workaround.** LookElsewhere combines microphone, fullscreen,
-dictation, application, and PipeWire evidence with confidence thresholds. It
-cannot claim exact semantics.
+dictation, application, and PipeWire evidence with confidence thresholds. A
+bounded helper reads only active node IDs and emits allowlisted roles and
+capture state; full property dictionaries and media titles never enter QML. It
+cannot claim exact semantics when applications omit standard roles.
 
-**Proposed upstream work.** Define a privacy-preserving portal or desktop status
-protocol that publishes coarse activity and availability without identifying
-participants, meeting titles, captured surfaces, or content. Portal backends
-should mediate access and make false/stale state behavior explicit.
+**Proposed upstream work.** Extend the existing XDPH IPC proposal in
+[issue #331](https://github.com/hyprwm/xdg-desktop-portal-hyprland/issues/331)
+with an event-driven coarse screencopy active/count signal. A cross-desktop
+portal or desktop status protocol may follow only after access control is
+designed; it must not identify participants, meeting titles, captured surfaces,
+or content.
 
 **Unlocks.** Dependable notification suppression, presence, wellness timing,
 and recording indicators across desktops.
@@ -257,12 +264,22 @@ remains write-only. Its `hyprctl activewindow` fallback caps the JSON stream
 and uses `jq` to return only a bounded application identifier and fullscreen
 boolean.
 
+PipeWire classification uses `tools/pipewire-evidence`. It reads only numeric
+IDs from active link groups, invokes `pw-dump` without a shell, caps every node
+at 64 KiB and the complete request at 1.5 seconds, and emits only allowlisted
+semantic fields. It avoids
+Quickshell's complete `PwNode.properties` map, which may include private,
+application-controlled media metadata.
+
 **Proposed upstream work.** Add descriptor-based, byte-limited file reads and
 process collectors that stop or reject input at a caller-defined maximum before
 allocating the complete payload. Expose file-type, ownership, truncation, and
 timeout failures explicitly; support a no-symlink path-resolution policy. A typed, bounded
 Hyprland active-window service would remove this plugin's subprocess fallback
-entirely.
+entirely. Quickshell should also expose typed `mediaRole`, `mediaCategory`,
+bounded application identity, and node state. The state request already exists
+as [Quickshell #407](https://github.com/quickshell-mirror/quickshell/issues/407);
+typed semantic fields need a separate narrowly scoped issue.
 
 **Unlocks.** Safer parsing in every resident QML plugin, fewer helper processes,
 and a reusable answer to untrusted or unexpectedly large local input.

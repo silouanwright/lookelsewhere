@@ -67,6 +67,7 @@ uses the default declared by the plugin manifest.
 | `fullscreenDetection` | `true` | Boolean | Delay a due break while the focused window is fullscreen. |
 | `mediaDetection` | `true` | Boolean | Delay for focused-app MPRIS playback. See the README limitation about audio/video classification. |
 | `microphoneDetection` | `true` | Boolean | Delay while PipeWire reports an active microphone stream; audio is never recorded. |
+| `screenSharingDetection` | `true` | Boolean | Delay when an active PipeWire stream explicitly identifies screen sharing or recording. |
 | `dictationDetection` | `true` | Boolean | Delay while Omarchy Voxtype dictation is active. |
 | `protectedApps` | `"steam"` | Comma-separated application IDs | Delay due breaks while listed applications are focused. `steam` also matches `steam_app_<id>` game windows. |
 
@@ -145,6 +146,7 @@ the complete default value set in one copyable shape:
   "fullscreenDetection": true,
   "mediaDetection": true,
   "microphoneDetection": true,
+  "screenSharingDetection": true,
   "dictationDetection": true,
   "protectedApps": "steam",
 

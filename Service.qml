@@ -23,6 +23,8 @@ Item {
   readonly property int stateReadLimit: 64 * 1024
   readonly property string boundedReaderPath: decodeURIComponent(
     String(Qt.resolvedUrl("vendor/qmlpack/bounded-read/bin/bounded-read")).replace(/^file:\/\//, ""))
+  readonly property string pipewireEvidencePath: decodeURIComponent(
+    String(Qt.resolvedUrl("tools/pipewire-evidence")).replace(/^file:\/\//, ""))
 
   property var config: Model.defaultConfig()
   property var snapshot: Model.defaultSnapshot(Date.now())
@@ -30,6 +32,8 @@ Item {
   property bool stateLoaded: false
   property bool dictationActive: false
   property bool dictationAvailable: false
+  property var pipewireEvidenceRecords: []
+  property int pipewireEvidenceGeneration: 0
   property string probedActiveAppId: ""
   property bool probedFullscreenActive: false
   property bool probedActiveWindowAvailable: false
@@ -51,13 +55,28 @@ Item {
   property int demoSequenceIndex: -1
   property string demoFixture: ""
   readonly property var demoSequence: [
-    "idle", "typing", "meeting", "microphone", "media", "fullscreen",
-    "dictation", "due", "warning", "final", "casual-break",
+    "idle", "typing", "meeting", "microphone", "camera", "screen-sharing",
+    "video", "media", "fullscreen", "dictation", "due", "warning", "final", "casual-break",
     "balanced-break", "hardcore-break", "long-break", "stats", "paused", "postponed"
   ]
 
   readonly property var players: Mpris.players ? Mpris.players.values : []
-  readonly property var pipewireNodes: Pipewire.nodes ? Pipewire.nodes.values : []
+  readonly property var pipewireLinkGroups: Pipewire.linkGroups ? Pipewire.linkGroups.values : []
+  readonly property var activePipewireNodeIds: {
+    var ids = []
+    for (var i = 0; i < pipewireLinkGroups.length; i++) {
+      var group = pipewireLinkGroups[i]
+      if (!group || group.state !== PwLinkState.Active) continue
+      var nodes = [group.source, group.target]
+      for (var j = 0; j < nodes.length; j++) {
+        if (!nodes[j] || !nodes[j].isStream) continue
+        var id = Number(nodes[j].id)
+        if (id > 0 && ids.indexOf(id) < 0) ids.push(id)
+      }
+    }
+    ids.sort(function(left, right) { return left - right })
+    return ids.slice(0, 32)
+  }
   readonly property var activeToplevel: Hyprland.activeToplevel
   readonly property string activeAppId: activeToplevel && activeToplevel.wayland
     ? String(activeToplevel.wayland.appId || "") : probedActiveAppId
@@ -75,14 +94,15 @@ Item {
     }
     return false
   }
-  readonly property bool microphoneActive: {
-    var source = Pipewire.defaultAudioSource
-    if (!source || !source.audio || source.audio.muted) return false
-    for (var i = 0; i < pipewireNodes.length; i++) {
-      var node = pipewireNodes[i]
-      if (node && node.isStream && node.isSink === false && node.audio && !node.audio.muted) return true
+  readonly property var pipewireEvidence: {
+    var result = []
+    for (var i = 0; i < pipewireEvidenceRecords.length; i++) {
+      var record = pipewireEvidenceRecords[i]
+      var focused = Model.pipewireNodeMatchesApp(record, activeAppId)
+      var item = Model.pipewireRoleEvidence(record, focused)
+      if (item) result.push(item)
     }
-    return false
+    return result
   }
   readonly property bool idle: demoMode ? demoIdle : idleMonitor.isIdle
   readonly property bool naturalPauseReady: demoMode ? demoNaturalPause : naturalPauseMonitor.isIdle
@@ -139,8 +159,11 @@ Item {
     if (demoMode) return demoEvidence
     var value = []
     if (dictationActive) value.push({ category: "dictation", confidence: 1, active: true })
-    if (microphoneActive && fullscreenActive) value.push({ category: "meeting", confidence: 0.9, active: true })
-    else if (microphoneActive) value.push({ category: "microphone", confidence: 0.75, active: true })
+    for (var i = 0; i < pipewireEvidence.length; i++) {
+      var item = pipewireEvidence[i]
+      value.push(item.category === "microphone" && fullscreenActive
+        ? { category: "meeting", confidence: 0.9, active: true } : item)
+    }
     if (mediaActive) value.push({ category: "media", confidence: 0.8, active: true })
     if (Model.matchesProtectedApp(activeAppId, config.protectedApps))
       value.push({ category: "application", confidence: 1, active: true })
@@ -171,6 +194,13 @@ Item {
     probedFullscreenActive = false
     probedActiveWindowAvailable = false
     activeWindowRefresh.restart()
+  }
+
+  onActivePipewireNodeIdsChanged: {
+    pipewireEvidenceGeneration++
+    pipewireEvidenceRecords = []
+    pipewireEvidenceProbe.retryCount = 0
+    pipewireEvidenceRefresh.restart()
   }
 
   function configure(values) {
@@ -343,7 +373,8 @@ Item {
       next.postponedUntilMs = now + 5 * 60000
       next.snoozesUsed = 1
     }
-    else if (["protected", "meeting", "microphone", "media", "fullscreen", "dictation"].indexOf(name) >= 0) {
+    else if (["protected", "meeting", "microphone", "camera", "screen-sharing",
+              "video", "media", "fullscreen", "dictation"].indexOf(name) >= 0) {
       next.accumulatedActiveMs = config.focusMs
       next.dueAtMs = now
       demoEvidence = [{
@@ -446,15 +477,17 @@ Item {
     flushState()
   }
 
-  PwObjectTracker {
-    objects: Pipewire.defaultAudioSource ? [Pipewire.defaultAudioSource] : []
-  }
-
   IdleMonitor {
     id: idleMonitor
     enabled: true
     timeout: 60
     respectInhibitors: true
+  }
+
+  // Link state is invalid until Quickshell tracks the link group. Tracking
+  // groups does not materialize the application-controlled node dictionaries.
+  PwObjectTracker {
+    objects: service.pipewireLinkGroups
   }
 
   // Quickshell's Wayland toplevel handle has no appId for XWayland games.
@@ -493,6 +526,76 @@ Item {
           service.probedActiveWindowAvailable = false
         }
       }
+    }
+  }
+
+  // PipeWire node dictionaries are application-controlled and may contain
+  // private titles or arbitrarily large values. The helper reads only active
+  // numeric node IDs and emits a small allowlisted record for QML.
+  Timer {
+    id: pipewireEvidenceRefresh
+    interval: 120
+    repeat: false
+    onTriggered: {
+      if (pipewireEvidenceProbe.running) {
+        pipewireEvidenceRefresh.restart()
+      } else if (service.activePipewireNodeIds.length === 0) {
+        service.pipewireEvidenceRecords = []
+      } else {
+        pipewireEvidenceProbe.generation = service.pipewireEvidenceGeneration
+        pipewireEvidenceProbe.timedOut = false
+        pipewireEvidenceProbe.command = [service.pipewireEvidencePath].concat(
+          service.activePipewireNodeIds.map(function(id) { return String(id) }))
+        pipewireEvidenceProbe.running = true
+      }
+    }
+  }
+
+  Process {
+    id: pipewireEvidenceProbe
+    property int generation: 0
+    property int retryCount: 0
+    property bool timedOut: false
+    stdout: StdioCollector {
+      id: pipewireEvidenceOutput
+      waitForEnd: true
+    }
+    onExited: function(exitCode) {
+      var didTimeOut = timedOut
+      timedOut = false
+      if (generation !== service.pipewireEvidenceGeneration) {
+        pipewireEvidenceRefresh.restart()
+        return
+      }
+      if (didTimeOut || exitCode !== 0) {
+        service.pipewireEvidenceRecords = []
+        if (retryCount < 1) {
+          retryCount++
+          pipewireEvidenceRefresh.restart()
+        }
+        return
+      }
+      try {
+        var parsed = JSON.parse(pipewireEvidenceOutput.text || "[]")
+        if (!Array.isArray(parsed) || parsed.length > 32) throw new Error("invalid PipeWire evidence")
+        service.pipewireEvidenceRecords = parsed
+        retryCount = 0
+      } catch (error) {
+        service.pipewireEvidenceRecords = []
+        if (retryCount < 1) {
+          retryCount++
+          pipewireEvidenceRefresh.restart()
+        }
+      }
+    }
+  }
+
+  Timer {
+    interval: 2000
+    running: pipewireEvidenceProbe.running
+    onTriggered: {
+      pipewireEvidenceProbe.timedOut = true
+      pipewireEvidenceProbe.signal(9)
     }
   }
 
@@ -670,6 +773,7 @@ Item {
   Component.onCompleted: {
     ensureStateDir.running = true
     activeWindowRefresh.start()
+    pipewireEvidenceRefresh.start()
   }
 
   IpcHandler {
@@ -677,7 +781,7 @@ Item {
 
     function status(): string { return JSON.stringify({ state: service.phase, remainingMs: service.remainingMs, evidence: service.evidence(), demo: service.demoMode, idlePaused: service.idlePauseActive, naturalPauseReady: service.naturalPauseReady, typingHoldActive: service.typingHoldActive, contextLabel: service.contextLabel, naturalBreakDecision: service.snapshot.naturalBreakDecision || null, recoveryWarning: service.recoveryWarning }) }
     function configuration(): string { return JSON.stringify(service.config) }
-    function diagnostics(): string { return JSON.stringify({ fullscreen: service.fullscreenAvailable, dictation: service.dictationAvailable, mpris: true, pipewire: true, idle: true, sound: service.soundAvailable, persistenceBlocked: service.persistenceBlocked }) }
+    function diagnostics(): string { return JSON.stringify({ fullscreen: service.fullscreenAvailable, dictation: service.dictationAvailable, mpris: true, pipewire: true, pipewireActiveStreams: service.activePipewireNodeIds.length, pipewireEvidenceRecords: service.pipewireEvidenceRecords.length, idle: true, sound: service.soundAvailable, persistenceBlocked: service.persistenceBlocked }) }
     function takeBreak(): string { service.takeBreak(); return service.phase }
     function postpone(minutes: int): string { service.postponeMinutes(minutes); return service.phase }
     function pause(minutes: int): string { service.pauseMinutes(minutes); return service.phase }

@@ -8,14 +8,17 @@ Rectangle {
   property bool available: true
   property bool placeRight: false
   property bool centerOnCorner: false
+  property bool customPosition: false
+  property real customX: 0
+  property real customY: 0
 
   readonly property real badgeSize: Style.space(14)
   readonly property bool shiftChord: /^⬆.$/.test(keyText)
   readonly property real keyWidth: shiftChord ? shiftRow.implicitWidth : label.implicitWidth
 
-  x: placeRight ? parent.width + Style.space(3)
+  x: customPosition ? customX : placeRight ? parent.width + Style.space(3)
     : (centerOnCorner ? parent.width - width / 2 : (parent.width - width) / 2)
-  y: placeRight ? (parent.height - height) / 2
+  y: customPosition ? customY : placeRight ? (parent.height - height) / 2
     : (centerOnCorner ? -height / 2 : parent.height + Style.space(2))
   implicitWidth: keyText.length === 1
     ? badgeSize

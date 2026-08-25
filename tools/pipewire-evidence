@@ -1,0 +1,125 @@
+#!/usr/bin/python3
+"""Return bounded, privacy-safe context fields for active PipeWire node IDs."""
+
+import json
+import os
+import selectors
+import subprocess
+import sys
+import time
+
+MAX_IDS = 32
+MAX_NODE_BYTES = 64 * 1024
+MAX_VALUE_CHARS = 256
+TOTAL_TIMEOUT_SECONDS = 1.5
+ALLOWED_ROLES = {"screen", "communication", "camera", "movie"}
+APP_KEYS = (
+    "application.id",
+    "application.name",
+    "application.process.binary",
+    "application.icon-name",
+)
+
+
+def fail(message, code):
+    print(message, file=sys.stderr)
+    raise SystemExit(code)
+
+
+def bounded_output(command, deadline):
+    try:
+        process = subprocess.Popen(command, stdout=subprocess.PIPE,
+                                   stderr=subprocess.DEVNULL)
+    except OSError as error:
+        fail(f"could not start pw-dump: {error}", 69)
+
+    output = bytearray()
+    selector = selectors.DefaultSelector()
+    selector.register(process.stdout, selectors.EVENT_READ)
+    try:
+        while selector.get_map():
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                process.kill()
+                fail("pw-dump timed out", 70)
+            for key, _ in selector.select(remaining):
+                chunk = os.read(key.fd, min(8192, MAX_NODE_BYTES + 1 - len(output)))
+                if not chunk:
+                    selector.unregister(key.fileobj)
+                    continue
+                output.extend(chunk)
+                if len(output) > MAX_NODE_BYTES:
+                    process.kill()
+                    fail("pw-dump node output exceeded the byte limit", 65)
+        if process.wait(timeout=max(0.01, deadline - time.monotonic())) != 0:
+            return None
+        return bytes(output)
+    finally:
+        selector.close()
+        if process.poll() is None:
+            process.kill()
+            process.wait()
+
+
+def text(value, limit=MAX_VALUE_CHARS):
+    return str(value or "")[:limit]
+
+
+def shape_node(payload):
+    try:
+        records = json.loads(payload)
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        fail("pw-dump returned invalid JSON", 65)
+    if not isinstance(records, list) or len(records) > 8:
+        fail("pw-dump returned an unexpected record shape", 65)
+
+    shaped = []
+    for record in records:
+        if not isinstance(record, dict) or record.get("type") != "PipeWire:Interface:Node":
+            continue
+        info = record.get("info")
+        props = info.get("props") if isinstance(info, dict) else None
+        if not isinstance(props, dict):
+            continue
+        role = text(props.get("media.role"), 32).lower()
+        media_class = text(props.get("media.class"), 48)
+        category = text(props.get("media.category"), 32).lower()
+        applications = []
+        for key in APP_KEYS:
+            candidate = text(props.get(key))
+            if candidate and candidate not in applications:
+                applications.append(candidate)
+        shaped.append({
+            "id": int(record.get("id", 0)),
+            "role": role if role in ALLOWED_ROLES else "",
+            "captureAudio": media_class == "Stream/Input/Audio" and category == "capture",
+            "applications": applications,
+        })
+    return shaped
+
+
+def main(arguments):
+    if not arguments or len(arguments) > MAX_IDS:
+        fail(f"expected between 1 and {MAX_IDS} PipeWire node IDs", 64)
+    ids = []
+    for argument in arguments:
+        if not argument.isascii() or not argument.isdecimal():
+            fail("PipeWire node IDs must be decimal integers", 64)
+        node_id = int(argument)
+        if node_id > 0xFFFFFFFF:
+            fail("PipeWire node ID is out of range", 64)
+        if node_id not in ids:
+            ids.append(node_id)
+
+    result = []
+    deadline = time.monotonic() + TOTAL_TIMEOUT_SECONDS
+    for node_id in ids:
+        payload = bounded_output(["/usr/bin/pw-dump", "--no-colors", str(node_id)], deadline)
+        if payload is not None:
+            result.extend(shape_node(payload))
+    json.dump(result, sys.stdout, separators=(",", ":"))
+    sys.stdout.write("\n")
+
+
+if __name__ == "__main__":
+    main(sys.argv[1:])

@@ -14,7 +14,9 @@ This is a competition and portfolio quality plan, not a LookAway parity list. Pr
 ## P1 — high-leverage differentiation
 
 - Return-from-away choice when an idle interval makes session intent ambiguous.
-- Screen recording/sharing protection if a dependable Wayland/PipeWire signal can be established.
+- Broader screen recording/sharing coverage beyond applications that publish a
+  standard PipeWire `Screen` role; track XDPH #331 rather than adding title or
+  process heuristics.
 - Per-app deep-focus overrides as transparent configuration, not opaque detection.
 - A lightweight blink micro-reminder that stays inside the eye-care promise.
 - Omarchy/Hyprland keybinding recipes for break, pause/resume, and bounded snoozes.

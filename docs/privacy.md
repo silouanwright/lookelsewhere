@@ -9,7 +9,8 @@ LookElsewhere observes the minimum local signals needed to time interruptions. I
 - Idle/active state and durations
 - Fullscreen state and coarse application identifier where needed for a local rule
 - MPRIS playback status and player identity where needed for classification
-- PipeWire node/stream properties required to infer microphone or communication activity
+- Coarse, bounded PipeWire role, capture-audio, and application-identity fields
+  required to infer microphone, meeting, camera, sharing, or video activity
 - Omarchy dictation active/inactive state
 - Current output/workspace state required for surface placement
 
@@ -33,6 +34,10 @@ Persist user configuration only through Omarchy's `shell.json`. The plugin state
 - Cap state and compositor input before it crosses into QML. State reads stop
   at 64 KiB; active-window output stops at 64 KiB and is reduced to a bounded
   application identifier plus one fullscreen boolean.
+- Never expose the complete application-controlled PipeWire property map to
+  QML. Active node reads stop at 64 KiB and the complete request stops at 1.5
+  seconds, then retain only allowlisted roles, one capture boolean, and bounded
+  application identifiers.
 - Do not request elevated privileges.
 
 ## User control

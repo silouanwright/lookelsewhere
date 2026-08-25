@@ -88,7 +88,7 @@ ColumnLayout {
       general: [pauseBreaksButton, editSettingsButton, officeHoursRow,
         officeStartDropdown, officeEndDropdown],
       context: [idleDetectionRow, fullscreenDetectionRow, mediaDetectionRow,
-        microphoneDetectionRow, dictationDetectionRow],
+        microphoneDetectionRow, screenSharingDetectionRow, dictationDetectionRow],
       breaks: [focusMinutesField, shortBreakField, longBreakEveryField,
         longBreakSecondsField, snoozeBudgetField, maximumDelayField,
         enforcementDropdown],
@@ -210,8 +210,9 @@ ColumnLayout {
       commandLayer: settingsPage.commandLayer
       keyText: CommandModel.label(settingsPage.shortcuts.pause)
       available: pauseBreaksButton.enabled
-      x: parent.controlX - width - Style.space(4)
-      y: parent.controlY + (parent.controlHeight - height) / 2
+      customPosition: true
+      badgeX: parent.controlX - badgeWidth - Style.space(4)
+      badgeY: parent.controlY + (parent.controlHeight - badgeHeight) / 2
     }
   }
 
@@ -257,8 +258,9 @@ ColumnLayout {
     OmaCommands.CommandHint {
       commandLayer: settingsPage.commandLayer
       keyText: CommandModel.label(settingsPage.shortcuts.edit)
-      x: parent.width - width
-      y: editSettingsButton.y - height / 2
+      customPosition: true
+      badgeX: parent.width - badgeWidth
+      badgeY: editSettingsButton.y - badgeHeight / 2
     }
   }
 
@@ -382,6 +384,18 @@ ColumnLayout {
     hasCursor: settingsPage.hasCursorFor(microphoneDetectionRow)
     onHovered: function(on) { if (on) settingsPage.setCursorTarget(microphoneDetectionRow) }
     onClicked: settingsPage.persistSettings({ microphoneDetection: !checked })
+  }
+  PanelSeparator { Layout.fillWidth: true; foreground: settingsPage.foreground }
+  LookUi.ToggleSettingRow {
+    id: screenSharingDetectionRow
+    Layout.fillWidth: true
+    label: qsTr("Protect screen sharing")
+    description: qsTr("Delay when PipeWire identifies sharing or recording")
+    checked: !settingsPage.settings || settingsPage.settings.screenSharingDetection === undefined || settingsPage.settings.screenSharingDetection === true
+    foreground: settingsPage.foreground; accent: settingsPage.accent; fontFamily: settingsPage.fontFamily
+    hasCursor: settingsPage.hasCursorFor(screenSharingDetectionRow)
+    onHovered: function(on) { if (on) settingsPage.setCursorTarget(screenSharingDetectionRow) }
+    onClicked: settingsPage.persistSettings({ screenSharingDetection: !checked })
   }
   PanelSeparator { Layout.fillWidth: true; foreground: settingsPage.foreground }
   LookUi.ToggleSettingRow {

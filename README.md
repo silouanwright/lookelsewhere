@@ -135,16 +135,18 @@ value, behavior, and a complete JSONC reference.
 
 - Hyprland and Omarchy are the supported and tested environment.
 - MPRIS does not identify whether the current item has a video track.
-  LookElsewhere infers video only when the playing application is focused. This
-  avoids pausing for background music but remains a heuristic.
+  LookElsewhere delays for focused-app playback and labels it `Media`; an
+  explicit PipeWire `Movie` role upgrades that to `Video`. This avoids pausing
+  for background music but remains a heuristic when applications omit roles.
 - Wayland exposes coarse application and device state, not semantic intent.
   Screen sharing, recording, and every meeting state cannot yet be identified
   perfectly without upstream support.
 - The `Typing..` state means recent keyboard or pointer activity. Wayland does
   not reveal which kind of input occurred, and LookElsewhere never reads keys
   or pointer coordinates.
-- An active microphone is only a meeting heuristic. Calls with no active input
-  may be missed, while unrelated recording can delay a break.
+- PipeWire can identify active microphone capture and explicit Communication,
+  Camera, Screen, and Movie roles, but applications are not required to set
+  them consistently. Calls with no active input may still be missed.
 - Hardcore prevents LookElsewhere's own skip actions, but it is not a security
   lock and cannot block compositor shortcuts, virtual terminals, or stopping
   Omarchy Shell.

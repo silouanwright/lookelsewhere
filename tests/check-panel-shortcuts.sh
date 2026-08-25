@@ -6,6 +6,7 @@ repo=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 settings_page="$repo/Views/SettingsPage.qml"
 now_view="$repo/Views/PanelNowView.qml"
 ui="$repo/vendor/qmlpack/oma-ui-kit/Ui"
+command_hint="$repo/vendor/qmlpack/oma-command-layer/Ui/CommandHint.qml"
 keyboard_line=$(grep -n -m1 '^  KeyboardPanel {' "$panel" | cut -d: -f1)
 first_shortcut_line=$(grep -n -m1 'OmaCommands.WindowCommand {' "$panel" | cut -d: -f1)
 window_shortcuts=$(grep -c 'OmaCommands.WindowCommand {' "$panel")
@@ -16,6 +17,9 @@ test "$window_shortcuts" -eq 14
 grep -q 'suspended: root.numberEditorActive || root.dropdownOpen' "$panel"
 grep -q 'context: Qt.WindowShortcut' "$repo/vendor/qmlpack/oma-command-layer/Ui/WindowCommand.qml"
 grep -q 'visible: commandLayer.hintsVisible' "$repo/vendor/qmlpack/oma-command-layer/Ui/CommandHint.qml"
+grep -q 'property bool customPosition: false' "$command_hint"
+grep -q 'customX: root.badgeX' "$command_hint"
+grep -q 'badgeX: parent.controlX - badgeWidth' "$settings_page"
 ! grep -q 'service && !service.interrupting' "$panel"
 grep -q 'function targets()' "$settings_page"
 grep -q 'target && typeof target.activate === "function"' "$settings_page"

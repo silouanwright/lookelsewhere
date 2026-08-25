@@ -561,7 +561,8 @@ TestCase {
     compare(Model.contextShortLabel("dictation"), "Dictation")
     compare(Model.contextShortLabel("meeting"), "Meeting")
     compare(Model.contextShortLabel("microphone"), "Mic")
-    compare(Model.contextShortLabel("media"), "Video")
+    compare(Model.contextShortLabel("video"), "Video")
+    compare(Model.contextShortLabel("media"), "Media")
     compare(Model.contextShortLabel("fullscreen"), "Fullscreen")
     compare(Model.contextShortLabel("unknown"), "")
   }
@@ -571,6 +572,29 @@ TestCase {
     verify(Model.appIdsMatch("firefox.instance123", "firefox"))
     verify(!Model.appIdsMatch("spotify", "foot"))
     verify(!Model.appIdsMatch("", "chromium"))
+  }
+
+  function test_pipewireRoleEvidenceIsExplicitAndPrivacyPreserving() {
+    compare(Model.pipewireRoleEvidence({ role: "screen" }, false).category, "screen-sharing")
+    compare(Model.pipewireRoleEvidence({ role: "communication" }, false).category, "meeting")
+    compare(Model.pipewireRoleEvidence({ role: "camera" }, false).category, "camera")
+    compare(Model.pipewireRoleEvidence({ role: "movie" }, true).category, "video")
+    compare(Model.pipewireRoleEvidence({ role: "movie" }, false), null)
+    compare(Model.pipewireRoleEvidence({ role: "", captureAudio: true }, false).category, "microphone")
+    compare(Model.pipewireRoleEvidence({ role: "" }, true), null)
+    verify(Model.pipewireNodeMatchesApp({ applications: ["chromium"] }, "chromium"))
+    verify(!Model.pipewireNodeMatchesApp({ applications: ["Music Player"] }, "chromium"))
+
+    var config = Model.defaultConfig()
+    compare(Model.strongestEvidence([
+      Model.pipewireRoleEvidence({ role: "screen" }, false),
+      Model.pipewireRoleEvidence({ role: "communication" }, false)
+    ], config).category, "screen-sharing")
+    config.detectors.screenSharing = false
+    compare(Model.strongestEvidence([
+      Model.pipewireRoleEvidence({ role: "screen" }, false),
+      Model.pipewireRoleEvidence({ role: "communication" }, false)
+    ], config).category, "meeting")
   }
 
   function test_protectedApplicationsDefaultToSteam() {

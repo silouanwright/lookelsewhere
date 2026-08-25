@@ -11,19 +11,23 @@ The cycle is:
 2. Typing
 3. Meeting
 4. Microphone
-5. Video
-6. Fullscreen
-7. Dictation
-8. Due soon
-9. Warning
-10. Final warning
-11. Casual break
-12. Balanced break
-13. Hardcore break
-14. Long break
-15. Paused
-16. Snoozed
-17. Real schedule restored
+5. Camera
+6. Screen sharing or recording
+7. Video
+8. Generic media
+9. Fullscreen
+10. Dictation
+11. Due soon
+12. Warning
+13. Final warning
+14. Casual break
+15. Balanced break
+16. Hardcore break
+17. Long break
+18. Statistics
+19. Paused
+20. Snoozed
+21. Real schedule restored
 
 Use fixtures for context detection, countdown thresholds, warnings, and break
 enforcement. Demonstrate keyboard navigation, settings, theme integration,

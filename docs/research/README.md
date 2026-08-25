@@ -11,6 +11,7 @@ This directory preserves the discovery work that preceded LookElsewhere so futur
 - [2026 screenshot audit](lookaway-screenshot-audit-2026-08-22.md) — screen-by-screen observations and adopt/adapt/defer decisions
 - [Eye-health evidence and content guide](eye-health-evidence-and-content-guide.md) — 20-20-20 evidence, responsible claims, educational structure, and product implications
 - [Next-round product opportunities](next-round-opportunities.md) — prioritized hypotheses derived from research, current behavior, and Wayland constraints
+- [Context detection research](context-detection-2026-08-25.md) — tested detector matrix, privacy boundaries, platform gaps, and upstream issue proposals
 
 ## Raw archive contents
 

@@ -94,7 +94,10 @@ application identity or screen content enters history.
 The long-lived shell never ingests an unbounded file or compositor record.
 State is loaded through a 64 KiB producer cap while `FileView` remains
 write-only, and the active-window fallback is capped and shaped by `jq` before
-QML receives it. Oversized input fails closed and preserves the state file.
+QML receives it. Active PipeWire node dictionaries are read outside QML only
+when the active link topology changes; `tools/pipewire-evidence` caps each node
+at 64 KiB and emits only coarse allowlisted evidence. Oversized input fails
+closed and preserves the state file.
 
 ## External integrations
 
