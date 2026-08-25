@@ -23,12 +23,20 @@ Item {
   readonly property int remainingSeconds: service ? Math.max(0, Math.ceil(service.remainingMs / 1000)) : 0
   readonly property int remainingMinutesPart: Math.floor(remainingSeconds / 60)
   readonly property int remainingSecondsPart: remainingSeconds % 60
-  readonly property string warningClockText:
-    (remainingMinutesPart < 10 ? "0" : "") + remainingMinutesPart + ":"
-      + (remainingSecondsPart < 10 ? "0" : "") + remainingSecondsPart
+  readonly property real warningClockFontSize: Style.font.heading
   readonly property real breakClockFontSize: Style.font.display * 1.35
+  readonly property real warningClockSeparatorOverlap: Math.max(0,
+    (warningClockColonMetrics.advanceWidth - warningClockColonMetrics.tightBoundingRect.width) / 2)
   readonly property real clockSeparatorOverlap: Math.max(0,
     (clockColonMetrics.advanceWidth - clockColonMetrics.tightBoundingRect.width) / 2)
+
+  TextMetrics {
+    id: warningClockColonMetrics
+    text: ":"
+    font.family: Style.font.family
+    font.pixelSize: root.warningClockFontSize
+    font.weight: Font.Bold
+  }
 
   TextMetrics {
     id: clockColonMetrics
@@ -272,12 +280,42 @@ Item {
             ColumnLayout {
               Layout.fillWidth: true
               spacing: 0
-              Text {
-                text: root.warningClockText
-                color: Color.popups.text
-                font.family: Style.font.family
-                font.pixelSize: Style.font.heading
-                font.weight: Font.Bold
+              Row {
+                spacing: -root.warningClockSeparatorOverlap
+                Accessible.role: Accessible.StaticText
+                Accessible.name: qsTr("%1 minutes and %2 seconds until break")
+                  .arg(root.remainingMinutesPart).arg(root.remainingSecondsPart)
+
+                RollingNumber {
+                  value: root.remainingMinutesPart
+                  minimumDigits: 2
+                  color: Color.popups.text
+                  fontFamily: Style.font.family
+                  fontSize: root.warningClockFontSize
+                  fontWeight: Font.Bold
+                  reducedMotion: root.service && root.service.config.reducedMotion
+                  animationActive: warningCard.visible
+                }
+
+                Text {
+                  text: ":"
+                  color: Color.popups.text
+                  font.family: Style.font.family
+                  font.pixelSize: root.warningClockFontSize
+                  font.weight: Font.Bold
+                  Accessible.ignored: true
+                }
+
+                RollingNumber {
+                  value: root.remainingSecondsPart
+                  minimumDigits: 2
+                  color: Color.popups.text
+                  fontFamily: Style.font.family
+                  fontSize: root.warningClockFontSize
+                  fontWeight: Font.Bold
+                  reducedMotion: root.service && root.service.config.reducedMotion
+                  animationActive: warningCard.visible
+                }
               }
               Text {
                 Layout.fillWidth: true
