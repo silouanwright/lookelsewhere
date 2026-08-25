@@ -42,6 +42,8 @@ reference, or accepted ADRs.
 ## Research archive
 
 - [Research archive and synthesis](research/README.md)
+- [Eye-health evidence and content guide](research/eye-health-evidence-and-content-guide.md)
+- [Next-round product opportunities](research/next-round-opportunities.md)
 - [GitPulse keyboard-first audit](research/gitpulse-keyboard-audit-2026-08-22.md)
 
 ## Documentation rules

@@ -9,6 +9,8 @@ This directory preserves the discovery work that preceded LookElsewhere so futur
 - [Raw research archive](archive/) — original working documents and interactive HTML prototype
 - [Reference screenshots](reference-screenshots/) — supplied LookAway screens and installed Omarchy plugin contact sheet
 - [2026 screenshot audit](lookaway-screenshot-audit-2026-08-22.md) — screen-by-screen observations and adopt/adapt/defer decisions
+- [Eye-health evidence and content guide](eye-health-evidence-and-content-guide.md) — 20-20-20 evidence, responsible claims, educational structure, and product implications
+- [Next-round product opportunities](next-round-opportunities.md) — prioritized hypotheses derived from research, current behavior, and Wayland constraints
 
 ## Raw archive contents
 
