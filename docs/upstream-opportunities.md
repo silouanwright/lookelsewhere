@@ -237,7 +237,9 @@ correctly cannot observe global keys or pointer coordinates.
 
 **Current workaround.** During the final ten seconds, LookElsewhere uses a
 one-second idle monitor and labels recent keyboard-or-pointer activity as
-`Typing..`. It never reads or stores key values or coordinates.
+`Active`. This can also hold while someone is casually browsing or scrolling,
+even though typing is the stronger signal that an interruption would be
+disruptive. LookElsewhere never reads or stores key values or coordinates.
 
 **Potential upstream work.** Research a compositor-mediated signal exposing
 only coarse recent-input categories and timestamps, with no key values,

@@ -87,7 +87,7 @@ ColumnLayout {
     var byTab = {
       general: [pauseBreaksButton, editSettingsButton, officeHoursRow,
         officeStartDropdown, officeEndDropdown],
-      context: [idleDetectionRow, fullscreenDetectionRow, mediaDetectionRow,
+      context: [idleDetectionRow, recentInputDetectionRow, fullscreenDetectionRow, mediaDetectionRow,
         microphoneDetectionRow, screenSharingDetectionRow, dictationDetectionRow],
       breaks: [focusMinutesField, shortBreakField, longBreakEveryField,
         longBreakSecondsField, snoozeBudgetField, maximumDelayField,
@@ -348,6 +348,18 @@ ColumnLayout {
     hasCursor: settingsPage.hasCursorFor(idleDetectionRow)
     onHovered: function(on) { if (on) settingsPage.setCursorTarget(idleDetectionRow) }
     onClicked: settingsPage.persistSettings({ idleDetection: !checked })
+  }
+  PanelSeparator { Layout.fillWidth: true; foreground: settingsPage.foreground }
+  LookUi.ToggleSettingRow {
+    id: recentInputDetectionRow
+    Layout.fillWidth: true
+    label: qsTr("Protect recent activity")
+    description: qsTr("Hold the final ten seconds while input continues")
+    checked: !settingsPage.settings || settingsPage.settings.recentInputDetection === undefined || settingsPage.settings.recentInputDetection === true
+    foreground: settingsPage.foreground; accent: settingsPage.accent; fontFamily: settingsPage.fontFamily
+    hasCursor: settingsPage.hasCursorFor(recentInputDetectionRow)
+    onHovered: function(on) { if (on) settingsPage.setCursorTarget(recentInputDetectionRow) }
+    onClicked: settingsPage.persistSettings({ recentInputDetection: !checked })
   }
   PanelSeparator { Layout.fillWidth: true; foreground: settingsPage.foreground }
   LookUi.ToggleSettingRow {

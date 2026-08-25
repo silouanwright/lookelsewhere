@@ -54,7 +54,7 @@ function defaultConfig() {
     panelPattern: "off",
     protectedApps: ["steam"],
     officeHours: { enabled: false, startMinute: 8 * 60, endMinute: 18 * 60 },
-    detectors: { idle: true, fullscreen: true, media: true, microphone: true, screenSharing: true, dictation: true, applications: true }
+    detectors: { idle: true, recentInput: true, fullscreen: true, media: true, microphone: true, screenSharing: true, dictation: true, applications: true }
   }
 }
 
@@ -146,7 +146,7 @@ function configFromSettings(settings) {
   if (incoming.officeHoursEnabled !== undefined) next.officeHours.enabled = incoming.officeHoursEnabled === true
   if (incoming.officeStart !== undefined) next.officeHours.startMinute = parseClockMinute(incoming.officeStart, next.officeHours.startMinute)
   if (incoming.officeEnd !== undefined) next.officeHours.endMinute = parseClockMinute(incoming.officeEnd, next.officeHours.endMinute)
-  var detectorKeys = ["idle", "fullscreen", "media", "microphone", "screenSharing", "dictation"]
+  var detectorKeys = ["idle", "recentInput", "fullscreen", "media", "microphone", "screenSharing", "dictation"]
   for (var i = 0; i < detectorKeys.length; i++) {
     var detector = detectorKeys[i]
     var settingKey = detector + "Detection"

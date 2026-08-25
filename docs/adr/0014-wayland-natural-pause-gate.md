@@ -22,7 +22,7 @@ quiet input, then begins the warning.
 
 During the final ten seconds, a two-second monitor also holds the countdown at
 ten seconds while keyboard or pointer activity continues. The bar reports this
-privacy-preserving approximation as `Typing..`; after two quiet seconds the
+privacy-preserving approximation as `Active`; after two quiet seconds the
 countdown resumes. Wayland does not expose typed keys or pointer coordinates to
 the plugin.
 

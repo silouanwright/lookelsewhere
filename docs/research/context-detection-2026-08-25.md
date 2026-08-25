@@ -22,7 +22,7 @@ by application and distribution version.
 | Context | Primary signal | Confidence | Current behavior | Known limit |
 |---|---|---:|---|---|
 | Away | Wayland idle notification | High | Pauses active-time accounting | Idle inhibitors and compositor policy can differ |
-| Recent typing/work | Short idle-notify window | Medium | Holds the final ten seconds while input remains active | Wayland intentionally does not reveal whether input was keyboard or pointer |
+| Recent input | Short idle-notify window | Medium | Holds the final ten seconds while input remains active | Wayland intentionally does not reveal whether input was keyboard or pointer, so casual scrolling can also hold |
 | Fullscreen | Quickshell Hyprland toplevel; bounded `hyprctl` fallback for XWayland | High | Delays a due break | Fullscreen does not prove video or a meeting |
 | Protected app | Focused app ID matched against user configuration | High | Delays a due break | Window identity varies across native Wayland and XWayland apps |
 | Focused media | MPRIS playback plus focused-player identity | Medium | Delays while the focused player is playing | Browsers do not expose whether the active media session contains video |

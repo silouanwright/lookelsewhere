@@ -40,6 +40,7 @@ TestCase {
       officeHoursEnabled: true,
       officeStart: "22:30",
       mediaDetection: false,
+      recentInputDetection: false,
       soundEnabled: true,
       soundVolume: 35,
       startSoundEnabled: false,
@@ -53,6 +54,7 @@ TestCase {
     verify(customized.officeHours.enabled)
     compare(customized.officeHours.startMinute, 22 * 60 + 30)
     verify(!customized.detectors.media)
+    verify(!customized.detectors.recentInput)
     verify(customized.soundEnabled)
     compare(customized.soundVolume, 35)
     verify(!customized.startSoundEnabled)
@@ -68,6 +70,7 @@ TestCase {
     verify(!restored.officeHours.enabled)
     compare(restored.officeHours.startMinute, 8 * 60)
     verify(restored.detectors.media)
+    verify(restored.detectors.recentInput)
     verify(restored.soundEnabled)
     compare(restored.soundVolume, 65)
     verify(restored.startSoundEnabled)

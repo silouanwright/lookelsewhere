@@ -141,9 +141,12 @@ value, behavior, and a complete JSONC reference.
 - Wayland exposes coarse application and device state, not semantic intent.
   Screen sharing, recording, and every meeting state cannot yet be identified
   perfectly without upstream support.
-- The `Typing..` state means recent keyboard or pointer activity. Wayland does
-  not reveal which kind of input occurred, and LookElsewhere never reads keys
-  or pointer coordinates.
+- The `Active` state means recent keyboard or pointer activity. Ordinary
+  Wayland clients cannot tell which kind occurred, so scrolling or moving the
+  pointer can hold the final ten seconds just like typing. LookElsewhere never
+  reads keys or pointer coordinates; exact typing-only protection requires
+  compositor support that does not exist today. Disable
+  `recentInputDetection` if ordinary browsing should never hold the countdown.
 - PipeWire can identify active microphone capture and explicit Communication,
   Camera, Screen, and Movie roles, but applications are not required to set
   them consistently. Calls with no active input may still be missed.

@@ -64,6 +64,7 @@ uses the default declared by the plugin manifest.
 | Key | Default | Accepted values | Meaning |
 |---|---:|---|---|
 | `idleDetection` | `true` | Boolean | Pause active-use accounting while the user is away. |
+| `recentInputDetection` | `true` | Boolean | Hold the final ten seconds while keyboard or pointer input continues. Wayland cannot distinguish the two. |
 | `fullscreenDetection` | `true` | Boolean | Delay a due break while the focused window is fullscreen. |
 | `mediaDetection` | `true` | Boolean | Delay for focused-app MPRIS playback. See the README limitation about audio/video classification. |
 | `microphoneDetection` | `true` | Boolean | Delay while PipeWire reports an active microphone stream; audio is never recorded. |
@@ -143,6 +144,7 @@ the complete default value set in one copyable shape:
 
   // Smart context
   "idleDetection": true,
+  "recentInputDetection": true,
   "fullscreenDetection": true,
   "mediaDetection": true,
   "microphoneDetection": true,

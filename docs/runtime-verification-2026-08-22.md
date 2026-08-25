@@ -49,11 +49,11 @@ one focused `HDMI-A-2` output at 3840×2160 with scale 2.
   and clean return to the preserved real schedule. No private application
   content appears in the committed media.
 
-## Typing protection
+## Recent-input protection
 
 - The guarded `typing` fixture retained the real Wayland idle-notify signal but
   suppressed persistence and sounds.
-- Repeated modifier-only input changed the bar to `Typing..` and held the
+- Repeated modifier-only input changed the bar to `Active` and held the
   warning deadline at exactly 10,000 ms.
 - After input stopped, the two-second recent-input window released the hold.
   It intentionally exceeds one scheduler interval so sparse input cannot

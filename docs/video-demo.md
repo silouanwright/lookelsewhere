@@ -8,7 +8,7 @@ The local filming setup binds:
 The cycle is:
 
 1. Away
-2. Typing
+2. Recent activity
 3. Meeting
 4. Microphone
 5. Camera

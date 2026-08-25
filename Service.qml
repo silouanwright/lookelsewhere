@@ -109,13 +109,14 @@ Item {
   // Must exceed the one-second scheduler interval so recent input cannot
   // expire between adjacent observations. Keep explicit for live calibration.
   readonly property int typingQuietSeconds: 2
-  readonly property bool typingHoldActive: (!demoMode || demoTypingProbe)
+  readonly property bool typingHoldActive: config.detectors.recentInput
+    && (!demoMode || demoTypingProbe)
     && (phase === Model.State.Warning || phase === Model.State.Final)
     && remainingMs <= 10000
     && !typingPauseMonitor.isIdle
   readonly property bool idlePauseActive: config.detectors.idle && idle
   readonly property var currentProtection: Model.strongestEvidence(evidence(), config)
-  readonly property string contextLabel: typingHoldActive ? "Typing.."
+  readonly property string contextLabel: typingHoldActive ? "Active"
     : currentProtection ? Model.contextShortLabel(currentProtection.category) : ""
   readonly property string phase: snapshot.state || Model.State.Working
   readonly property string label: idlePauseActive ? "Paused while you’re away" : Model.stateLabel(snapshot)
@@ -615,7 +616,8 @@ Item {
   // reading or storing input content.
   IdleMonitor {
     id: typingPauseMonitor
-    enabled: service.stateLoaded && (!service.demoMode || service.demoTypingProbe)
+    enabled: service.config.detectors.recentInput && service.stateLoaded
+      && (!service.demoMode || service.demoTypingProbe)
       && (service.phase === Model.State.Warning || service.phase === Model.State.Final)
       && service.remainingMs <= 11000
     timeout: service.typingQuietSeconds
