@@ -24,7 +24,7 @@ Panel {
 
   // Popup roles are independent from bar roles in an Omarchy theme.
   readonly property color foreground: Color.popups.text
-  readonly property color muted: Color.muted
+  readonly property color muted: Qt.darker(foreground, 1.55)
   readonly property color accent: Color.accent
   readonly property string fontFamily: bar ? bar.fontFamily : Style.font.family
   readonly property bool manuallyPaused: service && service.phase === "waiting-for-pause" && service.snapshot.pauseReason === "manual"
@@ -372,8 +372,11 @@ Panel {
             snapshot: root.service ? root.service.snapshot : null
             foreground: root.foreground
             muted: root.muted
+            accent: root.accent
             fontFamily: root.fontFamily
             sideInset: toolbarRow.implicitWidth
+            topInset: toolbarSurface.height
+            reducedMotion: root.service && root.service.config.reducedMotion
           }
         }
 

@@ -28,6 +28,7 @@ Item {
   readonly property int remainingSecondsPart: remainingSeconds % 60
   readonly property real warningClockFontSize: Style.font.heading
   readonly property real breakClockFontSize: Style.font.display * 1.35
+  readonly property color popupMuted: Qt.darker(Color.popups.text, 1.55)
   readonly property real warningClockSeparatorOverlap: Math.max(0,
     (warningClockColonMetrics.advanceWidth - warningClockColonMetrics.tightBoundingRect.width) / 2)
   readonly property real clockSeparatorOverlap: Math.max(0,
@@ -329,7 +330,7 @@ Item {
                 text: root.service && root.service.nextBreakIsLong
                   ? qsTr("Long break")
                   : qsTr("Short break")
-                color: Color.muted
+                color: root.popupMuted
                 font.family: Style.font.family
                 font.pixelSize: Style.font.bodySmall
                 font.weight: Font.DemiBold
@@ -377,24 +378,20 @@ Item {
         id: finalChip
         visible: root.finalCountdown
         anchors.top: parent.top
-        anchors.topMargin: Style.space(56)
+        anchors.topMargin: Style.space(48)
         anchors.horizontalCenter: parent.horizontalCenter
         width: Math.min(parent.width - Style.space(32), implicitWidth)
-        horizontalPadding: Style.space(14)
-        verticalPadding: Style.space(8)
-        contentSpacing: Style.space(10)
         ProductUi.BedIcon {
-          Layout.preferredWidth: Style.space(24)
+          Layout.preferredWidth: Style.space(20)
           Layout.preferredHeight: Layout.preferredWidth
           color: Color.accent
         }
         Text {
           Layout.fillWidth: true
           text: qsTr("Starting break in")
-          color: Color.popups.text
-          opacity: 0.78
+          color: root.popupMuted
           font.family: Style.font.family
-          font.pixelSize: Style.font.body
+          font.pixelSize: Style.font.bodySmall
           font.weight: Font.Medium
           elide: Text.ElideRight
         }
@@ -402,7 +399,7 @@ Item {
           text: root.service ? root.service.remainingText : ""
           color: Color.popups.text
           font.family: Style.font.family
-          font.pixelSize: Style.font.heading
+          font.pixelSize: Style.font.body
           font.weight: Font.DemiBold
         }
       }

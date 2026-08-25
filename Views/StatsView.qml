@@ -13,8 +13,11 @@ ColumnLayout {
   property var snapshot: null
   property color foreground: Color.popups.text
   property color muted: Color.muted
+  property color accent: Color.accent
   property string fontFamily: Style.font.family
   property real sideInset: 0
+  property real topInset: 0
+  property bool reducedMotion: false
 
   readonly property var statistics: snapshot && snapshot.statistics
     ? snapshot.statistics : Model.defaultStatistics(Date.now())
@@ -43,42 +46,51 @@ ColumnLayout {
   Layout.topMargin: Style.space(8)
   spacing: Style.space(10)
 
-  Text {
+  LookUi.SectionHeader {
     Layout.fillWidth: true
-    text: qsTr("Today")
-    color: root.foreground
-    font.family: root.fontFamily
-    font.pixelSize: Style.font.body
-    font.weight: Font.DemiBold
-    horizontalAlignment: Text.AlignHCenter
+    Layout.topMargin: root.topInset
+    label: qsTr("Today")
+    foreground: root.muted
+    fontFamily: root.fontFamily
   }
 
-  RowLayout {
+  Item {
     Layout.fillWidth: true
-    Layout.topMargin: Style.space(5)
-    spacing: Style.space(12)
+    Layout.preferredHeight: Math.max(activeMetric.implicitHeight, completedMetric.implicitHeight)
+    Layout.topMargin: -Style.space(7)
 
     Metric {
-      Layout.fillWidth: true
+      id: activeMetric
+      anchors { left: parent.left; right: metricDivider.left; verticalCenter: parent.verticalCenter }
+      anchors.rightMargin: Style.space(12)
       label: qsTr("Active screen time")
       value: Model.formatDuration(root.today.activeMs)
       prominent: true
     }
     Rectangle {
-      Layout.preferredWidth: Math.max(1, Style.space(1))
-      Layout.preferredHeight: Style.space(46)
+      id: metricDivider
+      anchors.horizontalCenter: parent.horizontalCenter
+      anchors.verticalCenter: parent.verticalCenter
+      width: Math.max(1, Style.space(1))
+      height: Style.space(46)
       color: root.foreground
       opacity: 0.14
     }
     Metric {
-      Layout.fillWidth: true
+      id: completedMetric
+      anchors { left: metricDivider.right; right: parent.right; verticalCenter: parent.verticalCenter }
+      anchors.leftMargin: Style.space(12)
       label: qsTr("Breaks completed")
       value: String(root.today.completed || 0)
       prominent: true
     }
   }
 
-  PanelSeparator { Layout.fillWidth: true; foreground: root.foreground }
+  PanelSeparator {
+    Layout.fillWidth: true
+    foreground: root.foreground
+    strength: 0.08
+  }
 
   RowLayout {
     Layout.fillWidth: true
@@ -86,18 +98,32 @@ ColumnLayout {
     Layout.rightMargin: Style.space(4)
     spacing: Style.space(7)
     Rectangle {
+      id: liveIndicator
       Layout.preferredWidth: Style.space(5)
       Layout.preferredHeight: Layout.preferredWidth
       radius: width / 2
-      color: root.foreground
-      opacity: 0.72
+      color: root.accent
+
+      SequentialAnimation on opacity {
+        running: !root.reducedMotion
+        loops: Animation.Infinite
+        NumberAnimation { to: 0.4; duration: 900; easing.type: Easing.InOutSine }
+        NumberAnimation { to: 1; duration: 900; easing.type: Easing.InOutSine }
+        onRunningChanged: if (!running) liveIndicator.opacity = 1
+      }
     }
     Text {
-      Layout.fillWidth: true
       text: qsTr("Current session")
       color: root.muted
       font.family: root.fontFamily
       font.pixelSize: Style.font.bodySmall
+    }
+    Text {
+      text: "·"
+      color: root.muted
+      font.family: root.fontFamily
+      font.pixelSize: Style.font.bodySmall
+      Accessible.ignored: true
     }
     Text {
       text: Model.formatDuration(root.statistics.currentSessionActiveMs)
@@ -110,25 +136,14 @@ ColumnLayout {
 
   Text {
     Layout.fillWidth: true
-    text: qsTr("Longest %1  ·  Median %2")
-      .arg(Model.formatDuration(root.today.longestSessionMs))
-      .arg(root.medianSessionMs > 0 ? Model.formatDuration(root.medianSessionMs) : qsTr("Not yet"))
-    color: root.muted
-    font.family: root.fontFamily
-    font.pixelSize: Style.font.bodySmall
-    horizontalAlignment: Text.AlignHCenter
-  }
-
-  Text {
-    Layout.fillWidth: true
-    Layout.topMargin: -Style.space(4)
+    Layout.leftMargin: Style.space(4)
     text: qsTr("%1 short · %2 long · %3 snoozed · %4 skipped")
       .arg(Number(root.today.shortBreaks || 0)).arg(Number(root.today.longBreaks || 0))
       .arg(Number(root.today.snoozed || 0)).arg(Number(root.today.skipped || 0))
     color: root.muted
     font.family: root.fontFamily
     font.pixelSize: Style.font.caption
-    horizontalAlignment: Text.AlignHCenter
+    horizontalAlignment: Text.AlignLeft
     wrapMode: Text.WordWrap
   }
 
@@ -138,6 +153,17 @@ ColumnLayout {
     label: qsTr("Recent sessions")
     foreground: root.muted
     fontFamily: root.fontFamily
+  }
+
+  Text {
+    Layout.fillWidth: true
+    text: qsTr("Longest %1  ·  Median %2")
+      .arg(Model.formatDuration(root.today.longestSessionMs))
+      .arg(root.medianSessionMs > 0 ? Model.formatDuration(root.medianSessionMs) : qsTr("Not yet"))
+    color: root.muted
+    font.family: root.fontFamily
+    font.pixelSize: Style.font.bodySmall
+    horizontalAlignment: Text.AlignLeft
   }
 
   Text {
@@ -164,6 +190,7 @@ ColumnLayout {
         spacing: Style.space(8)
         Text {
           Layout.fillWidth: true
+          Layout.alignment: Qt.AlignBaseline
           text: root.outcomeLabel(modelData.outcome)
           color: root.foreground
           font.family: root.fontFamily
@@ -172,12 +199,14 @@ ColumnLayout {
           elide: Text.ElideRight
         }
         Text {
+          Layout.alignment: Qt.AlignBaseline
           text: Model.formatDuration(modelData.durationMs)
           color: root.foreground
           font.family: root.fontFamily
           font.pixelSize: Style.font.bodySmall
         }
         Text {
+          Layout.alignment: Qt.AlignBaseline
           text: root.timeLabel(modelData.endedAtMs)
           color: root.muted
           font.family: root.fontFamily
@@ -188,6 +217,7 @@ ColumnLayout {
         Layout.fillWidth: true
         visible: index < root.sessions.length - 1
         foreground: root.foreground
+        strength: 0.08
       }
     }
   }
@@ -203,29 +233,41 @@ ColumnLayout {
 
   Repeater {
     model: root.previousDays
-    delegate: RowLayout {
+    delegate: ColumnLayout {
       required property var modelData
+      required property int index
       Layout.fillWidth: true
-      spacing: Style.space(8)
-      Text {
+      spacing: Style.space(5)
+
+      RowLayout {
         Layout.fillWidth: true
-        text: root.dayLabel(modelData.dateKey)
-        color: root.foreground
-        font.family: root.fontFamily
-        font.pixelSize: Style.font.bodySmall
-        elide: Text.ElideRight
+        spacing: Style.space(8)
+        Text {
+          Layout.fillWidth: true
+          text: root.dayLabel(modelData.dateKey)
+          color: root.foreground
+          font.family: root.fontFamily
+          font.pixelSize: Style.font.bodySmall
+          elide: Text.ElideRight
+        }
+        Text {
+          text: Model.formatDuration(modelData.activeMs)
+          color: root.muted
+          font.family: root.fontFamily
+          font.pixelSize: Style.font.caption
+        }
+        Text {
+          text: qsTr("%1 breaks").arg(Number(modelData.completed || 0))
+          color: root.muted
+          font.family: root.fontFamily
+          font.pixelSize: Style.font.caption
+        }
       }
-      Text {
-        text: Model.formatDuration(modelData.activeMs)
-        color: root.muted
-        font.family: root.fontFamily
-        font.pixelSize: Style.font.caption
-      }
-      Text {
-        text: qsTr("%1 breaks").arg(Number(modelData.completed || 0))
-        color: root.muted
-        font.family: root.fontFamily
-        font.pixelSize: Style.font.caption
+      PanelSeparator {
+        Layout.fillWidth: true
+        visible: index < root.previousDays.length - 1
+        foreground: root.foreground
+        strength: 0.08
       }
     }
   }
