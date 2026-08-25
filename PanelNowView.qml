@@ -2,6 +2,8 @@ import QtQuick
 import QtQuick.Layouts
 import qs.Commons
 import "Model.js" as Model
+import "vendor/qmlpack/oma-command-layer/Ui" as OmaCommands
+import "vendor/qmlpack/oma-command-layer/Ui/CommandModel.js" as CommandModel
 import "vendor/qmlpack/oma-ui/Ui" as LookUi
 
 ColumnLayout {
@@ -24,7 +26,7 @@ ColumnLayout {
   property string snoozeBudgetSummary: ""
   property string snoozeUnavailableSummary: ""
   property string snoozeAvailabilitySummary: qsTr("Snoozes available: 3")
-  property bool keyboardHintsVisible: false
+  property var commandLayer: null
   property var shortcuts: ({ breakNow: "B", snooze1: "1", snooze5: "2", snooze15: "3" })
   property real clockSeparatorOverlap: 0
   property Item shortcutsTarget: null
@@ -185,9 +187,9 @@ ColumnLayout {
         Accessible.onPressAction: clicked()
         onClicked: root.breakNowRequested()
 
-        LookUi.KeyHintBadge {
-          visible: root.keyboardHintsVisible
-          keyText: Model.panelShortcutLabel(root.shortcuts.breakNow)
+        OmaCommands.CommandHint {
+          commandLayer: root.commandLayer
+          keyText: CommandModel.label(root.shortcuts.breakNow)
           centerOnCorner: true
         }
       }
@@ -219,9 +221,9 @@ ColumnLayout {
         Accessible.onPressAction: clicked()
         onClicked: root.postponeRequested(1)
 
-        LookUi.KeyHintBadge {
-          visible: root.keyboardHintsVisible
-          keyText: Model.panelShortcutLabel(root.shortcuts.snooze1)
+        OmaCommands.CommandHint {
+          commandLayer: root.commandLayer
+          keyText: CommandModel.label(root.shortcuts.snooze1)
           available: postpone1Button.actionEnabled
           centerOnCorner: true
         }
@@ -254,9 +256,9 @@ ColumnLayout {
         Accessible.onPressAction: clicked()
         onClicked: root.postponeRequested(5)
 
-        LookUi.KeyHintBadge {
-          visible: root.keyboardHintsVisible
-          keyText: Model.panelShortcutLabel(root.shortcuts.snooze5)
+        OmaCommands.CommandHint {
+          commandLayer: root.commandLayer
+          keyText: CommandModel.label(root.shortcuts.snooze5)
           available: postpone5Button.actionEnabled
           centerOnCorner: true
         }
@@ -289,9 +291,9 @@ ColumnLayout {
         Accessible.onPressAction: clicked()
         onClicked: root.postponeRequested(15)
 
-        LookUi.KeyHintBadge {
-          visible: root.keyboardHintsVisible
-          keyText: Model.panelShortcutLabel(root.shortcuts.snooze15)
+        OmaCommands.CommandHint {
+          commandLayer: root.commandLayer
+          keyText: CommandModel.label(root.shortcuts.snooze15)
           available: postpone15Button.actionEnabled
           centerOnCorner: true
         }

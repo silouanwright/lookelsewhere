@@ -7,6 +7,8 @@ import qs.Commons
 import qs.Ui
 import "Model.js" as Model
 import "Ui" as ProductUi
+import "vendor/qmlpack/oma-command-layer/Ui" as OmaCommands
+import "vendor/qmlpack/oma-command-layer/Ui/CommandModel.js" as CommandModel
 import "vendor/qmlpack/oma-ui/Ui" as LookUi
 
 Panel {
@@ -29,10 +31,9 @@ Panel {
   readonly property bool idlePaused: service && service.idlePauseActive
   readonly property bool delayActionsVisible: !manuallyPaused && service
   readonly property bool delayActionsEnabled: !!delayActionsVisible && !!service.canPostpone
-  readonly property bool shortcutsActive: opened
   readonly property bool numberEditorActive: root.page === "options" && settingsPage.editorActive
   readonly property bool dropdownOpen: root.page === "options" && settingsPage.dropdownOpen
-  readonly property var shortcuts: Model.panelShortcuts(settings)
+  readonly property var shortcuts: CommandModel.resolve(settings, Model.panelShortcutDefinitions())
   readonly property bool keyboardHintsVisible: !!(settings && settings.showKeyboardHints === true)
   readonly property int snoozesRemaining: service
     ? Math.max(0, Number(service.config.snoozeBudget || 0) - Number(service.snapshot.snoozesUsed || 0))
@@ -121,29 +122,31 @@ Panel {
 
     // Window-local mnemonics must live in the popup's item tree so Qt can
     // associate WindowShortcut with the layer-shell window that owns focus.
-    Item {
-      width: 0
-      height: 0
+    OmaCommands.CommandLayer {
+      id: commandLayer
+      active: root.opened
+      suspended: root.numberEditorActive || root.dropdownOpen
+      hintsVisible: root.keyboardHintsVisible
+      onHintsToggleRequested: root.toggleKeyboardHints()
 
-      Shortcut { sequence: root.shortcuts.breakNow; context: Qt.WindowShortcut; enabled: root.shortcutsActive; onActivated: root.takeBreakAndClose() }
-      Shortcut { sequence: root.shortcuts.snooze1; context: Qt.WindowShortcut; enabled: root.shortcutsActive && root.delayActionsEnabled; onActivated: root.postponeAndClose(1) }
-      Shortcut { sequence: root.shortcuts.snooze5; context: Qt.WindowShortcut; enabled: root.shortcutsActive && root.delayActionsEnabled; onActivated: root.postponeAndClose(5) }
-      Shortcut { sequence: root.shortcuts.snooze15; context: Qt.WindowShortcut; enabled: root.shortcutsActive && root.delayActionsEnabled; onActivated: root.postponeAndClose(15) }
-      Shortcut { sequence: root.shortcuts.pause; context: Qt.WindowShortcut; enabled: root.shortcutsActive && root.service && Model.canTogglePause(root.service.phase); onActivated: root.toggleManualPause() }
-      Shortcut { sequence: root.shortcuts.history; context: Qt.WindowShortcut; enabled: root.shortcutsActive; onActivated: root.togglePage("stats") }
-      Shortcut { sequence: root.shortcuts.options; context: Qt.WindowShortcut; enabled: root.shortcutsActive; onActivated: root.togglePage("options") }
-      Shortcut { sequence: root.shortcuts.edit; context: Qt.WindowShortcut; enabled: root.shortcutsActive && root.page === "options"; onActivated: { root.close(); settingsEditor.running = true } }
-      Shortcut { sequence: root.shortcuts.generalTab; context: Qt.WindowShortcut; enabled: root.shortcutsActive && root.page === "options"; onActivated: settingsPage.settingsTab = "general" }
-      Shortcut { sequence: root.shortcuts.breaksTab; context: Qt.WindowShortcut; enabled: root.shortcutsActive && root.page === "options"; onActivated: settingsPage.settingsTab = "breaks" }
-      Shortcut { sequence: root.shortcuts.contextTab; context: Qt.WindowShortcut; enabled: root.shortcutsActive && root.page === "options"; onActivated: settingsPage.settingsTab = "context" }
-      Shortcut { sequence: root.shortcuts.experienceTab; context: Qt.WindowShortcut; enabled: root.shortcutsActive && root.page === "options"; onActivated: settingsPage.settingsTab = "experience" }
-      Shortcut {
+      OmaCommands.WindowCommand { commandLayer: commandLayer; sequence: root.shortcuts.breakNow; onInvoked: root.takeBreakAndClose() }
+      OmaCommands.WindowCommand { commandLayer: commandLayer; sequence: root.shortcuts.snooze1; available: root.delayActionsEnabled; onInvoked: root.postponeAndClose(1) }
+      OmaCommands.WindowCommand { commandLayer: commandLayer; sequence: root.shortcuts.snooze5; available: root.delayActionsEnabled; onInvoked: root.postponeAndClose(5) }
+      OmaCommands.WindowCommand { commandLayer: commandLayer; sequence: root.shortcuts.snooze15; available: root.delayActionsEnabled; onInvoked: root.postponeAndClose(15) }
+      OmaCommands.WindowCommand { commandLayer: commandLayer; sequence: root.shortcuts.pause; available: root.service && Model.canTogglePause(root.service.phase); onInvoked: root.toggleManualPause() }
+      OmaCommands.WindowCommand { commandLayer: commandLayer; sequence: root.shortcuts.history; onInvoked: root.togglePage("stats") }
+      OmaCommands.WindowCommand { commandLayer: commandLayer; sequence: root.shortcuts.options; onInvoked: root.togglePage("options") }
+      OmaCommands.WindowCommand { commandLayer: commandLayer; sequence: root.shortcuts.edit; available: root.page === "options"; onInvoked: { root.close(); settingsEditor.running = true } }
+      OmaCommands.WindowCommand { commandLayer: commandLayer; sequence: root.shortcuts.generalTab; available: root.page === "options"; onInvoked: settingsPage.settingsTab = "general" }
+      OmaCommands.WindowCommand { commandLayer: commandLayer; sequence: root.shortcuts.breaksTab; available: root.page === "options"; onInvoked: settingsPage.settingsTab = "breaks" }
+      OmaCommands.WindowCommand { commandLayer: commandLayer; sequence: root.shortcuts.contextTab; available: root.page === "options"; onInvoked: settingsPage.settingsTab = "context" }
+      OmaCommands.WindowCommand { commandLayer: commandLayer; sequence: root.shortcuts.experienceTab; available: root.page === "options"; onInvoked: settingsPage.settingsTab = "experience" }
+      OmaCommands.WindowCommand {
+        commandLayer: commandLayer
         sequence: root.shortcuts.close
-        context: Qt.WindowShortcut
-        enabled: root.shortcutsActive && !root.numberEditorActive && !root.dropdownOpen
-        onActivated: root.close()
+        onInvoked: root.close()
       }
-      Shortcut { sequence: root.shortcuts.hints; context: Qt.WindowShortcut; enabled: root.shortcutsActive; onActivated: root.toggleKeyboardHints() }
+      OmaCommands.WindowCommand { commandLayer: commandLayer; sequence: root.shortcuts.hints; onInvoked: commandLayer.toggleHints() }
     }
 
     Item {
@@ -248,9 +251,9 @@ Panel {
           Accessible.onPressAction: clicked()
           onClicked: root.toggleKeyboardHints()
 
-          LookUi.KeyHintBadge {
-            visible: root.keyboardHintsVisible
-            keyText: Model.panelShortcutLabel(root.shortcuts.hints)
+          OmaCommands.CommandHint {
+            commandLayer: commandLayer
+            keyText: CommandModel.label(root.shortcuts.hints)
           }
         }
 
@@ -285,9 +288,9 @@ Panel {
             Accessible.onPressAction: clicked()
             onClicked: root.togglePage("stats")
 
-            LookUi.KeyHintBadge {
-              visible: root.keyboardHintsVisible
-              keyText: Model.panelShortcutLabel(root.shortcuts.history)
+            OmaCommands.CommandHint {
+              commandLayer: commandLayer
+              keyText: CommandModel.label(root.shortcuts.history)
             }
           }
 
@@ -318,9 +321,9 @@ Panel {
             Accessible.onPressAction: clicked()
             onClicked: root.togglePage("options")
 
-            LookUi.KeyHintBadge {
-              visible: root.keyboardHintsVisible
-              keyText: Model.panelShortcutLabel(root.shortcuts.options)
+            OmaCommands.CommandHint {
+              commandLayer: commandLayer
+              keyText: CommandModel.label(root.shortcuts.options)
             }
           }
         }
@@ -345,7 +348,7 @@ Panel {
           snoozeBudgetSummary: root.snoozeBudgetSummary
           snoozeUnavailableSummary: root.snoozeUnavailableSummary
           snoozeAvailabilitySummary: root.snoozeAvailabilitySummary
-          keyboardHintsVisible: root.keyboardHintsVisible
+          commandLayer: commandLayer
           shortcuts: root.shortcuts
           clockSeparatorOverlap: root.clockSeparatorOverlap
           shortcutsTarget: shortcutsButton
@@ -407,6 +410,7 @@ Panel {
           settings: root.settings
           shortcuts: root.shortcuts
           keyboardHintsVisible: root.keyboardHintsVisible
+          commandLayer: commandLayer
           manuallyPaused: root.manuallyPaused
           foreground: root.foreground
           muted: root.muted

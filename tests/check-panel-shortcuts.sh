@@ -7,12 +7,15 @@ settings_page="$repo/SettingsPage.qml"
 now_view="$repo/PanelNowView.qml"
 ui="$repo/vendor/qmlpack/oma-ui/Ui"
 keyboard_line=$(grep -n -m1 '^  KeyboardPanel {' "$panel" | cut -d: -f1)
-first_shortcut_line=$(grep -n -m1 '^[[:space:]]*Shortcut {' "$panel" | cut -d: -f1)
-window_shortcuts=$(grep -c 'context: Qt.WindowShortcut' "$panel")
+first_shortcut_line=$(grep -n -m1 'OmaCommands.WindowCommand {' "$panel" | cut -d: -f1)
+window_shortcuts=$(grep -c 'OmaCommands.WindowCommand {' "$panel")
 
 test "$first_shortcut_line" -gt "$keyboard_line"
 test "$window_shortcuts" -eq 14
 ! grep -q 'context: Qt.ApplicationShortcut' "$panel"
+grep -q 'suspended: root.numberEditorActive || root.dropdownOpen' "$panel"
+grep -q 'context: Qt.WindowShortcut' "$repo/vendor/qmlpack/oma-command-layer/Ui/WindowCommand.qml"
+grep -q 'visible: commandLayer.hintsVisible' "$repo/vendor/qmlpack/oma-command-layer/Ui/CommandHint.qml"
 ! grep -q 'service && !service.interrupting' "$panel"
 grep -q 'function targets()' "$settings_page"
 grep -q 'target && typeof target.activate === "function"' "$settings_page"

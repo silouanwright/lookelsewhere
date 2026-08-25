@@ -1,6 +1,7 @@
 import QtQuick
 import QtTest
 import "../../Model.js" as Model
+import "../../vendor/qmlpack/oma-command-layer/Ui/CommandModel.js" as CommandModel
 
 TestCase {
   name: "LookElsewhereModel"
@@ -93,27 +94,30 @@ TestCase {
   }
 
   function test_panelShortcutConfiguration() {
-    var defaults = Model.panelShortcuts({})
+    var defaults = CommandModel.resolve({}, Model.panelShortcutDefinitions())
     compare(defaults.breakNow, "B")
     compare(defaults.generalTab, "G")
     compare(defaults.breaksTab, "R")
     compare(defaults.hints, "?")
 
-    var customized = Model.panelShortcuts({
+    var customized = CommandModel.resolve({
       shortcutBreakNow: "ctrl + k",
       shortcutGeneralTab: "F2",
       shortcutHints: "F1"
-    })
+    }, Model.panelShortcutDefinitions())
     compare(customized.breakNow, "Ctrl+K")
     compare(customized.generalTab, "F2")
     compare(customized.hints, "F1")
-    compare(Model.panelShortcutLabel("Ctrl+K"), "Ctrl+K")
+    compare(CommandModel.label("Ctrl+K"), "Ctrl+K")
+    compare(CommandModel.label("Shift+D"), "⬆D")
 
-    var invalid = Model.panelShortcuts({ shortcutBreakNow: "Escape", shortcutPause: "" })
+    var invalid = CommandModel.resolve({ shortcutBreakNow: "Escape", shortcutPause: "" },
+                                       Model.panelShortcutDefinitions())
     compare(invalid.breakNow, "B")
     compare(invalid.pause, "P")
 
-    var duplicate = Model.panelShortcuts({ shortcutBreakNow: "H" })
+    var duplicate = CommandModel.resolve({ shortcutBreakNow: "H" },
+                                         Model.panelShortcutDefinitions())
     compare(duplicate.breakNow, "B")
     compare(duplicate.history, "H")
   }

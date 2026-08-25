@@ -1,0 +1,4 @@
+module OmaCommandLayer
+CommandLayer 1.0 CommandLayer.qml
+WindowCommand 1.0 WindowCommand.qml
+CommandHint 1.0 CommandHint.qml

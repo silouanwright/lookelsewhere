@@ -20,6 +20,29 @@
         "bin/bounded-read": "sha256:6a1fbfc7c1ab8811aa1a36b0222ec40d4ea7c6a2a49bfac03934ce38583b828b"
       }
     },
+    "oma-command-layer": {
+      "source": "github:silouanwright/omatools/packages/oma-command-layer@0.1.2",
+      "resolution": {
+        "transport": "github",
+        "repository_id": 1345448296,
+        "repository_name": "silouanwright/omatools",
+        "package_path": "packages/oma-command-layer",
+        "requested": "0.1.2",
+        "version": "0.1.2",
+        "tag": "packages/oma-command-layer/v0.1.2",
+        "commit": "e47aedec3601276381af31744748db24cedcc100"
+      },
+      "digest": "sha256:55010c363e4bdd3f371bc70f268d6daace0b68f82954dbc4f411a6cf4022107b",
+      "files": {
+        "LICENSE": "sha256:0c088bc264e3ae0398a852410ed879ead024daa8806895963f83ce1fc688d317",
+        "README.md": "sha256:59d9755662f8329fdfc323bef0046d11956ceb0ecb4b6d05b5fa8d37fc62ff87",
+        "Ui/CommandHint.qml": "sha256:2b0dd029d28d4a1ec0679d12bf7c138ab212e23b42d95da11ea0b5ae0f523574",
+        "Ui/CommandLayer.qml": "sha256:ba13057f84f51f01173ca8a57566ad37f0932c7e3ed6f3941324be5f8cfcd1a3",
+        "Ui/CommandModel.js": "sha256:c41f1dd61f1dfe717e4666317ae16088eaa75f27145f24f34985e66aa3e1ab2f",
+        "Ui/WindowCommand.qml": "sha256:f332b61c7c94d0815a51924eb4ba4e3363920db6927cc5fc7750367ad86f245e",
+        "Ui/qmldir": "sha256:91952dbb4c850294bcb15a74fd2443f3f9e392e45b4324bc5cc852fe4066cda5"
+      }
+    },
     "oma-showcase": {
       "source": "github:silouanwright/omatools/packages/oma-showcase@0.1.0",
       "resolution": {

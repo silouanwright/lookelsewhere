@@ -4,6 +4,7 @@ import qs.Commons
 import qs.Ui
 import "../.." as Product
 import "../../Ui" as ProductUi
+import "../../vendor/qmlpack/oma-command-layer/Ui" as OmaCommands
 import "../../vendor/qmlpack/oma-ui/Ui" as LookUi
 
 BorderSurface {
@@ -18,6 +19,10 @@ BorderSurface {
   borderSpec: Border.surfaceSpec("popups", "border", Color.popups.border, Math.max(1, Style.space(2)))
   padding: Style.spacing.popupPadding
   radius: cornerRadius
+
+  OmaCommands.CommandLayer {
+    id: commandLayer
+  }
 
   ProductUi.PanelPattern {
     anchors.fill: parent
@@ -97,7 +102,7 @@ BorderSurface {
       delayActionsEnabled: true
       snoozeBudgetSummary: qsTr("0 of 10 snoozes used")
       snoozeAvailabilitySummary: qsTr("Snoozes available: 10")
-      keyboardHintsVisible: false
+      commandLayer: commandLayer
       shortcutsTarget: helpButton
       statsTarget: toolbarRow.children[0]
       settingsTarget: settingsButton

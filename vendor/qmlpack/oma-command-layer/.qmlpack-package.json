@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "name": "oma-command-layer",
+  "license": "MIT",
+  "files": [
+    "Ui/CommandHint.qml",
+    "Ui/CommandLayer.qml",
+    "Ui/CommandModel.js",
+    "Ui/WindowCommand.qml",
+    "Ui/qmldir",
+    "README.md",
+    "LICENSE"
+  ],
+  "dependencies": {
+    "oma-ui": "github:silouanwright/omatools/packages/oma-ui@0.2.0"
+  },
+  "compatibility": {
+    "omarchy": ">=4 <5",
+    "quickshell": ">=0.3 <0.4"
+  }
+}

@@ -4,6 +4,8 @@ import QtQuick.Layouts
 import qs.Commons
 import qs.Ui
 import "Model.js" as Model
+import "vendor/qmlpack/oma-command-layer/Ui" as OmaCommands
+import "vendor/qmlpack/oma-command-layer/Ui/CommandModel.js" as CommandModel
 import "vendor/qmlpack/oma-ui/Ui" as LookUi
 
 ColumnLayout {
@@ -13,6 +15,7 @@ ColumnLayout {
   property var settings: ({})
   property var shortcuts: ({})
   property bool keyboardHintsVisible: false
+  property var commandLayer: null
   property bool manuallyPaused: false
   property bool active: false
   property color foreground: Color.popups.text
@@ -140,10 +143,10 @@ ColumnLayout {
     Layout.alignment: Qt.AlignHCenter
     Layout.topMargin: settingsPage.topInset + Style.space(8)
     options: [
-      { value: "general", label: qsTr("General"), key: Model.panelShortcutLabel(settingsPage.shortcuts.generalTab) },
-      { value: "breaks", label: qsTr("Breaks"), key: Model.panelShortcutLabel(settingsPage.shortcuts.breaksTab) },
-      { value: "context", label: qsTr("Context"), key: Model.panelShortcutLabel(settingsPage.shortcuts.contextTab) },
-      { value: "experience", label: qsTr("Experience"), key: Model.panelShortcutLabel(settingsPage.shortcuts.experienceTab) }
+      { value: "general", label: qsTr("General"), key: CommandModel.label(settingsPage.shortcuts.generalTab) },
+      { value: "breaks", label: qsTr("Breaks"), key: CommandModel.label(settingsPage.shortcuts.breaksTab) },
+      { value: "context", label: qsTr("Context"), key: CommandModel.label(settingsPage.shortcuts.contextTab) },
+      { value: "experience", label: qsTr("Experience"), key: CommandModel.label(settingsPage.shortcuts.experienceTab) }
     ]
     value: settingsPage.settingsTab
     hintsVisible: settingsPage.keyboardHintsVisible
@@ -203,9 +206,9 @@ ColumnLayout {
     Keys.onEscapePressed: settingsPage.dismissHintsOrClose()
     onClicked: settingsPage.toggleManualPause()
 
-    LookUi.KeyHintBadge {
-      visible: settingsPage.keyboardHintsVisible
-      keyText: Model.panelShortcutLabel(settingsPage.shortcuts.pause)
+    OmaCommands.CommandHint {
+      commandLayer: settingsPage.commandLayer
+      keyText: CommandModel.label(settingsPage.shortcuts.pause)
       available: pauseBreaksButton.enabled
       x: parent.controlX - width - Style.space(4)
       y: parent.controlY + (parent.controlHeight - height) / 2
@@ -251,9 +254,9 @@ ColumnLayout {
 
     }
 
-    LookUi.KeyHintBadge {
-      visible: settingsPage.keyboardHintsVisible
-      keyText: Model.panelShortcutLabel(settingsPage.shortcuts.edit)
+    OmaCommands.CommandHint {
+      commandLayer: settingsPage.commandLayer
+      keyText: CommandModel.label(settingsPage.shortcuts.edit)
       x: parent.width - width
       y: editSettingsButton.y - height / 2
     }
