@@ -100,6 +100,11 @@ Item {
   readonly property string phase: snapshot.state || Model.State.Working
   readonly property string label: idlePauseActive ? "Paused while you’re away" : Model.stateLabel(snapshot)
   readonly property string remainingText: Model.formatDuration(remainingMs)
+  readonly property string naturalBreakMessage: Model.naturalBreakMessage(snapshot)
+  readonly property bool naturalBreakUndoAvailable: snapshot.naturalBreakDecision
+    && Date.now() <= Number(snapshot.naturalBreakDecision.undoUntilMs || 0)
+  readonly property bool naturalBreakToastVisible: snapshot.naturalBreakDecision
+    && Date.now() - Number(snapshot.naturalBreakDecision.decidedAtMs || 0) <= 6000
   readonly property real progress: {
     if (phase === Model.State.Breaking) {
       var duration = Number(snapshot.activeBreakDurationMs || config.breakMs)
@@ -145,6 +150,7 @@ Item {
 
   function observe() {
     var beforeState = snapshot.state
+    var beforeDecision = JSON.stringify(snapshot.naturalBreakDecision || null)
     var effectiveIdle = config.detectors.idle && idle
     snapshot = Model.observe(snapshot, {
       nowMs: Date.now(),
@@ -155,7 +161,8 @@ Item {
       evidence: evidence()
     }, config)
     playTransitionSound(beforeState, snapshot.state)
-    if (!demoMode && snapshot.state !== beforeState) scheduleSave()
+    if (!demoMode && (snapshot.state !== beforeState
+        || JSON.stringify(snapshot.naturalBreakDecision || null) !== beforeDecision)) scheduleSave()
   }
 
   onActiveToplevelChanged: {
@@ -193,6 +200,11 @@ Item {
 
   function resetHistory() {
     snapshot = Model.resetTotals(snapshot)
+    scheduleSave()
+  }
+
+  function undoNaturalBreak() {
+    snapshot = Model.undoNaturalBreak(snapshot, Date.now())
     scheduleSave()
   }
 
@@ -644,7 +656,7 @@ Item {
   IpcHandler {
     target: "look-elsewhere"
 
-    function status(): string { return JSON.stringify({ state: service.phase, remainingMs: service.remainingMs, evidence: service.evidence(), demo: service.demoMode, idlePaused: service.idlePauseActive, naturalPauseReady: service.naturalPauseReady, typingHoldActive: service.typingHoldActive, contextLabel: service.contextLabel, recoveryWarning: service.recoveryWarning }) }
+    function status(): string { return JSON.stringify({ state: service.phase, remainingMs: service.remainingMs, evidence: service.evidence(), demo: service.demoMode, idlePaused: service.idlePauseActive, naturalPauseReady: service.naturalPauseReady, typingHoldActive: service.typingHoldActive, contextLabel: service.contextLabel, naturalBreakDecision: service.snapshot.naturalBreakDecision || null, recoveryWarning: service.recoveryWarning }) }
     function configuration(): string { return JSON.stringify(service.config) }
     function diagnostics(): string { return JSON.stringify({ fullscreen: service.fullscreenAvailable, dictation: service.dictationAvailable, mpris: true, pipewire: true, idle: true, sound: service.soundAvailable, persistenceBlocked: service.persistenceBlocked }) }
     function takeBreak(): string { service.takeBreak(); return service.phase }
@@ -655,6 +667,7 @@ Item {
     function resume(): string { service.resume(); return service.phase }
     function skip(): string { service.skipBreak(); return service.phase }
     function resetHistory(): string { service.resetHistory(); return "ok" }
+    function undoNaturalBreak(): string { service.undoNaturalBreak(); return service.phase }
     function resetLocalData(): string { service.resetLocalData(); return "ok" }
     function demo(state: string): string { service.setDemo(state); return service.phase }
     function demoNext(): string { return service.advanceDemo() }

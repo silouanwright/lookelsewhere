@@ -14,7 +14,9 @@ var State = {
 
 var ValidStates = Object.keys(State).map(function(key) { return State[key] })
 var MaximumPersistedFutureMs = 24 * 60 * 60 * 1000
+var NaturalBreakReviewMs = 5 * 60 * 1000
 var SessionResetInactivityMs = 60 * 60 * 1000
+var NaturalBreakUndoMs = 60 * 1000
 
 function clamp(value, low, high) {
   return Math.max(low, Math.min(high, Number(value)))
@@ -168,6 +170,7 @@ function defaultSnapshot(nowMs) {
     protectedCategory: "",
     pauseReason: "",
     snoozesUsed: 0,
+    naturalBreakDecision: null,
     totals: { prompted: 0, completed: 0, postponed: 0, skipped: 0, delayed: 0 }
   }
 }
@@ -213,6 +216,24 @@ function copySnapshot(snapshot) {
     number = Number(number)
     return isFinite(number) ? Math.max(0, number) : 0
   }
+  var decision = value.naturalBreakDecision || null
+  if (decision && ["resumed", "reset"].indexOf(String(decision.kind || "")) < 0) decision = null
+  if (decision) {
+    var before = decision.before || {}
+    decision = {
+      kind: String(decision.kind),
+      awayMs: nonnegative(decision.awayMs),
+      decidedAtMs: nonnegative(decision.decidedAtMs),
+      undoUntilMs: nonnegative(decision.undoUntilMs),
+      before: {
+        state: [State.Working, State.DueSoon].indexOf(String(before.state || "")) >= 0
+          ? String(before.state) : State.Working,
+        accumulatedActiveMs: nonnegative(before.accumulatedActiveMs),
+        breaksSinceLong: nonnegative(before.breaksSinceLong),
+        snoozesUsed: nonnegative(before.snoozesUsed)
+      }
+    }
+  }
   return {
     version: 1,
     state: state,
@@ -232,6 +253,7 @@ function copySnapshot(snapshot) {
     protectedCategory: String(value.protectedCategory || ""),
     pauseReason: String(value.pauseReason || ""),
     snoozesUsed: nonnegative(value.snoozesUsed),
+    naturalBreakDecision: decision,
     totals: {
       prompted: nonnegative(totals.prompted),
       completed: nonnegative(totals.completed),
@@ -251,6 +273,9 @@ function recoverSnapshot(snapshot, nowMs) {
   ]
   for (var i = 0; i < timestamps.length; i++)
     if (next[timestamps[i]] > latest) return null
+  if (next.naturalBreakDecision
+      && (next.naturalBreakDecision.decidedAtMs > latest
+        || next.naturalBreakDecision.undoUntilMs > latest)) return null
   return next
 }
 
@@ -269,9 +294,26 @@ function observe(snapshot, input, config) {
   var elapsed = clamp(now - previous, 0, 5 * 60 * 1000)
   var activeNow = input.active === true && input.idle !== true
   var manuallyPaused = next.state === State.Waiting && next.pauseReason === "manual"
-  if (activeNow && !manuallyPaused
-      && now - Number(next.lastActiveAtMs || previous) >= SessionResetInactivityMs) {
-    next = resetSession(next, now)
+  if (next.naturalBreakDecision && now > next.naturalBreakDecision.undoUntilMs)
+    next.naturalBreakDecision = null
+  var awayMs = now - Number(next.lastActiveAtMs || previous)
+  var stableWork = next.state === State.Working || next.state === State.DueSoon
+  if (activeNow && !manuallyPaused && stableWork && awayMs >= NaturalBreakReviewMs) {
+    var before = {
+      state: next.state,
+      accumulatedActiveMs: next.accumulatedActiveMs,
+      breaksSinceLong: next.breaksSinceLong,
+      snoozesUsed: next.snoozesUsed
+    }
+    var kind = awayMs >= SessionResetInactivityMs ? "reset" : "resumed"
+    if (kind === "reset") next = resetSession(next, now)
+    next.naturalBreakDecision = {
+      kind: kind,
+      awayMs: awayMs,
+      decidedAtMs: now,
+      undoUntilMs: now + NaturalBreakUndoMs,
+      before: before
+    }
     elapsed = 0
   }
   next.lastObservedAtMs = now
@@ -366,6 +408,37 @@ function observe(snapshot, input, config) {
     return next
   }
   return startWarning(next, now, cfg)
+}
+
+function undoNaturalBreak(snapshot, nowMs) {
+  var next = copySnapshot(snapshot)
+  var decision = next.naturalBreakDecision
+  if (!decision || Number(nowMs) > decision.undoUntilMs) {
+    next.naturalBreakDecision = null
+    return next
+  }
+  if (decision.kind === "reset") {
+    next.state = decision.before.state
+    next.accumulatedActiveMs = decision.before.accumulatedActiveMs
+    next.breaksSinceLong = decision.before.breaksSinceLong
+    next.snoozesUsed = decision.before.snoozesUsed
+  } else {
+    next = resetSession(next, nowMs)
+  }
+  next.stateEnteredAtMs = Number(nowMs)
+  next.lastObservedAtMs = Number(nowMs)
+  next.lastActiveAtMs = Number(nowMs)
+  next.naturalBreakDecision = null
+  return next
+}
+
+function naturalBreakMessage(snapshot) {
+  var decision = snapshot && snapshot.naturalBreakDecision
+  if (!decision) return ""
+  var away = formatDuration(decision.awayMs)
+  return decision.kind === "reset"
+    ? "Fresh session after " + away + " away"
+    : "Timer resumed after " + away + " away"
 }
 
 function startWarning(snapshot, nowMs, config, durationMs) {

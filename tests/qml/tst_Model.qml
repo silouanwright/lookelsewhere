@@ -240,9 +240,10 @@ TestCase {
     var c = config({ focusMs: 60 * 60 * 1000 })
     var s = Model.defaultSnapshot(1000)
     s = Model.observe(s, { nowMs: 30 * 60 * 1000, active: true, idle: false, evidence: [] }, c)
-    // A missing observation is capped so suspend, hibernate, and clock jumps
-    // cannot manufacture an entire focus session.
-    compare(s.accumulatedActiveMs, 5 * 60 * 1000)
+    // A meaningful missing interval is classified as time away. Resuming the
+    // prior session must not manufacture active screen time.
+    compare(s.accumulatedActiveMs, 0)
+    compare(s.naturalBreakDecision.kind, "resumed")
   }
 
   function test_outsideOfficeHoursPausesAndReentersCleanly() {
@@ -633,5 +634,59 @@ TestCase {
     compare(s.state, Model.State.Waiting)
     compare(s.pauseReason, "manual")
     compare(s.accumulatedActiveMs, 12000)
+  }
+
+  function test_naturalBreakResumesAfterMeaningfulAwayTime() {
+    var c = config({ focusMs: 30 * 60 * 1000 })
+    var s = Model.defaultSnapshot(1000)
+    s.accumulatedActiveMs = 8 * 60 * 1000
+    s.lastActiveAtMs = 1000
+    s.lastObservedAtMs = 10 * 60 * 1000
+    s = Model.observe(s, { nowMs: 10 * 60 * 1000 + 1000, active: true, idle: false, evidence: [] }, c)
+    compare(s.naturalBreakDecision.kind, "resumed")
+    compare(s.accumulatedActiveMs, 8 * 60 * 1000)
+    verify(Model.naturalBreakMessage(s).indexOf("Timer resumed") === 0)
+  }
+
+  function test_naturalBreakResetCanBeUndone() {
+    var c = config({ focusMs: 30 * 60 * 1000 })
+    var s = Model.defaultSnapshot(1000)
+    s.accumulatedActiveMs = 8 * 60 * 1000
+    s.breaksSinceLong = 3
+    s.snoozesUsed = 2
+    s.lastActiveAtMs = 1000
+    s.lastObservedAtMs = 2 * 60 * 60 * 1000
+    s = Model.observe(s, { nowMs: 2 * 60 * 60 * 1000 + 1000, active: true, idle: false, evidence: [] }, c)
+    compare(s.naturalBreakDecision.kind, "reset")
+    compare(s.accumulatedActiveMs, 0)
+    s = Model.undoNaturalBreak(s, 2 * 60 * 60 * 1000 + 2000)
+    compare(s.accumulatedActiveMs, 8 * 60 * 1000)
+    compare(s.breaksSinceLong, 3)
+    compare(s.snoozesUsed, 2)
+    compare(s.naturalBreakDecision, null)
+  }
+
+  function test_undoResumeStartsFreshSession() {
+    var c = config({ focusMs: 30 * 60 * 1000 })
+    var s = Model.defaultSnapshot(1000)
+    s.accumulatedActiveMs = 8 * 60 * 1000
+    s.lastActiveAtMs = 1000
+    s.lastObservedAtMs = 10 * 60 * 1000
+    s = Model.observe(s, { nowMs: 10 * 60 * 1000 + 1000, active: true, idle: false, evidence: [] }, c)
+    s = Model.undoNaturalBreak(s, 10 * 60 * 1000 + 2000)
+    compare(s.accumulatedActiveMs, 0)
+    compare(s.naturalBreakDecision, null)
+  }
+
+  function test_naturalBreakDecisionSurvivesSafeRecovery() {
+    var now = 10 * 60 * 1000
+    var s = Model.defaultSnapshot(1000)
+    s.naturalBreakDecision = {
+      kind: "reset", awayMs: now, decidedAtMs: now, undoUntilMs: now + 60000,
+      before: { state: Model.State.Working, accumulatedActiveMs: 12000, breaksSinceLong: 2, snoozesUsed: 1 }
+    }
+    var recovered = Model.recoverSnapshot(s, now)
+    compare(recovered.naturalBreakDecision.kind, "reset")
+    compare(recovered.naturalBreakDecision.before.accumulatedActiveMs, 12000)
   }
 }

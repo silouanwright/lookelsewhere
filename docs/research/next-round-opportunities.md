@@ -19,15 +19,11 @@ Prioritize work that:
 
 ### P0: Reversible natural-break handling
 
-Current behavior uses a one-hour inactive boundary to begin a fresh session.
-The next improvement is not a more elaborate hidden heuristic. It is a visible,
-reversible decision:
-
-- quietly restart or resume after a meaningful away interval;
-- show a short auto-dismissing explanation;
-- offer Undo;
-- retain the last decision in the panel for a short time;
-- test suspend, lock, idle, shell restart, and clock changes.
+Implemented: meaningful away intervals now resume or reset the session, briefly
+explain the decision with Undo, and persist the correction record. Deterministic
+coverage includes idle/suspend-style gaps, recovery, and
+manual pause. Lock integration and hostile wall-clock changes remain explicit
+follow-up validation work.
 
 This directly addresses the morning long-break failure and builds trust in the
 state model.
@@ -130,4 +126,3 @@ surfaces. Add them only after natural-break handling and statistics are trusted.
 A feature is ready when its success, ambiguity, and failure states are visible;
 its keyboard and accessibility paths work; it survives restart and suspend; it
 has deterministic state tests; and its documentation says what it cannot know.
-

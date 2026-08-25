@@ -32,7 +32,10 @@ The persisted model records semantic state and timestamps. UI surfaces derive pr
 
 - Count time only while the user is considered actively using the desktop.
 - Idle periods do not accrue focus time.
-- A sufficiently long idle period may satisfy some or all of a pending break according to explicit thresholds.
+- Returning after 5–59 minutes away resumes the existing focus session. Returning
+  after 60 minutes or more starts a fresh session and resets the short/long-break
+  cadence. LookElsewhere briefly explains either decision with an Undo action.
+  Manual pause is never reclassified automatically.
 - Returning after one hour without active use starts a fresh work session:
   the focus interval, long-break cadence, and snooze cycle reset while lifetime
   statistics and an explicit manual pause remain intact.

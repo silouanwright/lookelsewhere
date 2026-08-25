@@ -20,6 +20,7 @@ Item {
   property var manifest: null
 
   readonly property bool visibleState: service && service.interrupting
+  readonly property bool naturalBreakToastVisible: service && service.naturalBreakToastVisible
   readonly property bool breaking: service && service.phase === "breaking"
   readonly property bool finalCountdown: service && service.phase === "final-countdown"
   readonly property int remainingSeconds: service ? Math.max(0, Math.ceil(service.remainingMs / 1000)) : 0
@@ -55,13 +56,15 @@ Item {
       id: window
       required property var modelData
       screen: modelData
-      visible: root.visibleState && shouldPresent
+      visible: (root.visibleState || root.naturalBreakToastVisible) && shouldPresent
       anchors { top: true; bottom: true; left: true; right: true }
       color: "transparent"
       exclusionMode: ExclusionMode.Ignore
       mask: Region {
         item: !window.authoritative ? emptyHitArea
-          : (root.breaking ? fullScreenHitArea : (root.finalCountdown ? finalChip : warningCard))
+          : (root.breaking ? fullScreenHitArea
+            : (root.finalCountdown ? finalChip
+              : (root.visibleState ? warningCard : naturalBreakChip)))
       }
 
       readonly property bool authoritative: Hyprland.focusedMonitor && Hyprland.focusedMonitor.name === modelData.name
@@ -247,6 +250,43 @@ Item {
           if (event.key !== Qt.Key_Escape || !root.service) return
           if (root.service.canSkipBreak) root.service.skipBreak()
           event.accepted = true
+        }
+      }
+
+      BorderSurface {
+        id: naturalBreakChip
+        visible: root.naturalBreakToastVisible && !root.visibleState
+        anchors.top: parent.top
+        anchors.topMargin: Style.space(48)
+        anchors.horizontalCenter: parent.horizontalCenter
+        width: naturalBreakRow.implicitWidth + Style.space(24)
+        height: naturalBreakRow.implicitHeight + Style.space(12)
+        radius: height / 2
+        color: Color.popups.background
+        borderSpec: Border.surfaceSpec("popups", "border", Color.popups.border, Math.max(1, Style.space(2)))
+
+        RowLayout {
+          id: naturalBreakRow
+          anchors.centerIn: parent
+          spacing: Style.space(7)
+          ProductUi.BedIcon {
+            Layout.preferredWidth: Style.space(20)
+            Layout.preferredHeight: Layout.preferredWidth
+            color: Color.accent
+          }
+          Text {
+            text: root.service ? root.service.naturalBreakMessage : ""
+            color: Color.popups.text
+            font.family: Style.font.family
+            font.pixelSize: Style.font.bodySmall
+            font.weight: Font.Medium
+          }
+          OverlayButton {
+            text: qsTr("Undo")
+            verticalPadding: Style.space(2)
+            horizontalPadding: Style.space(6)
+            onClicked: if (root.service) root.service.undoNaturalBreak()
+          }
         }
       }
 
