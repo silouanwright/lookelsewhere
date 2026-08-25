@@ -232,8 +232,7 @@ Item {
           subtitle: root.service ? root.service.config.breakSubtitle
             : qsTr("Let your eyes settle on something distant. Breathe. The screen will still be here.")
           longBreak: root.service && root.service.snapshot.activeBreakIsLong
-          minutes: root.remainingMinutesPart
-          seconds: root.remainingSecondsPart
+          totalSeconds: root.remainingSeconds
           reducedMotion: root.service && root.service.config.reducedMotion
           animationActive: window.visible && root.breaking
           actionsVisible: window.authoritative
@@ -253,40 +252,29 @@ Item {
         }
       }
 
-      BorderSurface {
+      ProductUi.TransientNotice {
         id: naturalBreakChip
         visible: root.naturalBreakToastVisible && !root.visibleState
         anchors.top: parent.top
         anchors.topMargin: Style.space(48)
         anchors.horizontalCenter: parent.horizontalCenter
-        width: naturalBreakRow.implicitWidth + Style.space(24)
-        height: naturalBreakRow.implicitHeight + Style.space(12)
-        radius: height / 2
-        color: Color.popups.background
-        borderSpec: Border.surfaceSpec("popups", "border", Color.popups.border, Math.max(1, Style.space(2)))
-
-        RowLayout {
-          id: naturalBreakRow
-          anchors.centerIn: parent
-          spacing: Style.space(7)
-          ProductUi.BedIcon {
-            Layout.preferredWidth: Style.space(20)
-            Layout.preferredHeight: Layout.preferredWidth
-            color: Color.accent
-          }
-          Text {
-            text: root.service ? root.service.naturalBreakMessage : ""
-            color: Color.popups.text
-            font.family: Style.font.family
-            font.pixelSize: Style.font.bodySmall
-            font.weight: Font.Medium
-          }
-          OverlayButton {
-            text: qsTr("Undo")
-            verticalPadding: Style.space(2)
-            horizontalPadding: Style.space(6)
-            onClicked: if (root.service) root.service.undoNaturalBreak()
-          }
+        ProductUi.BedIcon {
+          Layout.preferredWidth: Style.space(20)
+          Layout.preferredHeight: Layout.preferredWidth
+          color: Color.accent
+        }
+        Text {
+          text: root.service ? root.service.naturalBreakMessage : ""
+          color: Color.popups.text
+          font.family: Style.font.family
+          font.pixelSize: Style.font.bodySmall
+          font.weight: Font.Medium
+        }
+        OverlayButton {
+          text: qsTr("Undo")
+          verticalPadding: Style.space(2)
+          horizontalPadding: Style.space(6)
+          onClicked: if (root.service) root.service.undoNaturalBreak()
         }
       }
 
@@ -322,42 +310,18 @@ Item {
             ColumnLayout {
               Layout.fillWidth: true
               spacing: 0
-              Row {
-                spacing: -root.warningClockSeparatorOverlap
+              ProductUi.RollingClock {
+                value: root.remainingSeconds
+                separatorOverlap: root.warningClockSeparatorOverlap
+                color: Color.popups.text
+                fontFamily: Style.font.family
+                fontSize: root.warningClockFontSize
+                fontWeight: Font.Bold
+                reducedMotion: root.service && root.service.config.reducedMotion
+                animationActive: warningCard.visible
                 Accessible.role: Accessible.StaticText
                 Accessible.name: qsTr("%1 minutes and %2 seconds until break")
                   .arg(root.remainingMinutesPart).arg(root.remainingSecondsPart)
-
-                ProductUi.RollingNumber {
-                  value: root.remainingMinutesPart
-                  minimumDigits: 2
-                  color: Color.popups.text
-                  fontFamily: Style.font.family
-                  fontSize: root.warningClockFontSize
-                  fontWeight: Font.Bold
-                  reducedMotion: root.service && root.service.config.reducedMotion
-                  animationActive: warningCard.visible
-                }
-
-                Text {
-                  text: ":"
-                  color: Color.popups.text
-                  font.family: Style.font.family
-                  font.pixelSize: root.warningClockFontSize
-                  font.weight: Font.Bold
-                  Accessible.ignored: true
-                }
-
-                ProductUi.RollingNumber {
-                  value: root.remainingSecondsPart
-                  minimumDigits: 2
-                  color: Color.popups.text
-                  fontFamily: Style.font.family
-                  fontSize: root.warningClockFontSize
-                  fontWeight: Font.Bold
-                  reducedMotion: root.service && root.service.config.reducedMotion
-                  animationActive: warningCard.visible
-                }
               }
               Text {
                 Layout.fillWidth: true
@@ -409,46 +373,37 @@ Item {
         }
       }
 
-      BorderSurface {
+      ProductUi.TransientNotice {
         id: finalChip
         visible: root.finalCountdown
         anchors.top: parent.top
         anchors.topMargin: Style.space(56)
         anchors.horizontalCenter: parent.horizontalCenter
-        width: Math.min(parent.width - Style.space(32), finalRow.implicitWidth + Style.space(28))
-        height: finalRow.implicitHeight + Style.space(16)
-        radius: height / 2
-        color: Color.popups.background
-        borderSpec: Border.surfaceSpec("popups", "border", Color.popups.border, Math.max(1, Style.space(2)))
-
-        RowLayout {
-          id: finalRow
-          anchors.fill: parent
-          anchors.leftMargin: Style.space(14)
-          anchors.rightMargin: Style.space(14)
-          spacing: Style.space(10)
-          ProductUi.BedIcon {
-            Layout.preferredWidth: Style.space(24)
-            Layout.preferredHeight: Layout.preferredWidth
-            color: Color.accent
-          }
-          Text {
-            Layout.fillWidth: true
-            text: qsTr("Starting break in")
-            color: Color.popups.text
-            opacity: 0.78
-            font.family: Style.font.family
-            font.pixelSize: Style.font.body
-            font.weight: Font.Medium
-            elide: Text.ElideRight
-          }
-          Text {
-            text: root.service ? root.service.remainingText : ""
-            color: Color.popups.text
-            font.family: Style.font.family
-            font.pixelSize: Style.font.heading
-            font.weight: Font.DemiBold
-          }
+        width: Math.min(parent.width - Style.space(32), implicitWidth)
+        horizontalPadding: Style.space(14)
+        verticalPadding: Style.space(8)
+        contentSpacing: Style.space(10)
+        ProductUi.BedIcon {
+          Layout.preferredWidth: Style.space(24)
+          Layout.preferredHeight: Layout.preferredWidth
+          color: Color.accent
+        }
+        Text {
+          Layout.fillWidth: true
+          text: qsTr("Starting break in")
+          color: Color.popups.text
+          opacity: 0.78
+          font.family: Style.font.family
+          font.pixelSize: Style.font.body
+          font.weight: Font.Medium
+          elide: Text.ElideRight
+        }
+        Text {
+          text: root.service ? root.service.remainingText : ""
+          color: Color.popups.text
+          font.family: Style.font.family
+          font.pixelSize: Style.font.heading
+          font.weight: Font.DemiBold
         }
       }
     }

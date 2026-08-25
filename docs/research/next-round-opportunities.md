@@ -30,16 +30,18 @@ state model.
 
 ### P0: Session statistics without surveillance
 
-Add only the statistics that help tune break behavior:
+Implemented with a chart-free daily summary and bounded recent history:
 
 - active screen time today;
-- completed, snoozed, skipped, delayed, and naturally satisfied breaks;
+- completed, snoozed, skipped, and naturally satisfied breaks;
 - current and longest uninterrupted session;
 - median completed session length;
 - short versus long breaks;
-- detector delay reasons in aggregate, without titles or content.
+- seven recent daily summaries and twelve sessions per day.
 
-Do not add website tracking, app-content tracking, or a judgmental score.
+The state remains local and stores no website activity, application content,
+titles, URLs, or judgmental score. Aggregate detector-delay reasons remain a
+possible follow-up only if they change a user decision.
 
 ### P1: Detector correction and exclusions
 

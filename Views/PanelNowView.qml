@@ -18,8 +18,7 @@ ColumnLayout {
   property bool manuallyPaused: false
   readonly property bool timerPaused: idlePaused || manuallyPaused
   property bool nextBreakIsLong: false
-  property int minutes: 20
-  property int seconds: 0
+  property int totalSeconds: 20 * 60
   property string remainingText: qsTr("20 minutes")
   property bool reducedMotion: true
   property bool animationActive: false
@@ -90,43 +89,19 @@ ColumnLayout {
         : root.idlePaused ? qsTr("Idle; focus timer paused")
         : qsTr("Time remaining: %1").arg(root.remainingText)
 
-      Row {
+      ProductUi.RollingClock {
         id: clockRow
         anchors.centerIn: parent
-        spacing: -root.clockSeparatorOverlap
+        value: root.totalSeconds
+        separatorOverlap: root.clockSeparatorOverlap
+        color: root.foreground
+        fontFamily: root.fontFamily
+        fontSize: Style.font.display * 1.55
+        fontWeight: Font.Bold
+        reducedMotion: root.reducedMotion
+        animationActive: root.animationActive && !root.timerPaused
         opacity: root.timerPaused ? 0 : 1
         Accessible.ignored: true
-
-        ProductUi.RollingNumber {
-          value: root.minutes
-          minimumDigits: 2
-          color: root.foreground
-          fontFamily: root.fontFamily
-          fontSize: Style.font.display * 1.55
-          fontWeight: Font.Bold
-          reducedMotion: root.reducedMotion
-          animationActive: root.animationActive && !root.timerPaused
-        }
-
-        Text {
-          text: ":"
-          color: root.foreground
-          font.family: root.fontFamily
-          font.pixelSize: Style.font.display * 1.55
-          font.weight: Font.Bold
-          Accessible.ignored: true
-        }
-
-        ProductUi.RollingNumber {
-          value: root.seconds
-          minimumDigits: 2
-          color: root.foreground
-          fontFamily: root.fontFamily
-          fontSize: Style.font.display * 1.55
-          fontWeight: Font.Bold
-          reducedMotion: root.reducedMotion
-          animationActive: root.animationActive && !root.timerPaused
-        }
 
         Behavior on opacity { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
       }

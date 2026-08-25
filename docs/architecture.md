@@ -21,9 +21,12 @@ Omarchy Shell / Quickshell process
     ├── Views/
     │   ├── Panel.qml: popup shell, toolbar, status, actions, and summary
     │   ├── PanelNowView.qml: current-break status and actions
+    │   ├── StatsView.qml: private daily summary and bounded session history
     │   ├── SettingsPage.qml: settings, scrolling, and keyboard navigation
     │   └── BreakContent.qml: reusable full-screen break content
     ├── Ui/
+    │   ├── RollingClock.qml: one total-seconds presentation queue across minute boundaries
+    │   ├── TransientNotice.qml: shared top-centered status/warning pill
     │   ├── product-owned pattern adapter and artwork selection
     │   ├── shared bed icon
     │   └── rolling digit and number controls
@@ -83,6 +86,10 @@ The state document contains no configuration, is versioned, and is written
 atomically. Legacy documents containing a `config` field remain readable, but
 that field is ignored. Corrupt or unsupported state retains diagnostic evidence
 rather than silently replacing the original.
+
+Statistics share that bounded snapshot. They retain seven previous local days
+and twelve session outcomes per day, with durations and timestamps only. No
+application identity or screen content enters history.
 
 The long-lived shell never ingests an unbounded file or compositor record.
 State is loaded through a 64 KiB producer cap while `FileView` remains

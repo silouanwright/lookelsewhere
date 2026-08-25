@@ -1,6 +1,6 @@
 # Competition Completion Matrix
 
-Status reflects inspected repository and installed-runtime evidence on 2026-08-22. `Implemented` is not equivalent to release-verified.
+Status reflects inspected repository and installed-runtime evidence on 2026-08-25. `Implemented` is not equivalent to release-verified.
 
 | Requirement | Status | Current evidence / remaining proof |
 |---|---|---|
@@ -20,12 +20,12 @@ Status reflects inspected repository and installed-runtime evidence on 2026-08-2
 | Multi-monitor single authority | Implemented | Focused-monitor authority in `Overlay.qml`; a compositor output created during an active break immediately rendered the full surface and was removed cleanly; physical mixed-scale focus handoff remains future hardware QA |
 | Casual/Balanced/Hardcore enforcement | Implemented | Casual and Balanced permit bounded snoozing and skip; Hardcore permits bounded snoozing but rejects pointer, IPC, Escape, and modified-Escape skip until natural completion; legacy policy names migrate safely |
 | MVP configuration contract | Implemented | Typed short/long timing, custom break copy, policy, detector, motion, sound, output, and bar settings are wired; README documents `omarchy bar set` and local reset |
-| Outcome totals | Implemented | Prompted/completed/postponed/skipped/delayed persist, compact history summary is visible, and reset IPC exists |
+| Private statistics | Implemented | Daily active time, current/longest/median sessions, short/long completed breaks, snoozes, skips, natural-away outcomes, seven-day summaries, bounded persistence, and reset IPC are covered by pure tests and a dedicated Stats view |
 | Privacy boundary | Implemented by design | No content capture/title persistence/network calls; release audit remains |
 | Deterministic fixtures | Implemented | Working/due/idle/paused/postponed/protected/typing/warning/final/break/recovery/enforcement plus timer-driven `flow` exist and restore real state |
 | Keyboard and accessibility | Implemented | Native button roles/names/actions, top-to-bottom Options cursor navigation, editor/dropdown Escape restoration, deterministic Tab/Backtab order, panel-local mnemonic actions, optional conflict-checked global Omarchy bindings, Hardcore lockout, and reduced-motion behavior; live keyboard evidence and clean runtime logs recorded |
 | Theme and bar-position QA | Implemented | Osaka Jade and Catppuccin Latte plus top/bottom/left/right were exercised live and restored; transient panel IPC lifecycle issue found and fixed |
-| Automated tests and QML review | Implemented | 53 passing model/component tests, including protected applications, focused-player matching, typing holds, protected-context bar labels, configurable shortcuts, missed-tick sequencing, long-break cadence, policy migration, Hardcore skip policy, and lead-timed sound transitions; the latest diff review found one SectionHeader sizing conflict, which was fixed and rechecked |
+| Automated tests and QML review | Implemented | 75 passing model/component tests, including private-statistics migration and bounds, minute-boundary and longer-stall countdown sequencing, protected applications, focused-player matching, typing holds, configurable shortcuts, long-break cadence, policy migration, Hardcore skip policy, and lead-timed sound transitions |
 | Public packaging | Implemented | Manifest, rights notices, release README, exact final-UI preview/panel/warning/long-break assets and 23-second demo, marketplace draft, clean provenance audit, isolated add/validate/remove proof, and live panel-owned disable/re-enable proof exist |
 | Competition submission | Submitted | Public repository and [marketplace issue #1785](https://github.com/HANCORE-linux/omarchy-plugin-marketplace/issues/1785) exist; review status lives on the issue |
 

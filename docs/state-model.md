@@ -36,11 +36,23 @@ The persisted model records semantic state and timestamps. UI surfaces derive pr
   after 60 minutes or more starts a fresh session and resets the short/long-break
   cadence. LookElsewhere briefly explains either decision with an Undo action.
   Manual pause is never reclassified automatically.
-- Returning after one hour without active use starts a fresh work session:
-  the focus interval, long-break cadence, and snooze cycle reset while lifetime
-  statistics and an explicit manual pause remain intact.
 - Short ambiguous idle may receive partial credit or ask for classification only after the MVP if a nonannoying design is proven.
 - Protected context may continue active-use accumulation while delaying interruption.
+
+## Private statistics
+
+- Count active screen time only while the scheduler considers the user active.
+- A completed break or a one-hour natural-away reset closes the current focus
+  session. Skipping a break does not, because the uninterrupted screen session
+  continued.
+- Daily summaries include completed short and long breaks, snoozes, skips,
+  longest session, median completed-session length, and recent session outcomes.
+- Midnight archives the local day while preserving an uninterrupted session
+  that crosses the boundary.
+- Retain at most seven previous days and twelve completed sessions per day so
+  the bounded state document cannot grow indefinitely.
+- Store no application names, window titles, URLs, media metadata, keystrokes,
+  screenshots, or audio.
 
 ## Recovery invariants
 

@@ -52,8 +52,7 @@ Item {
       title: qsTr("Look elsewhere")
       subtitle: qsTr("Let your eyes settle on something distant. Breathe. The screen will still be here.")
       longBreak: true
-      minutes: 3
-      seconds: 0
+      totalSeconds: 3 * 60
       reducedMotion: true
       actionsVisible: true
       skipVisible: true

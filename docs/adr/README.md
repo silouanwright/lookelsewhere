@@ -23,3 +23,4 @@ ADRs use `Accepted`, `Proposed`, or `Superseded` status. Accepted decisions gove
 | [0017](0017-bound-data-before-qml.md) | Bound and shape replaceable data before QML | Accepted |
 | [0018](0018-window-scoped-keyboard-ownership.md) | Scope panel shortcuts to the popup window | Accepted |
 | [0019](0019-reviewable-source-packages.md) | Manage extracted source through reviewable packages | Accepted |
+| [0020](0020-one-countdown-presentation-clock.md) | Use one total-seconds countdown presentation clock | Accepted |

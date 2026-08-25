@@ -48,6 +48,8 @@ rebuilt with Omarchy and Linux flair.
   hours, enforcement modes, and configurable sounds
 - Private by design: no account, telemetry, screen capture, audio recording, or
   retained window and media titles
+- Private daily statistics for active screen time, breaks, snoozes, skips, and
+  uninterrupted sessions, without app or website surveillance
 - Free and open source; [LookAway charges $14.99 per year](https://apps.apple.com/us/app/lookaway-break-reminder/id6747192301)
 
 ## The menubar
@@ -156,12 +158,10 @@ in [Upstream Opportunities](docs/upstream-opportunities.md).
 
 ## Roadmap
 
-- Better private statistics and break history
-- Smarter return-from-away behavior
 - Stronger meeting, screen-sharing, recording, video, and per-app signals
 - Optional glanceable break ideas and more short- and long-break routines
 - More sound choices, previews, and optional start/end hooks
-- Deeper private statistics and trend views
+- Optional longer-term private trends when they answer a useful question
 - Clean foundations for other Quickshell and Wayland desktops
 
 New features should stay private, explainable, keyboard-accessible, and native

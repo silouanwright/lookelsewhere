@@ -53,7 +53,7 @@ Item {
   readonly property var demoSequence: [
     "idle", "typing", "meeting", "microphone", "media", "fullscreen",
     "dictation", "due", "warning", "final", "casual-break",
-    "balanced-break", "hardcore-break", "long-break", "paused", "postponed"
+    "balanced-break", "hardcore-break", "long-break", "stats", "paused", "postponed"
   ]
 
   readonly property var players: Mpris.players ? Mpris.players.values : []
@@ -233,10 +233,7 @@ Item {
   function skipBreak() {
     if (!canSkipBreak) return
     var beforeState = snapshot.state
-    var next = Model.completeBreak(snapshot, Date.now())
-    next.totals.completed = Math.max(0, next.totals.completed - 1)
-    next.totals.skipped++
-    snapshot = next
+    snapshot = Model.skipBreak(snapshot, Date.now())
     playTransitionSound(beforeState, snapshot.state)
     scheduleSave()
   }
@@ -311,6 +308,28 @@ Item {
       next = Model.startWarning(next, now, config, 12000)
     }
     else if (name === "due") next.accumulatedActiveMs = config.focusMs - 30000
+    else if (name === "stats") {
+      next.statistics.today.activeMs = 5 * 60 * 60 * 1000 + 24 * 60 * 1000
+      next.statistics.today.completed = 8
+      next.statistics.today.skipped = 1
+      next.statistics.today.snoozed = 2
+      next.statistics.today.shortBreaks = 7
+      next.statistics.today.longBreaks = 1
+      next.statistics.today.longestSessionMs = 42 * 60 * 1000
+      next.statistics.today.sessionDurationsMs = [18, 24, 42, 16].map(function(minutes) { return minutes * 60000 })
+      next.statistics.today.sessions = [
+        { endedAtMs: now - 12 * 60000, durationMs: 18 * 60000, outcome: "break" },
+        { endedAtMs: now - 58 * 60000, durationMs: 24 * 60000, outcome: "long-break" },
+        { endedAtMs: now - 2 * 60 * 60000, durationMs: 42 * 60000, outcome: "away" }
+      ]
+      next.statistics.currentSessionActiveMs = 11 * 60000
+      for (var dayOffset = 1; dayOffset <= 3; dayOffset++) {
+        var day = Model.defaultStatisticDay(Model.localDayKey(now - dayOffset * 24 * 60 * 60000))
+        day.activeMs = (4 + dayOffset / 2) * 60 * 60 * 1000
+        day.completed = 9 - dayOffset
+        next.statistics.days.push(day)
+      }
+    }
     else if (name === "long-break") {
       next.breaksSinceLong = Math.max(0, config.longBreakEvery - 1)
       next = Model.startBreak(next, now, config)

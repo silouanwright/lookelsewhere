@@ -94,8 +94,7 @@ BorderSurface {
       muted: Color.muted
       accent: Color.accent
       fontFamily: Style.font.family
-      minutes: 0
-      seconds: 30
+      totalSeconds: 30
       remainingText: qsTr("30 seconds")
       reducedMotion: true
       delayActionsVisible: true

@@ -10,6 +10,10 @@ Test time accounting, state transitions, enforcement budgets, detector precedenc
 
 Test formatting, state-to-copy mapping, action availability, focus order, overlay authority selection, and model bindings with fixture snapshots.
 
+Countdown tests operate on total seconds rather than independent minute and
+second fields. They cover missed samples across a minute boundary and assert
+that every intermediate visible second is presented in order.
+
 ### Manifest/static checks
 
 - `omarchy plugin validate <repo>`

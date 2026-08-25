@@ -11,8 +11,7 @@ ColumnLayout {
   property string title: qsTr("Look elsewhere")
   property string subtitle: qsTr("Let your eyes settle on something distant. Breathe. The screen will still be here.")
   property bool longBreak: false
-  property int minutes: 3
-  property int seconds: 0
+  property int totalSeconds: 3 * 60
   property bool reducedMotion: true
   property bool animationActive: false
   property bool actionsVisible: true
@@ -79,42 +78,19 @@ ColumnLayout {
     }
   }
 
-  Row {
+  ProductUi.RollingClock {
     Layout.alignment: Qt.AlignHCenter
-    spacing: -root.clockSeparatorOverlap
+    value: root.totalSeconds
+    separatorOverlap: root.clockSeparatorOverlap
+    color: Color.lock.text
+    fontFamily: Style.font.family
+    fontSize: root.clockFontSize
+    fontWeight: Font.DemiBold
+    reducedMotion: root.reducedMotion
+    animationActive: root.animationActive
     Accessible.role: Accessible.StaticText
-    Accessible.name: qsTr("%1 minutes and %2 seconds remaining").arg(root.minutes).arg(root.seconds)
-
-    ProductUi.RollingNumber {
-      value: root.minutes
-      minimumDigits: 2
-      color: Color.lock.text
-      fontFamily: Style.font.family
-      fontSize: root.clockFontSize
-      fontWeight: Font.DemiBold
-      reducedMotion: root.reducedMotion
-      animationActive: root.animationActive
-    }
-
-    Text {
-      text: ":"
-      color: Color.lock.text
-      font.family: Style.font.family
-      font.pixelSize: root.clockFontSize
-      font.weight: Font.DemiBold
-      Accessible.ignored: true
-    }
-
-    ProductUi.RollingNumber {
-      value: root.seconds
-      minimumDigits: 2
-      color: Color.lock.text
-      fontFamily: Style.font.family
-      fontSize: root.clockFontSize
-      fontWeight: Font.DemiBold
-      reducedMotion: root.reducedMotion
-      animationActive: root.animationActive
-    }
+    Accessible.name: qsTr("%1 minutes and %2 seconds remaining")
+      .arg(Math.floor(root.totalSeconds / 60)).arg(root.totalSeconds % 60)
   }
 
   RowLayout {

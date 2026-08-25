@@ -17,6 +17,10 @@ var MaximumPersistedFutureMs = 24 * 60 * 60 * 1000
 var NaturalBreakReviewMs = 5 * 60 * 1000
 var SessionResetInactivityMs = 60 * 60 * 1000
 var NaturalBreakUndoMs = 60 * 1000
+var MaximumStatisticMs = 48 * 60 * 60 * 1000
+var MaximumStatisticCount = 10000
+var MaximumStatisticDays = 7
+var MaximumSessionsPerDay = 12
 
 function clamp(value, low, high) {
   return Math.max(low, Math.min(high, Number(value)))
@@ -171,8 +175,128 @@ function defaultSnapshot(nowMs) {
     pauseReason: "",
     snoozesUsed: 0,
     naturalBreakDecision: null,
+    statistics: defaultStatistics(nowMs),
     totals: { prompted: 0, completed: 0, postponed: 0, skipped: 0, delayed: 0 }
   }
+}
+
+function localDayKey(nowMs) {
+  var date = new Date(Number(nowMs || 0))
+  function pad(value) { return value < 10 ? "0" + value : String(value) }
+  return date.getFullYear() + "-" + pad(date.getMonth() + 1) + "-" + pad(date.getDate())
+}
+
+function defaultStatisticDay(dayKey) {
+  return {
+    dateKey: String(dayKey || ""),
+    activeMs: 0,
+    completed: 0,
+    skipped: 0,
+    snoozed: 0,
+    shortBreaks: 0,
+    longBreaks: 0,
+    longestSessionMs: 0,
+    sessionDurationsMs: [],
+    sessions: []
+  }
+}
+
+function defaultStatistics(nowMs) {
+  return { today: defaultStatisticDay(localDayKey(nowMs)), days: [], currentSessionActiveMs: 0 }
+}
+
+function boundedStatisticNumber(value, maximum) {
+  var number = Number(value)
+  return isFinite(number) ? Math.max(0, Math.min(maximum, number)) : 0
+}
+
+function copyStatisticDay(value, fallbackDayKey) {
+  value = value || {}
+  var dayKey = /^\d{4}-\d{2}-\d{2}$/.test(String(value.dateKey || ""))
+    ? String(value.dateKey) : String(fallbackDayKey || "")
+  var durations = Array.isArray(value.sessionDurationsMs) ? value.sessionDurationsMs : []
+  durations = durations.slice(0, MaximumSessionsPerDay).map(function(duration) {
+    return boundedStatisticNumber(duration, MaximumStatisticMs)
+  })
+  var sessions = Array.isArray(value.sessions) ? value.sessions : []
+  sessions = sessions.slice(0, MaximumSessionsPerDay).map(function(session) {
+    session = session || {}
+    var outcome = ["break", "long-break", "away"].indexOf(String(session.outcome || "")) >= 0
+      ? String(session.outcome) : "break"
+    return {
+      endedAtMs: boundedStatisticNumber(session.endedAtMs, Number.MAX_SAFE_INTEGER),
+      durationMs: boundedStatisticNumber(session.durationMs, MaximumStatisticMs),
+      outcome: outcome
+    }
+  })
+  return {
+    dateKey: dayKey,
+    activeMs: boundedStatisticNumber(value.activeMs, MaximumStatisticMs),
+    completed: boundedStatisticNumber(value.completed, MaximumStatisticCount),
+    skipped: boundedStatisticNumber(value.skipped, MaximumStatisticCount),
+    snoozed: boundedStatisticNumber(value.snoozed, MaximumStatisticCount),
+    shortBreaks: boundedStatisticNumber(value.shortBreaks, MaximumStatisticCount),
+    longBreaks: boundedStatisticNumber(value.longBreaks, MaximumStatisticCount),
+    longestSessionMs: boundedStatisticNumber(value.longestSessionMs, MaximumStatisticMs),
+    sessionDurationsMs: durations,
+    sessions: sessions
+  }
+}
+
+function copyStatistics(value, nowMs) {
+  value = value || {}
+  var todayKey = localDayKey(nowMs)
+  var today = copyStatisticDay(value.today, todayKey)
+  var days = Array.isArray(value.days) ? value.days : []
+  days = days.slice(0, MaximumStatisticDays).map(function(day) {
+    return copyStatisticDay(day, "")
+  }).filter(function(day) { return day.dateKey !== "" && day.dateKey !== today.dateKey })
+  return {
+    today: today,
+    days: days,
+    currentSessionActiveMs: boundedStatisticNumber(value.currentSessionActiveMs, MaximumStatisticMs)
+  }
+}
+
+function ensureStatisticsDay(snapshot, nowMs) {
+  var next = snapshot
+  var todayKey = localDayKey(nowMs)
+  var statistics = next.statistics
+  if (statistics.today.dateKey !== todayKey) {
+    var previous = statistics.today
+    var hasPreviousData = previous.activeMs > 0 || previous.completed > 0
+      || previous.skipped > 0 || previous.snoozed > 0 || previous.sessions.length > 0
+    statistics.days = (hasPreviousData ? [previous] : []).concat(statistics.days.filter(function(day) {
+      return day.dateKey !== previous.dateKey && day.dateKey !== todayKey
+    })).slice(0, MaximumStatisticDays)
+    statistics.today = defaultStatisticDay(todayKey)
+  }
+  next.statistics = statistics
+  return next
+}
+
+function recordActiveStatistics(snapshot, elapsedMs, nowMs) {
+  var next = snapshot
+  var elapsed = boundedStatisticNumber(elapsedMs, 5 * 60 * 1000)
+  next.statistics.today.activeMs = Math.min(MaximumStatisticMs, next.statistics.today.activeMs + elapsed)
+  next.statistics.currentSessionActiveMs = Math.min(MaximumStatisticMs,
+    next.statistics.currentSessionActiveMs + elapsed)
+  next.statistics.today.longestSessionMs = Math.max(next.statistics.today.longestSessionMs,
+    next.statistics.currentSessionActiveMs)
+  return next
+}
+
+function closeStatisticsSession(snapshot, nowMs, outcome) {
+  var next = ensureStatisticsDay(snapshot, nowMs)
+  var duration = next.statistics.currentSessionActiveMs
+  if (duration > 0) {
+    next.statistics.today.sessionDurationsMs.unshift(duration)
+    next.statistics.today.sessionDurationsMs = next.statistics.today.sessionDurationsMs.slice(0, MaximumSessionsPerDay)
+    next.statistics.today.sessions.unshift({ endedAtMs: Number(nowMs), durationMs: duration, outcome: outcome })
+    next.statistics.today.sessions = next.statistics.today.sessions.slice(0, MaximumSessionsPerDay)
+  }
+  next.statistics.currentSessionActiveMs = 0
+  return next
 }
 
 function minuteOfDay(date) {
@@ -229,6 +353,7 @@ function copySnapshot(snapshot) {
         state: [State.Working, State.DueSoon].indexOf(String(before.state || "")) >= 0
           ? String(before.state) : State.Working,
         accumulatedActiveMs: nonnegative(before.accumulatedActiveMs),
+        currentSessionActiveMs: boundedStatisticNumber(before.currentSessionActiveMs, MaximumStatisticMs),
         breaksSinceLong: nonnegative(before.breaksSinceLong),
         snoozesUsed: nonnegative(before.snoozesUsed)
       }
@@ -254,6 +379,7 @@ function copySnapshot(snapshot) {
     pauseReason: String(value.pauseReason || ""),
     snoozesUsed: nonnegative(value.snoozesUsed),
     naturalBreakDecision: decision,
+    statistics: copyStatistics(value.statistics, value.lastObservedAtMs || 0),
     totals: {
       prompted: nonnegative(totals.prompted),
       completed: nonnegative(totals.completed),
@@ -276,6 +402,10 @@ function recoverSnapshot(snapshot, nowMs) {
   if (next.naturalBreakDecision
       && (next.naturalBreakDecision.decidedAtMs > latest
         || next.naturalBreakDecision.undoUntilMs > latest)) return null
+  var statisticDays = [next.statistics.today].concat(next.statistics.days)
+  for (var dayIndex = 0; dayIndex < statisticDays.length; dayIndex++)
+    for (var sessionIndex = 0; sessionIndex < statisticDays[dayIndex].sessions.length; sessionIndex++)
+      if (statisticDays[dayIndex].sessions[sessionIndex].endedAtMs > latest) return null
   return next
 }
 
@@ -283,6 +413,7 @@ function resetSession(snapshot, nowMs) {
   var previous = copySnapshot(snapshot)
   var next = defaultSnapshot(nowMs)
   next.totals = previous.totals
+  next.statistics = previous.statistics
   return next
 }
 
@@ -293,6 +424,7 @@ function observe(snapshot, input, config) {
   var previous = Number(next.lastObservedAtMs || now)
   var elapsed = clamp(now - previous, 0, 5 * 60 * 1000)
   var activeNow = input.active === true && input.idle !== true
+  next = ensureStatisticsDay(next, now)
   var manuallyPaused = next.state === State.Waiting && next.pauseReason === "manual"
   if (next.naturalBreakDecision && now > next.naturalBreakDecision.undoUntilMs)
     next.naturalBreakDecision = null
@@ -302,11 +434,15 @@ function observe(snapshot, input, config) {
     var before = {
       state: next.state,
       accumulatedActiveMs: next.accumulatedActiveMs,
+      currentSessionActiveMs: next.statistics.currentSessionActiveMs,
       breaksSinceLong: next.breaksSinceLong,
       snoozesUsed: next.snoozesUsed
     }
     var kind = awayMs >= SessionResetInactivityMs ? "reset" : "resumed"
-    if (kind === "reset") next = resetSession(next, now)
+    if (kind === "reset") {
+      next = closeStatisticsSession(next, now, "away")
+      next = resetSession(next, now)
+    }
     next.naturalBreakDecision = {
       kind: kind,
       awayMs: awayMs,
@@ -337,6 +473,9 @@ function observe(snapshot, input, config) {
     // than crediting paused time after a delayed tick, suspend, or restart.
     elapsed = 0
   }
+
+  if (activeNow && !manuallyPaused && next.state !== State.Breaking)
+    next = recordActiveStatistics(next, elapsed, now)
 
   if (next.state === State.Breaking) {
     if (now >= next.breakEndsAtMs) return completeBreak(next, now)
@@ -422,6 +561,13 @@ function undoNaturalBreak(snapshot, nowMs) {
     next.accumulatedActiveMs = decision.before.accumulatedActiveMs
     next.breaksSinceLong = decision.before.breaksSinceLong
     next.snoozesUsed = decision.before.snoozesUsed
+    var sessions = next.statistics.today.sessions
+    if (sessions.length && sessions[0].outcome === "away"
+        && sessions[0].endedAtMs === decision.decidedAtMs) {
+      sessions.shift()
+      next.statistics.today.sessionDurationsMs.shift()
+    }
+    next.statistics.currentSessionActiveMs = decision.before.currentSessionActiveMs
   } else {
     next = resetSession(next, nowMs)
   }
@@ -469,6 +615,10 @@ function isNextBreakLong(snapshot, config) {
 
 function completeBreak(snapshot, nowMs) {
   var next = copySnapshot(snapshot)
+  next = closeStatisticsSession(next, nowMs, next.activeBreakIsLong ? "long-break" : "break")
+  next.statistics.today.completed++
+  if (next.activeBreakIsLong) next.statistics.today.longBreaks++
+  else next.statistics.today.shortBreaks++
   next.breaksSinceLong = next.activeBreakIsLong ? 0 : next.breaksSinceLong + 1
   next.state = State.Working
   next.stateEnteredAtMs = nowMs
@@ -486,6 +636,18 @@ function completeBreak(snapshot, nowMs) {
   return next
 }
 
+function skipBreak(snapshot, nowMs) {
+  var previous = copySnapshot(snapshot)
+  var statistics = previous.statistics
+  var next = completeBreak(previous, nowMs)
+  next.statistics = statistics
+  next = ensureStatisticsDay(next, nowMs)
+  next.statistics.today.skipped++
+  next.totals.completed = Math.max(0, next.totals.completed - 1)
+  next.totals.skipped++
+  return next
+}
+
 function postpone(snapshot, nowMs, durationMs, config) {
   if (!canPostpone(snapshot, config)) return copySnapshot(snapshot)
   var next = copySnapshot(snapshot)
@@ -495,6 +657,8 @@ function postpone(snapshot, nowMs, durationMs, config) {
   next.warningEndsAtMs = 0
   next.snoozesUsed++
   next.totals.postponed++
+  next = ensureStatisticsDay(next, nowMs)
+  next.statistics.today.snoozed++
   return next
 }
 
@@ -519,6 +683,8 @@ function delayNextBreak(snapshot, nowMs, durationMs, config) {
   next.warningEndsAtMs = 0
   next.snoozesUsed++
   next.totals.postponed++
+  next = ensureStatisticsDay(next, nowMs)
+  next.statistics.today.snoozed++
   return next
 }
 
@@ -587,7 +753,19 @@ function panelShortcutDefinitions() {
 function resetTotals(snapshot) {
   var next = copySnapshot(snapshot)
   next.totals = { prompted: 0, completed: 0, postponed: 0, skipped: 0, delayed: 0 }
+  var currentSession = next.statistics.currentSessionActiveMs
+  next.statistics = defaultStatistics(next.lastObservedAtMs)
+  next.statistics.currentSessionActiveMs = currentSession
   return next
+}
+
+function medianSessionDuration(snapshot) {
+  var values = snapshot && snapshot.statistics && snapshot.statistics.today
+    ? snapshot.statistics.today.sessionDurationsMs.slice() : []
+  if (!values.length) return 0
+  values.sort(function(left, right) { return left - right })
+  var middle = Math.floor(values.length / 2)
+  return values.length % 2 ? values[middle] : (values[middle - 1] + values[middle]) / 2
 }
 
 function formatBarDuration(milliseconds) {

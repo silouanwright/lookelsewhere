@@ -86,6 +86,10 @@ Panel {
       root.bar.shell.updateEntryInline(root.moduleName, entry)
   }
   function togglePage(name) { page = page === name ? "now" : name }
+  function openStats() {
+    open()
+    page = "stats"
+  }
   function toggleKeyboardHints() {
     persistSettings({ showKeyboardHints: !keyboardHintsVisible })
   }
@@ -111,7 +115,8 @@ Panel {
     // break surfaces are separate and intentionally centered by Overlay.qml.
     centerOnBar: false
     focusTarget: root.page === "options" ? settingsPage.initialFocusTarget : neutralFocus
-    contentWidth: popup.fittedContentWidth(Style.space(root.page === "options" ? 440 : 260))
+    contentWidth: popup.fittedContentWidth(Style.space(root.page === "options" ? 440
+      : (root.page === "stats" ? 320 : 260)))
     contentHeight: popup.fittedContentHeight(content.implicitHeight)
 
     ProductUi.PanelPattern {
@@ -338,8 +343,7 @@ Panel {
           idlePaused: root.idlePaused
           manuallyPaused: root.manuallyPaused
           nextBreakIsLong: root.service && root.service.nextBreakIsLong
-          minutes: root.remainingMinutesPart
-          seconds: root.remainingSecondsPart
+          totalSeconds: root.remainingSeconds
           remainingText: root.service ? root.service.remainingText : qsTr("Starting")
           reducedMotion: root.service && root.service.config.reducedMotion
           animationActive: root.opened && root.page === "now"
@@ -360,46 +364,16 @@ Panel {
           onEscapeRequested: root.dismissHintsOrClose()
         }
 
-        ColumnLayout {
+        Loader {
           Layout.fillWidth: true
-          Layout.leftMargin: toolbarRow.implicitWidth
-          Layout.rightMargin: toolbarRow.implicitWidth
-          Layout.topMargin: Style.space(8)
-          visible: root.page === "stats"
-          spacing: Style.space(10)
-
-          Text {
-            Layout.fillWidth: true
-            text: qsTr("Break history")
-            color: root.foreground
-            font.family: root.fontFamily
-            font.pixelSize: Style.font.body
-            font.weight: Font.DemiBold
-            horizontalAlignment: Text.AlignHCenter
-          }
-
-          Text {
-            Layout.fillWidth: true
-            text: root.service && root.service.snapshot && root.service.snapshot.totals
-              ? qsTr("%1 completed").arg(Number(root.service.snapshot.totals.completed || 0))
-              : qsTr("0 completed")
-            color: root.foreground
-            font.family: root.fontFamily
-            font.pixelSize: Style.font.heading
-            font.weight: Font.DemiBold
-            horizontalAlignment: Text.AlignHCenter
-          }
-          Text {
-            Layout.fillWidth: true
-            text: root.service && root.service.snapshot && root.service.snapshot.totals
-              ? qsTr("%1 postponed · %2 delayed")
-                  .arg(Number(root.service.snapshot.totals.postponed || 0))
-                  .arg(Number(root.service.snapshot.totals.delayed || 0))
-              : qsTr("0 postponed · 0 delayed")
-            color: root.muted
-            font.family: root.fontFamily
-            font.pixelSize: Style.font.bodySmall
-            horizontalAlignment: Text.AlignHCenter
+          active: root.page === "stats"
+          visible: active
+          sourceComponent: StatsView {
+            snapshot: root.service ? root.service.snapshot : null
+            foreground: root.foreground
+            muted: root.muted
+            fontFamily: root.fontFamily
+            sideInset: toolbarRow.implicitWidth
           }
         }
 

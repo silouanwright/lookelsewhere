@@ -42,6 +42,7 @@ BarWidget {
   function open() { if (panelItem) panelItem.open() }
   function close() { if (panelItem) panelItem.close() }
   function togglePanel() { if (panelItem) panelItem.toggle() }
+  function openStats() { if (panelItem) panelItem.openStats() }
   function closeForPopoutSwitch() { if (panelItem) panelItem.closeForPopoutSwitch() }
 
   onBarChanged: injectPanel()
@@ -77,6 +78,7 @@ BarWidget {
     function show(): void { root.open() }
     function hide(): void { root.close() }
     function toggle(): void { root.togglePanel() }
+    function openStats(): void { root.openStats() }
   }
 
   WidgetButton {

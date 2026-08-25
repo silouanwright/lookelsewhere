@@ -640,6 +640,7 @@ TestCase {
     var c = config({ focusMs: 30 * 60 * 1000 })
     var s = Model.defaultSnapshot(1000)
     s.accumulatedActiveMs = 8 * 60 * 1000
+    s.statistics.currentSessionActiveMs = 8 * 60 * 1000
     s.lastActiveAtMs = 1000
     s.lastObservedAtMs = 10 * 60 * 1000
     s = Model.observe(s, { nowMs: 10 * 60 * 1000 + 1000, active: true, idle: false, evidence: [] }, c)
@@ -652,6 +653,7 @@ TestCase {
     var c = config({ focusMs: 30 * 60 * 1000 })
     var s = Model.defaultSnapshot(1000)
     s.accumulatedActiveMs = 8 * 60 * 1000
+    s.statistics.currentSessionActiveMs = 8 * 60 * 1000
     s.breaksSinceLong = 3
     s.snoozesUsed = 2
     s.lastActiveAtMs = 1000
@@ -659,10 +661,14 @@ TestCase {
     s = Model.observe(s, { nowMs: 2 * 60 * 60 * 1000 + 1000, active: true, idle: false, evidence: [] }, c)
     compare(s.naturalBreakDecision.kind, "reset")
     compare(s.accumulatedActiveMs, 0)
+    compare(s.statistics.today.sessions.length, 1)
+    compare(s.statistics.today.sessions[0].outcome, "away")
     s = Model.undoNaturalBreak(s, 2 * 60 * 60 * 1000 + 2000)
     compare(s.accumulatedActiveMs, 8 * 60 * 1000)
     compare(s.breaksSinceLong, 3)
     compare(s.snoozesUsed, 2)
+    compare(s.statistics.currentSessionActiveMs, 8 * 60 * 1000)
+    compare(s.statistics.today.sessions.length, 0)
     compare(s.naturalBreakDecision, null)
   }
 
@@ -688,5 +694,104 @@ TestCase {
     var recovered = Model.recoverSnapshot(s, now)
     compare(recovered.naturalBreakDecision.kind, "reset")
     compare(recovered.naturalBreakDecision.before.accumulatedActiveMs, 12000)
+  }
+
+  function test_statisticsCountOnlyActiveScreenTime() {
+    var c = config()
+    var s = Model.defaultSnapshot(1000)
+    s = Model.observe(s, { nowMs: 6000, active: true, idle: false, evidence: [] }, c)
+    compare(s.statistics.today.activeMs, 5000)
+    compare(s.statistics.currentSessionActiveMs, 5000)
+    s = Model.observe(s, { nowMs: 11000, active: false, idle: true, evidence: [] }, c)
+    compare(s.statistics.today.activeMs, 5000)
+  }
+
+  function test_completedBreakClosesStatisticsSession() {
+    var s = Model.defaultSnapshot(1000)
+    s.statistics.currentSessionActiveMs = 18 * 60000
+    s.statistics.today.activeMs = 18 * 60000
+    s.state = Model.State.Breaking
+    s.activeBreakDurationMs = 20000
+    s.breakEndsAtMs = 21000
+    s = Model.completeBreak(s, 21000)
+    compare(s.statistics.today.completed, 1)
+    compare(s.statistics.today.shortBreaks, 1)
+    compare(s.statistics.currentSessionActiveMs, 0)
+    compare(s.statistics.today.sessions[0].durationMs, 18 * 60000)
+    compare(s.statistics.today.sessions[0].outcome, "break")
+  }
+
+  function test_skippingDoesNotEndUninterruptedSession() {
+    var s = Model.defaultSnapshot(1000)
+    s.statistics.currentSessionActiveMs = 18 * 60000
+    s.state = Model.State.Breaking
+    s.breakEndsAtMs = 21000
+    s = Model.skipBreak(s, 21000)
+    compare(s.statistics.today.skipped, 1)
+    compare(s.statistics.today.completed, 0)
+    compare(s.statistics.currentSessionActiveMs, 18 * 60000)
+    compare(s.statistics.today.sessions.length, 0)
+  }
+
+  function test_snoozesAreRecordedPerDay() {
+    var c = config({ snoozeBudget: 3 })
+    var s = Model.defaultSnapshot(1000)
+    s = Model.delayNextBreak(s, 2000, 60000, c)
+    compare(s.statistics.today.snoozed, 1)
+  }
+
+  function test_statisticsRollOverAtLocalDayBoundary() {
+    var start = new Date(2026, 7, 24, 23, 59, 59).getTime()
+    var nextDay = start + 2000
+    var c = config({ focusMs: 60 * 60 * 1000 })
+    var s = Model.defaultSnapshot(start)
+    s.statistics.today.activeMs = 100000
+    s.statistics.currentSessionActiveMs = 100000
+    s = Model.observe(s, { nowMs: nextDay, active: true, idle: false, evidence: [] }, c)
+    compare(s.statistics.days.length, 1)
+    compare(s.statistics.days[0].activeMs, 100000)
+    compare(s.statistics.today.dateKey, Model.localDayKey(nextDay))
+    compare(s.statistics.today.activeMs, 2000)
+    compare(s.statistics.currentSessionActiveMs, 102000)
+  }
+
+  function test_medianSessionDuration() {
+    var s = Model.defaultSnapshot(1000)
+    s.statistics.today.sessionDurationsMs = [30 * 60000, 10 * 60000, 20 * 60000]
+    compare(Model.medianSessionDuration(s), 20 * 60000)
+    s.statistics.today.sessionDurationsMs = [10 * 60000, 20 * 60000]
+    compare(Model.medianSessionDuration(s), 15 * 60000)
+  }
+
+  function test_recoveryRejectsFutureStatisticsSession() {
+    var now = 1000000
+    var s = Model.defaultSnapshot(now)
+    s.statistics.today.sessions = [{
+      endedAtMs: now + 25 * 60 * 60 * 1000,
+      durationMs: 1000,
+      outcome: "break"
+    }]
+    compare(Model.recoverSnapshot(s, now), null)
+  }
+
+  function test_statisticsMigrateAndRemainBounded() {
+    var now = new Date(2026, 7, 25, 12, 0, 0).getTime()
+    var legacy = Model.copySnapshot({ lastObservedAtMs: now })
+    compare(legacy.statistics.today.dateKey, Model.localDayKey(now))
+    compare(legacy.statistics.today.activeMs, 0)
+
+    var s = Model.defaultSnapshot(now)
+    for (var index = 0; index < 20; index++) {
+      s.statistics.today.sessions.push({ endedAtMs: now, durationMs: 1000, outcome: "break" })
+      s.statistics.today.sessionDurationsMs.push(1000)
+      var dayNumber = 24 - index
+      var day = Model.defaultStatisticDay("2026-08-" + (dayNumber < 10 ? "0" : "") + dayNumber)
+      day.activeMs = 1000
+      s.statistics.days.push(day)
+    }
+    s = Model.copySnapshot(s)
+    compare(s.statistics.today.sessions.length, 12)
+    compare(s.statistics.today.sessionDurationsMs.length, 12)
+    compare(s.statistics.days.length, 7)
   }
 }
