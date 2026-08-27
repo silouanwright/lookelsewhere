@@ -54,6 +54,11 @@ Item {
   property bool preDemoPersistenceBlocked: false
   property int demoSequenceIndex: -1
   property string demoFixture: ""
+  property real lastObserveStartedAtMs: 0
+  property int lastObserveGapMs: 0
+  property int maximumObserveGapMs: 0
+  property int lastObserveDurationMs: 0
+  property int maximumObserveDurationMs: 0
   readonly property var demoSequence: [
     "idle", "typing", "meeting", "microphone", "camera", "screen-sharing",
     "video", "media", "fullscreen", "dictation", "due", "warning", "final", "casual-break",
@@ -173,6 +178,16 @@ Item {
   }
 
   function observe() {
+    var startedAtMs = Date.now()
+    if (lastObserveStartedAtMs > 0) {
+      lastObserveGapMs = Math.max(0, startedAtMs - lastObserveStartedAtMs)
+      if (lastObserveGapMs > maximumObserveGapMs) {
+        maximumObserveGapMs = lastObserveGapMs
+        if (lastObserveGapMs >= 1500)
+          console.warn("LookElsewhere scheduler tick delayed by " + lastObserveGapMs + " ms")
+      }
+    }
+    lastObserveStartedAtMs = startedAtMs
     var beforeState = snapshot.state
     var beforeDecision = JSON.stringify(snapshot.naturalBreakDecision || null)
     var effectiveIdle = config.detectors.idle && idle
@@ -187,6 +202,12 @@ Item {
     playTransitionSound(beforeState, snapshot.state)
     if (!demoMode && (snapshot.state !== beforeState
         || JSON.stringify(snapshot.naturalBreakDecision || null) !== beforeDecision)) scheduleSave()
+    lastObserveDurationMs = Math.max(0, Date.now() - startedAtMs)
+    if (lastObserveDurationMs > maximumObserveDurationMs) {
+      maximumObserveDurationMs = lastObserveDurationMs
+      if (lastObserveDurationMs >= 50)
+        console.warn("LookElsewhere scheduler update took " + lastObserveDurationMs + " ms")
+    }
   }
 
   onActiveToplevelChanged: {
@@ -783,7 +804,7 @@ Item {
 
     function status(): string { return JSON.stringify({ state: service.phase, remainingMs: service.remainingMs, evidence: service.evidence(), demo: service.demoMode, idlePaused: service.idlePauseActive, naturalPauseReady: service.naturalPauseReady, typingHoldActive: service.typingHoldActive, contextLabel: service.contextLabel, naturalBreakDecision: service.snapshot.naturalBreakDecision || null, recoveryWarning: service.recoveryWarning }) }
     function configuration(): string { return JSON.stringify(service.config) }
-    function diagnostics(): string { return JSON.stringify({ fullscreen: service.fullscreenAvailable, dictation: service.dictationAvailable, mpris: true, pipewire: true, pipewireActiveStreams: service.activePipewireNodeIds.length, pipewireEvidenceRecords: service.pipewireEvidenceRecords.length, idle: true, sound: service.soundAvailable, persistenceBlocked: service.persistenceBlocked }) }
+    function diagnostics(): string { return JSON.stringify({ fullscreen: service.fullscreenAvailable, dictation: service.dictationAvailable, mpris: true, pipewire: true, pipewireActiveStreams: service.activePipewireNodeIds.length, pipewireEvidenceRecords: service.pipewireEvidenceRecords.length, idle: true, sound: service.soundAvailable, persistenceBlocked: service.persistenceBlocked, schedulerLastGapMs: service.lastObserveGapMs, schedulerMaximumGapMs: service.maximumObserveGapMs, schedulerLastDurationMs: service.lastObserveDurationMs, schedulerMaximumDurationMs: service.maximumObserveDurationMs }) }
     function takeBreak(): string { service.takeBreak(); return service.phase }
     function postpone(minutes: int): string { service.postponeMinutes(minutes); return service.phase }
     function pause(minutes: int): string { service.pauseMinutes(minutes); return service.phase }
