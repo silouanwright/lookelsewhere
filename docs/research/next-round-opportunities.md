@@ -46,6 +46,8 @@ possible follow-up only if they change a user decision.
 ### P1: Detector correction and exclusions
 
 - explain the active detector in the panel and bar;
+- implemented: add or remove the currently focused application from the
+  protected-app list without manually discovering its application ID;
 - allow application exclusions for microphone/video heuristics;
 - distinguish foreground video from background audio where the platform can;
 - warn when a keep-awake inhibitor prevents away detection;
@@ -112,12 +114,6 @@ surfaces. Add them only after natural-break handling and statistics are trusted.
 
 ## Questions to answer before implementation
 
-- What away-duration bands should resume, reset, or satisfy a break?
-- Which observable signals can improve that decision without invasive input
-  monitoring?
-- How long should the correction action remain available?
-- What is a “session” for statistics, and how does a natural break close one?
-- Which statistics change a user decision rather than merely filling a chart?
 - What exact collision window should planned breaks use?
 - Which detector exclusions can be implemented reliably with current Hyprland,
   MPRIS, PipeWire, and Omarchy APIs?

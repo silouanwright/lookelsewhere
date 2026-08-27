@@ -658,6 +658,10 @@ TestCase {
     var customized = Model.configFromSettings({ protectedApps: "code, org.gnome.Builder.desktop" })
     compare(customized.protectedApps.join(","), "code,org.gnome.builder")
     verify(Model.matchesProtectedApp("org.gnome.Builder", customized.protectedApps))
+    compare(Model.toggleProtectedApp(defaults.protectedApps, "steam_app_1868140"), "")
+    compare(Model.toggleProtectedApp(defaults.protectedApps, "ORG.GNOME.Builder.desktop"), "steam, org.gnome.builder")
+    compare(Model.toggleProtectedApp(["steam", "org.gnome.builder"], "org.gnome.Builder"), "steam")
+    compare(Model.toggleProtectedApp(defaults.protectedApps, ""), "steam")
   }
 
   function test_manualPauseLabel() {

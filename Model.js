@@ -884,3 +884,17 @@ function matchesProtectedApp(appId, protectedApps) {
   }
   return false
 }
+
+function toggleProtectedApp(protectedApps, appId) {
+  var configured = (protectedApps || []).map(function(value) {
+    return String(value || "").trim().toLowerCase().replace(/\.desktop$/, "")
+  }).filter(function(value) { return value !== "" })
+  var active = String(appId || "").trim().toLowerCase().replace(/\.desktop$/, "")
+  if (!active) return configured.join(", ")
+  if (matchesProtectedApp(active, configured)) return configured.filter(function(value) {
+    return !appIdsMatch(active, value)
+      && !(value === "steam" && /^steam_app_[0-9]+$/.test(active))
+  }).join(", ")
+  configured.push(active)
+  return configured.join(", ")
+}

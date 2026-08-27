@@ -25,7 +25,7 @@ implementation. ADRs explain why consequential choices were made.
 
 ## Planning and release records
 
-- [Product priorities](product-priorities.md)
+- [Current product roadmap](product-priorities.md)
 - [Competition MVP requirements](mvp-requirements.md)
 - [Completion matrix](completion-matrix.md)
 - [Design feedback reconciliation](design-feedback-reconciliation.md)

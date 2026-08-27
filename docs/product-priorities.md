@@ -1,48 +1,65 @@
-# Product Priorities
+# Product Roadmap
 
-This is a competition and portfolio quality plan, not a LookAway parity list. Priorities favor a memorable complete experience, reliable Wayland behavior, Omarchy-native integration, and evidence a reviewer can understand quickly.
+Updated August 27, 2026. This is the current priority list for LookElsewhere.
+The README carries the public summary; research documents and completion
+matrices preserve the evidence behind these decisions but do not supersede
+this file.
 
-## P0 — required before public review
+## Now: trust and context
 
-- **Correct interruption timeline:** warning begins during the final configured seconds of focus time, final countdown follows, and the break begins at the original zero without a hidden second cycle.
-- **Portrait quick panel:** anchored to the bar icon, narrow vertical hierarchy, large countdown, no progress bar, one obvious primary action, compact secondary state.
-- **Bounded snoozing:** visible +1/+5/+15 minute actions, enforcement-aware availability, persisted budget use, and deterministic expiry behavior.
-- **Trustworthy active-time behavior:** away time pauses visibly in the bar and panel; natural-pause behavior is either proven live or described conservatively.
-- **Reliable core surfaces:** warning, final countdown, full-screen break, keyboard exit policy, multi-monitor authority, shell restart, and contrasting themes pass live acceptance.
-- **Original product story:** README and demo show the problem, Omarchy/Wayland architecture, privacy boundary, native theming, and verified behavior without third-party screenshots as marketing assets.
+- **Countdown reliability:** keep the displayed timer authoritative and smooth
+  under Quickshell stalls, with diagnostics that can distinguish scheduling
+  delay from presentation delay.
+- **Detector correction and exclusions:** explain why a break is delayed, let
+  users add or remove the focused application from protection, and add narrow
+  per-detector exclusions where PipeWire or MPRIS heuristics are wrong.
+- **Context acceptance:** continue live verification with Steam games, Chromium
+  video, calls, screen sharing, dictation, fullscreen applications, suspend,
+  and mixed-monitor setups without overstating what Wayland can identify.
+- **Release hardening:** keep keyboard navigation, light and dark themes,
+  persistence recovery, bounded external input, and shell reload behavior under
+  regression coverage.
 
-## P1 — high-leverage differentiation
+## Next: stronger routines
 
-- Return-from-away choice when an idle interval makes session intent ambiguous.
-- Broader screen recording/sharing coverage beyond applications that publish a
-  standard PipeWire `Screen` role; track XDPH #331 rather than adding title or
-  process heuristics.
-- Per-app deep-focus overrides as transparent configuration, not opaque detection.
-- A lightweight blink micro-reminder that stays inside the eye-care promise.
-- Omarchy/Hyprland keybinding recipes for break, pause/resume, and bounded snoozes.
-- Privacy-conscious start/end hooks only with explicit configuration and argument-array execution.
-- Calm overdue state when a break is delayed, if it improves clarity without nagging.
-- Rolling countdown transitions in the panel and break screen, with reduced-motion fallback.
+1. **Planned breaks:** fixed-time lunch, walk, and shutdown routines with
+   weekday selection, collision handling, away-time credit, grace after
+   protected activity, and correct midnight and timezone behavior.
+2. **Custom break guidance:** separate short- and long-break message pools with
+   a few calm defaults and optional random selection. Guidance should help the
+   user look away, not create another screen to read.
+3. **Accessibility completion:** screen-reader announcements, increased-
+   contrast verification, non-color state cues, focus restoration, and reduced
+   transparency testing across Omarchy themes.
+4. **Sound refinement:** a small set of optional cues, in-panel preview, and
+   clearer custom-sound configuration.
 
-## P2 — valuable after the competition cut
+## Later
 
-- Posture and other broader wellness reminders.
-- Calendar integration.
-- Additional sound packs and an in-panel sound preview.
-- Automatic lock on break as an explicit opt-in.
-- Diagnostics export and a richer support surface.
-- Optional statistics/history exploration without a manipulative score.
-- Cross-device synchronization.
+- Optional start/end hooks and arbitrary-duration on-demand breaks.
+- MPRIS pause-and-resume that never starts media which was already paused.
+- Longer-term private trends only when they answer a useful question.
+- Blink reminders and other independent wellness routines.
+- Broader Quickshell and Wayland support, with a standalone scheduler only if
+  the shell lifecycle becomes the wrong reliability boundary.
 
-## Explicitly deferred or rejected
+## Recently shipped
 
-- Marketplace publication before Silouan's exact approval.
-- Mac visual chrome, LookAway branding, or cloned illustrations.
-- Telemetry in the competition MVP.
-- A screen score merely to create engagement.
-- Mobile sync or a standalone daemon before the native plugin is complete.
-- Detector claims that cannot be demonstrated on the installed Omarchy/Wayland stack.
+- Reversible fresh-session handling after meaningful time away.
+- Private, chart-free daily statistics and bounded recent history.
+- Privacy-safe PipeWire context for microphones, meetings, cameras, screen
+  sharing, and explicit video roles.
+- Focused-app protection with Steam defaults and an in-panel **Add current app**
+  / **Remove current app** action.
+- Progressive warnings, long breaks, sounds, enforcement modes, office hours,
+  deterministic demo states, and complete keyboard control.
 
-## Release decision rule
+## Product constraints
 
-A P1 feature enters the competition cut only if it strengthens the demo, preserves the privacy model, has a reliable fallback, and does not leave a P0 acceptance item incomplete. Otherwise it remains documented follow-up work.
+- No telemetry, website history, window-title retention, screen capture, or
+  audio recording.
+- No detector claim that cannot be demonstrated on the supported stack.
+- No gamified score or dashboard added merely to make the product look larger.
+- No instruction-heavy break screen that keeps the user looking at the screen.
+- Every feature must remain explainable, keyboard-accessible, and native to
+  Omarchy.

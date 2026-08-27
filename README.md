@@ -121,6 +121,10 @@ Open the gear in the plugin panel for categorized General, Breaks, Context, and
 Experience settings. Changes are saved directly to Omarchy's configuration;
 LookElsewhere does not maintain a second settings file.
 
+The Context page can add or remove the currently focused application from the
+protected-app list without requiring you to discover its Wayland application
+ID manually.
+
 For scripting or direct configuration, use Omarchy's CLI:
 
 ```bash
@@ -163,15 +167,21 @@ in [Upstream Opportunities](docs/upstream-opportunities.md).
 
 ## Roadmap
 
-- Stronger meeting, screen-sharing, recording, video, and per-app signals
-- Optional glanceable break ideas and more short- and long-break routines
-- More sound choices, previews, and optional start/end hooks
-- Optional longer-term private trends when they answer a useful question
-- Clean foundations for other Quickshell and Wayland desktops
+- More trustworthy context controls, detector corrections, and per-app
+  exclusions
+- Planned lunch, walk, and shutdown breaks that cooperate with regular breaks
+- Custom short- and long-break guidance without turning breaks into more screen
+  time
+- Accessibility completion across themes, motion preferences, and screen
+  readers
+- More sound choices and in-panel previews
 
 New features should stay private, explainable, keyboard-accessible, and native
 to Omarchy. Helping your eyes should not require another dashboard demanding
 attention.
+
+See the [current product roadmap](docs/product-priorities.md) for priorities,
+recently shipped work, and the acceptance constraints behind them.
 
 ## About the developer
 

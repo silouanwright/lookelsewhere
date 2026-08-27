@@ -44,6 +44,9 @@ ColumnLayout {
     || officeStartDropdown.popupOpen || officeEndDropdown.popupOpen
     || outputModeDropdown.popupOpen || displayModeDropdown.popupOpen
     || panelPatternDropdown.popupOpen
+  readonly property string activeAppId: service ? String(service.activeAppId || "").trim() : ""
+  readonly property bool activeAppProtected: service
+    && Model.matchesProtectedApp(activeAppId, service.config.protectedApps)
   readonly property Item initialFocusTarget: settingsTabs
   readonly property Item finalFocusTarget: {
     var controls = targets()
@@ -88,7 +91,7 @@ ColumnLayout {
       general: [pauseBreaksButton, editSettingsButton, officeHoursRow,
         officeStartDropdown, officeEndDropdown],
       context: [idleDetectionRow, recentInputDetectionRow, fullscreenDetectionRow, mediaDetectionRow,
-        microphoneDetectionRow, screenSharingDetectionRow, dictationDetectionRow],
+        microphoneDetectionRow, screenSharingDetectionRow, dictationDetectionRow, protectedAppsRow],
       breaks: [focusMinutesField, shortBreakField, longBreakEveryField,
         longBreakSecondsField, snoozeBudgetField, maximumDelayField,
         enforcementDropdown],
@@ -126,6 +129,10 @@ ColumnLayout {
     if (!cursorActive) { setCursor(0); return }
     var target = targets()[cursorIndex]
     if (target && typeof target.activate === "function") target.activate()
+  }
+  function toggleCurrentProtectedApp() {
+    if (!service || !activeAppId) return
+    persistSettings({ protectedApps: Model.toggleProtectedApp(service.config.protectedApps, activeAppId) })
   }
   function ensureCursorVisible(item) {
     var flick = scrollFlickable
@@ -420,6 +427,43 @@ ColumnLayout {
     hasCursor: settingsPage.hasCursorFor(dictationDetectionRow)
     onHovered: function(on) { if (on) settingsPage.setCursorTarget(dictationDetectionRow) }
     onClicked: settingsPage.persistSettings({ dictationDetection: !checked })
+  }
+  PanelSeparator { Layout.fillWidth: true; foreground: settingsPage.foreground }
+  Item {
+    id: protectedAppsRow
+    Layout.fillWidth: true
+    Layout.preferredHeight: Math.max(protectedAppsLabels.implicitHeight, currentAppButton.implicitHeight)
+
+    function activate() { settingsPage.toggleCurrentProtectedApp() }
+
+    LookUi.SettingLabels {
+      id: protectedAppsLabels
+      anchors.left: parent.left
+      anchors.right: currentAppButton.left
+      anchors.rightMargin: Style.space(12)
+      anchors.verticalCenter: parent.verticalCenter
+      label: qsTr("Protected applications")
+      description: settingsPage.service && settingsPage.service.config.protectedApps.length
+        ? settingsPage.service.config.protectedApps.join(", ") : qsTr("None configured")
+      foreground: settingsPage.foreground
+      muted: settingsPage.muted
+      fontFamily: settingsPage.fontFamily
+    }
+
+    LookUi.WeightedButton {
+      id: currentAppButton
+      anchors.right: parent.right
+      anchors.verticalCenter: parent.verticalCenter
+      label: settingsPage.activeAppProtected ? qsTr("Remove current app") : qsTr("Add current app")
+      actionEnabled: settingsPage.activeAppId !== ""
+      disabledTooltipText: qsTr("No focused application was detected")
+      foreground: settingsPage.foreground
+      accent: settingsPage.accent
+      fontFamily: settingsPage.fontFamily
+      hasCursor: settingsPage.hasCursorFor(protectedAppsRow)
+      onHovered: if (hovered) settingsPage.setCursorTarget(protectedAppsRow)
+      onClicked: settingsPage.toggleCurrentProtectedApp()
+    }
   }
 
   }
