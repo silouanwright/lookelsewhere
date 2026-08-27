@@ -22,16 +22,13 @@ this file.
 
 ## Next: stronger routines
 
-1. **Planned breaks:** fixed-time lunch, walk, and shutdown routines with
-   weekday selection, collision handling, away-time credit, grace after
-   protected activity, and correct midnight and timezone behavior.
-2. **Custom break guidance:** separate short- and long-break message pools with
+1. **Custom break guidance:** separate short- and long-break message pools with
    a few calm defaults and optional random selection. Guidance should help the
    user look away, not create another screen to read.
-3. **Accessibility completion:** screen-reader announcements, increased-
+2. **Accessibility completion:** screen-reader announcements, increased-
    contrast verification, non-color state cues, focus restoration, and reduced
    transparency testing across Omarchy themes.
-4. **Sound refinement:** a small set of optional cues, in-panel preview, and
+3. **Sound refinement:** a small set of optional cues, in-panel preview, and
    clearer custom-sound configuration.
 
 ## Later
@@ -45,6 +42,8 @@ this file.
 
 ## Recently shipped
 
+- Native recurring planned breaks with weekday scheduling, protected-context
+  grace, away-time credit, coalescing, snoozing, and Skip Today.
 - Reversible fresh-session handling after meaningful time away.
 - Private, chart-free daily statistics and bounded recent history.
 - Privacy-safe PipeWire context for microphones, meetings, cameras, screen

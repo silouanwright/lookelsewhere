@@ -4,7 +4,7 @@
 
 ### Pure policy tests
 
-Test time accounting, state transitions, enforcement budgets, detector precedence, cooldown, maximum delay, office hours, overnight schedules, partial idle credit, and recovery from timestamp snapshots without UI.
+Test time accounting, state transitions, enforcement budgets, detector precedence, cooldown, maximum delay, office hours, overnight schedules, planned recurrence, collision/coalescing, partial idle credit, and recovery from timestamp snapshots without UI.
 
 ### QML/component tests
 
@@ -39,6 +39,8 @@ model, and controls activate through the shared UI contract.
 - Fullscreen enter/leave
 - Dictation start/stop
 - Suspend/resume and clock discontinuity
+- Planned warning, protection, snooze, Skip Today, away-time credit, expiry,
+  restart recovery, and coalescing with an ordinary break
 - Monitor add/remove and focus change
 - Top/bottom/left/right bar positions where relevant
 

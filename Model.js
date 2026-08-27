@@ -234,19 +234,33 @@ function copyPlannedOccurrence(value) {
     expiresAtMs: bounded(value.expiresAtMs, Number.MAX_SAFE_INTEGER),
     creditedAwayMs: bounded(value.creditedAwayMs, MaximumPlannedDurationMs),
     idleStartedAtMs: bounded(value.idleStartedAtMs, Number.MAX_SAFE_INTEGER),
-    deferred: value.deferred === true
+    intervalDueAtMs: bounded(value.intervalDueAtMs, Number.MAX_SAFE_INTEGER),
+    deferred: value.deferred === true,
+    snoozesUsed: bounded(value.snoozesUsed, 20)
   }
 }
 
-function beginPlannedOccurrence(snapshot, occurrence, nowMs) {
+function beginPlannedOccurrence(snapshot, occurrence, nowMs, config) {
   var next = copySnapshot(snapshot)
+  var cfg = config && config.version === 1 ? config : normalizeConfig(config)
   var planned = copyPlannedOccurrence(occurrence)
   if (!planned) return next
   planned.creditedAwayMs = 0
   planned.idleStartedAtMs = 0
+  planned.snoozesUsed = 0
+  planned.intervalDueAtMs = next.dueAtMs > 0 ? next.dueAtMs
+    : Number(nowMs) + Math.max(0, cfg.focusMs - Number(next.accumulatedActiveMs || 0))
   planned.deferred = Number(nowMs) > planned.scheduledAtMs
   next.activePlannedOccurrence = planned
-  next.dueAtMs = planned.scheduledAtMs
+  if (!(next.state === State.Waiting && next.pauseReason === "manual")) {
+    next.state = State.Working
+    next.stateEnteredAtMs = Number(nowMs)
+    next.postponedUntilMs = 0
+    next.cooldownUntilMs = 0
+    next.warningEndsAtMs = 0
+    next.protectedCategory = ""
+    next.pauseReason = ""
+  }
   return next
 }
 
@@ -281,6 +295,97 @@ function rememberPlannedOccurrence(snapshot, occurrenceKey) {
     next.handledPlannedOccurrences.unshift(key)
   next.handledPlannedOccurrences = next.handledPlannedOccurrences.slice(0, MaximumHandledPlannedOccurrences)
   return next
+}
+
+function clearPlannedPresentation(snapshot, nowMs) {
+  var next = copySnapshot(snapshot)
+  next.activePlannedOccurrence = null
+  next.activeBreakIsPlanned = false
+  next.state = State.Working
+  next.stateEnteredAtMs = Number(nowMs)
+  next.dueAtMs = 0
+  next.postponedUntilMs = 0
+  next.cooldownUntilMs = 0
+  next.warningEndsAtMs = 0
+  next.breakEndsAtMs = 0
+  next.activeBreakDurationMs = 0
+  next.activeBreakIsLong = false
+  next.protectedCategory = ""
+  next.pauseReason = ""
+  return next
+}
+
+function coalesceIntervalForPlanned(snapshot, occurrence, nowMs, config) {
+  var next = snapshot
+  var remaining = Math.max(0, config.focusMs - Number(next.accumulatedActiveMs || 0))
+  var intervalDueAtMs = occurrence.intervalDueAtMs > 0
+    ? occurrence.intervalDueAtMs : Number(nowMs) + remaining
+  if (Math.abs(intervalDueAtMs - occurrence.scheduledAtMs) <= PlannedCoalescingMs) {
+    next.accumulatedActiveMs = 0
+    next.dueAtMs = 0
+    next.postponedUntilMs = 0
+    next.cooldownUntilMs = 0
+    next.warningEndsAtMs = 0
+  }
+  return next
+}
+
+function finishPlannedOccurrence(snapshot, nowMs, config, outcome) {
+  var next = copySnapshot(snapshot)
+  var planned = next.activePlannedOccurrence
+  if (!planned) return next
+  if (outcome === "completed") {
+    next = closeStatisticsSession(next, nowMs, "planned-break")
+    next.statistics.today.completed++
+    next.statistics.today.plannedBreaks++
+    next.totals.completed++
+  } else if (outcome === "skipped") {
+    next.statistics.today.skipped++
+    next.statistics.today.plannedSkipped++
+    next.totals.skipped++
+  } else {
+    next.statistics.today.plannedIgnored++
+  }
+  next = rememberPlannedOccurrence(next, planned.key)
+  next = coalesceIntervalForPlanned(next, planned, nowMs, config)
+  return clearPlannedPresentation(next, nowMs)
+}
+
+function startPlannedBreak(snapshot, nowMs, config) {
+  var next = copySnapshot(snapshot)
+  var planned = next.activePlannedOccurrence
+  if (!planned) return startBreak(next, nowMs, config)
+  var duration = Math.max(0, planned.durationMs - plannedAwayCredit(next, nowMs))
+  if (duration <= 0) return finishPlannedOccurrence(next, nowMs, config, "completed")
+  next.state = State.Breaking
+  next.stateEnteredAtMs = Number(nowMs)
+  next.activeBreakDurationMs = duration
+  next.activeBreakIsLong = false
+  next.activeBreakIsPlanned = true
+  next.breakEndsAtMs = Number(nowMs) + duration
+  next.postponedUntilMs = 0
+  next.warningEndsAtMs = 0
+  return next
+}
+
+function postponePlanned(snapshot, nowMs, durationMs, config) {
+  var next = copySnapshot(snapshot)
+  var planned = next.activePlannedOccurrence
+  if (!planned || planned.snoozesUsed >= config.snoozeBudget) return next
+  planned.snoozesUsed++
+  planned.deferred = true
+  next.activePlannedOccurrence = planned
+  next.state = State.Waiting
+  next.stateEnteredAtMs = Number(nowMs)
+  next.postponedUntilMs = Number(nowMs) + Math.max(0, Number(durationMs || 0))
+  next.warningEndsAtMs = 0
+  next.statistics.today.snoozed++
+  next.totals.postponed++
+  return next
+}
+
+function skipPlannedOccurrence(snapshot, nowMs, config) {
+  return finishPlannedOccurrence(snapshot, nowMs, config, "skipped")
 }
 
 function plannedOccurrencesNear(config, nowMs) {
@@ -395,6 +500,9 @@ function defaultStatisticDay(dayKey) {
     snoozed: 0,
     shortBreaks: 0,
     longBreaks: 0,
+    plannedBreaks: 0,
+    plannedSkipped: 0,
+    plannedIgnored: 0,
     longestSessionMs: 0,
     sessionDurationsMs: [],
     sessions: []
@@ -421,7 +529,7 @@ function copyStatisticDay(value, fallbackDayKey) {
   var sessions = Array.isArray(value.sessions) ? value.sessions : []
   sessions = sessions.slice(0, MaximumSessionsPerDay).map(function(session) {
     session = session || {}
-    var outcome = ["break", "long-break", "away"].indexOf(String(session.outcome || "")) >= 0
+    var outcome = ["break", "long-break", "planned-break", "away"].indexOf(String(session.outcome || "")) >= 0
       ? String(session.outcome) : "break"
     return {
       endedAtMs: boundedStatisticNumber(session.endedAtMs, Number.MAX_SAFE_INTEGER),
@@ -437,6 +545,9 @@ function copyStatisticDay(value, fallbackDayKey) {
     snoozed: boundedStatisticNumber(value.snoozed, MaximumStatisticCount),
     shortBreaks: boundedStatisticNumber(value.shortBreaks, MaximumStatisticCount),
     longBreaks: boundedStatisticNumber(value.longBreaks, MaximumStatisticCount),
+    plannedBreaks: boundedStatisticNumber(value.plannedBreaks, MaximumStatisticCount),
+    plannedSkipped: boundedStatisticNumber(value.plannedSkipped, MaximumStatisticCount),
+    plannedIgnored: boundedStatisticNumber(value.plannedIgnored, MaximumStatisticCount),
     longestSessionMs: boundedStatisticNumber(value.longestSessionMs, MaximumStatisticMs),
     sessionDurationsMs: durations,
     sessions: sessions
@@ -465,7 +576,8 @@ function ensureStatisticsDay(snapshot, nowMs) {
   if (statistics.today.dateKey !== todayKey) {
     var previous = statistics.today
     var hasPreviousData = previous.activeMs > 0 || previous.completed > 0
-      || previous.skipped > 0 || previous.snoozed > 0 || previous.sessions.length > 0
+      || previous.skipped > 0 || previous.snoozed > 0 || previous.plannedBreaks > 0
+      || previous.plannedSkipped > 0 || previous.plannedIgnored > 0 || previous.sessions.length > 0
     statistics.days = (hasPreviousData ? [previous] : []).concat(statistics.days.filter(function(day) {
       return day.dateKey !== previous.dateKey && day.dateKey !== todayKey
     })).slice(0, MaximumStatisticDays)
@@ -614,7 +726,7 @@ function recoverSnapshot(snapshot, nowMs) {
       && (next.naturalBreakDecision.decidedAtMs > latest
         || next.naturalBreakDecision.undoUntilMs > latest)) return null
   if (next.activePlannedOccurrence) {
-    var plannedTimestamps = ["scheduledAtMs", "expiresAtMs", "idleStartedAtMs"]
+    var plannedTimestamps = ["scheduledAtMs", "expiresAtMs", "idleStartedAtMs", "intervalDueAtMs"]
     for (var plannedIndex = 0; plannedIndex < plannedTimestamps.length; plannedIndex++)
       if (next.activePlannedOccurrence[plannedTimestamps[plannedIndex]] > latest) return null
   }
@@ -634,6 +746,88 @@ function resetSession(snapshot, nowMs) {
   return next
 }
 
+function observePlannedOccurrence(snapshot, input, config, nowMs, protection) {
+  var next = copySnapshot(snapshot)
+  var planned = next.activePlannedOccurrence
+  if (!planned) return next
+
+  if (Number(nowMs) > planned.expiresAtMs)
+    return finishPlannedOccurrence(next, nowMs, config, "ignored")
+
+  next = reconcilePlannedAway(next, nowMs, input.idle === true)
+  planned = next.activePlannedOccurrence
+  var awayCredit = plannedAwayCredit(next, nowMs)
+  if (awayCredit >= planned.durationMs)
+    return finishPlannedOccurrence(next, nowMs, config, "completed")
+
+  if (input.idle === true) {
+    if (Number(nowMs) >= planned.scheduledAtMs) planned.deferred = true
+    next.activePlannedOccurrence = planned
+    next.state = State.Waiting
+    next.pauseReason = "planned-away"
+    return next
+  }
+
+  if (next.state === State.Waiting && next.pauseReason === "manual") {
+    if (Number(nowMs) >= planned.scheduledAtMs) planned.deferred = true
+    next.activePlannedOccurrence = planned
+    return next
+  }
+  if (next.postponedUntilMs > Number(nowMs)) {
+    next.state = State.Waiting
+    next.pauseReason = "planned-snooze"
+    return next
+  }
+
+  var delayAge = Math.max(0, Number(nowMs) - planned.scheduledAtMs)
+  if (protection && delayAge < config.maximumDelayMs) {
+    if (Number(nowMs) >= planned.scheduledAtMs) planned.deferred = true
+    next.activePlannedOccurrence = planned
+    if (next.state !== State.Protected) next.totals.delayed++
+    next.state = State.Protected
+    next.protectedCategory = protection.category
+    return next
+  }
+  if (next.state === State.Protected) {
+    next.cooldownUntilMs = Number(nowMs) + config.cooldownMs
+    next.protectedCategory = ""
+  }
+  if (Number(nowMs) < next.cooldownUntilMs && delayAge < config.maximumDelayMs) {
+    if (Number(nowMs) >= planned.scheduledAtMs) planned.deferred = true
+    next.activePlannedOccurrence = planned
+    next.state = State.Waiting
+    next.pauseReason = "planned-cooldown"
+    return next
+  }
+
+  if (Number(nowMs) < planned.scheduledAtMs) {
+    var remaining = planned.scheduledAtMs - Number(nowMs)
+    next.pauseReason = ""
+    if (next.state === State.Final) return next
+    if (next.state === State.Warning) {
+      if (remaining <= config.finalMs) next.state = State.Final
+      return next
+    }
+    return startWarning(next, nowMs, config, remaining)
+  }
+
+  if (next.state === State.Final && !planned.deferred
+      && input.typingActive !== true && input.naturalPause !== false)
+    return startPlannedBreak(next, nowMs, config)
+
+  if (!planned.deferred && Number(nowMs) <= planned.scheduledAtMs + 1000
+      && input.typingActive !== true && input.naturalPause !== false)
+    return startPlannedBreak(next, nowMs, config)
+
+  planned.deferred = true
+  next.activePlannedOccurrence = planned
+  next.state = State.PlannedReady
+  next.stateEnteredAtMs = Number(nowMs)
+  next.pauseReason = ""
+  next.warningEndsAtMs = 0
+  return next
+}
+
 function observe(snapshot, input, config) {
   var cfg = config && config.version === 1 ? config : normalizeConfig(config)
   var next = copySnapshot(snapshot || defaultSnapshot(input.nowMs))
@@ -642,11 +836,14 @@ function observe(snapshot, input, config) {
   var elapsed = clamp(now - previous, 0, 5 * 60 * 1000)
   var activeNow = input.active === true && input.idle !== true
   next = ensureStatisticsDay(next, now)
+  var plannedCandidate = next.activePlannedOccurrence ? null
+    : nextActionablePlannedOccurrence(cfg, now, next.handledPlannedOccurrences)
   var manuallyPaused = next.state === State.Waiting && next.pauseReason === "manual"
   if (next.naturalBreakDecision && now > next.naturalBreakDecision.undoUntilMs)
     next.naturalBreakDecision = null
   var awayMs = now - Number(next.lastActiveAtMs || previous)
-  var stableWork = next.state === State.Working || next.state === State.DueSoon
+  var stableWork = (next.state === State.Working || next.state === State.DueSoon)
+    && !next.activePlannedOccurrence && !plannedCandidate
   if (activeNow && !manuallyPaused && stableWork && awayMs >= NaturalBreakReviewMs) {
     var before = {
       state: next.state,
@@ -670,12 +867,32 @@ function observe(snapshot, input, config) {
     elapsed = 0
   }
   next.lastObservedAtMs = now
-  if (activeNow) next.lastActiveAtMs = now
 
   if (!cfg.enabled) {
     next.state = State.Disabled
     return next
   }
+
+  if (next.state === State.Breaking) {
+    if (activeNow) next.lastActiveAtMs = now
+    if (now >= next.breakEndsAtMs) return completeBreak(next, now, cfg)
+    return next
+  }
+
+  var protection = strongestEvidence(input.evidence || [], cfg)
+  if (!next.activePlannedOccurrence) {
+    if (plannedCandidate) next = beginPlannedOccurrence(next, plannedCandidate, now, cfg)
+  }
+  if (next.activePlannedOccurrence) {
+    var plannedWasManuallyPaused = next.state === State.Waiting && next.pauseReason === "manual"
+    if (activeNow && !plannedWasManuallyPaused && inOfficeHours(new Date(now), cfg.officeHours))
+      next = recordActiveStatistics(next, elapsed, now)
+    next = observePlannedOccurrence(next, input, cfg, now, protection)
+    if (activeNow) next.lastActiveAtMs = now
+    return next
+  }
+
+  if (activeNow) next.lastActiveAtMs = now
   if (!inOfficeHours(new Date(now), cfg.officeHours)) {
     next.state = State.Paused
     next.pauseReason = "outside-office-hours"
@@ -694,11 +911,6 @@ function observe(snapshot, input, config) {
   if (activeNow && !manuallyPaused && next.state !== State.Breaking)
     next = recordActiveStatistics(next, elapsed, now)
 
-  if (next.state === State.Breaking) {
-    if (now >= next.breakEndsAtMs) return completeBreak(next, now)
-    return next
-  }
-  var protection = strongestEvidence(input.evidence || [], cfg)
   if ((next.state === State.Warning || next.state === State.Final) && protection) {
     if (!next.dueAtMs) next.dueAtMs = next.warningEndsAtMs
     if (now - next.dueAtMs < cfg.maximumDelayMs) {
@@ -848,8 +1060,11 @@ function isNextBreakLong(snapshot, config) {
     && Number((snapshot || {}).breaksSinceLong || 0) + 1 >= config.longBreakEvery
 }
 
-function completeBreak(snapshot, nowMs) {
+function completeBreak(snapshot, nowMs, config) {
   var next = copySnapshot(snapshot)
+  if (next.activeBreakIsPlanned && next.activePlannedOccurrence)
+    return finishPlannedOccurrence(next, nowMs,
+      config && config.version === 1 ? config : normalizeConfig(config), "completed")
   next = closeStatisticsSession(next, nowMs, next.activeBreakIsLong ? "long-break" : "break")
   next.statistics.today.completed++
   if (next.activeBreakIsLong) next.statistics.today.longBreaks++
@@ -871,8 +1086,11 @@ function completeBreak(snapshot, nowMs) {
   return next
 }
 
-function skipBreak(snapshot, nowMs) {
+function skipBreak(snapshot, nowMs, config) {
   var previous = copySnapshot(snapshot)
+  if (previous.activePlannedOccurrence)
+    return skipPlannedOccurrence(previous, nowMs,
+      config && config.version === 1 ? config : normalizeConfig(config))
   var statistics = previous.statistics
   var next = completeBreak(previous, nowMs)
   next.statistics = statistics
@@ -885,6 +1103,8 @@ function skipBreak(snapshot, nowMs) {
 
 function postpone(snapshot, nowMs, durationMs, config) {
   if (!canPostpone(snapshot, config)) return copySnapshot(snapshot)
+  if (snapshot && snapshot.activePlannedOccurrence)
+    return postponePlanned(snapshot, nowMs, durationMs, config)
   var next = copySnapshot(snapshot)
   next.state = State.Waiting
   next.stateEnteredAtMs = nowMs
@@ -925,11 +1145,14 @@ function delayNextBreak(snapshot, nowMs, durationMs, config) {
 
 function canPostpone(snapshot, config) {
   var cfg = config && config.version === 1 ? config : normalizeConfig(config)
+  if (snapshot && snapshot.activePlannedOccurrence)
+    return Number(snapshot.activePlannedOccurrence.snoozesUsed || 0) < cfg.snoozeBudget
   return Number(snapshot && snapshot.snoozesUsed || 0) < cfg.snoozeBudget
 }
 
-function canSkipBreak(config) {
+function canSkipBreak(config, snapshot) {
   var cfg = config && config.version === 1 ? config : normalizeConfig(config)
+  if (snapshot && snapshot.activePlannedOccurrence) return true
   return cfg.enforcement !== "hardcore"
 }
 
@@ -972,12 +1195,14 @@ function panelShortcutDefinitions() {
     { action: "snooze1", setting: "shortcutSnooze1", fallback: "1" },
     { action: "snooze5", setting: "shortcutSnooze5", fallback: "2" },
     { action: "snooze15", setting: "shortcutSnooze15", fallback: "3" },
+    { action: "skipToday", setting: "shortcutSkipToday", fallback: "S" },
     { action: "pause", setting: "shortcutPause", fallback: "P" },
     { action: "history", setting: "shortcutHistory", fallback: "H" },
     { action: "options", setting: "shortcutOptions", fallback: "O" },
     { action: "edit", setting: "shortcutEdit", fallback: "E" },
     { action: "generalTab", setting: "shortcutGeneralTab", fallback: "G" },
     { action: "breaksTab", setting: "shortcutBreaksTab", fallback: "R" },
+    { action: "plansTab", setting: "shortcutPlansTab", fallback: "L" },
     { action: "contextTab", setting: "shortcutContextTab", fallback: "C" },
     { action: "experienceTab", setting: "shortcutExperienceTab", fallback: "X" },
     { action: "close", setting: "shortcutClose", fallback: "Q" },
@@ -1028,6 +1253,8 @@ function stateLabel(snapshot) {
   if (state === State.Waiting) return "Waiting for a natural pause"
   if (state === State.Warning) return "Break starting soon"
   if (state === State.Final) return "Starting break"
+  if (state === State.PlannedReady) return snapshot.activePlannedOccurrence
+    ? snapshot.activePlannedOccurrence.name + " is ready" : "Planned break is ready"
   if (state === State.Breaking) return "Look elsewhere"
   if (state === State.Paused) return "Breaks paused"
   if (state === State.Disabled) return "LookElsewhere is off"

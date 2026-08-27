@@ -36,11 +36,14 @@ Panel {
   readonly property var shortcuts: CommandModel.resolve(settings, Model.panelShortcutDefinitions())
   readonly property bool keyboardHintsVisible: !!(settings && settings.showKeyboardHints === true)
   readonly property int snoozesRemaining: service
-    ? Math.max(0, Number(service.config.snoozeBudget || 0) - Number(service.snapshot.snoozesUsed || 0))
+    ? Math.max(0, Number(service.config.snoozeBudget || 0) - Number(service.plannedActive
+        ? service.snapshot.activePlannedOccurrence.snoozesUsed : service.snapshot.snoozesUsed || 0))
     : 0
+  readonly property int snoozesUsed: service ? Number(service.plannedActive
+    ? service.snapshot.activePlannedOccurrence.snoozesUsed : service.snapshot.snoozesUsed || 0) : 0
   readonly property string snoozeBudgetSummary: service
     ? qsTr("%1 of %2 snoozes used")
-        .arg(Number(service.snapshot.snoozesUsed || 0))
+        .arg(root.snoozesUsed)
         .arg(Number(service.config.snoozeBudget || 0))
     : ""
   readonly property string snoozeUnavailableSummary: service
@@ -72,6 +75,10 @@ Panel {
     service.delayNextBreakMinutes(minutes)
     close()
   }
+  function skipBreakAndClose() {
+    if (service) service.skipBreak()
+    close()
+  }
   function toggleManualPause() {
     if (service && Model.canTogglePause(service.phase)) service.togglePause()
   }
@@ -89,6 +96,14 @@ Panel {
   function openStats() {
     open()
     page = "stats"
+  }
+  function openOptions() {
+    open()
+    page = "options"
+  }
+  function openSettings(name) {
+    openOptions()
+    settingsPage.selectTab(name)
   }
   function toggleKeyboardHints() {
     persistSettings({ showKeyboardHints: !keyboardHintsVisible })
@@ -138,14 +153,16 @@ Panel {
       OmaCommands.WindowCommand { commandLayer: commandLayer; sequence: root.shortcuts.snooze1; available: root.delayActionsEnabled; onInvoked: root.postponeAndClose(1) }
       OmaCommands.WindowCommand { commandLayer: commandLayer; sequence: root.shortcuts.snooze5; available: root.delayActionsEnabled; onInvoked: root.postponeAndClose(5) }
       OmaCommands.WindowCommand { commandLayer: commandLayer; sequence: root.shortcuts.snooze15; available: root.delayActionsEnabled; onInvoked: root.postponeAndClose(15) }
+      OmaCommands.WindowCommand { commandLayer: commandLayer; sequence: root.shortcuts.skipToday; available: root.service && root.service.plannedReady; onInvoked: root.skipBreakAndClose() }
       OmaCommands.WindowCommand { commandLayer: commandLayer; sequence: root.shortcuts.pause; available: root.service && Model.canTogglePause(root.service.phase); onInvoked: root.toggleManualPause() }
       OmaCommands.WindowCommand { commandLayer: commandLayer; sequence: root.shortcuts.history; onInvoked: root.togglePage("stats") }
       OmaCommands.WindowCommand { commandLayer: commandLayer; sequence: root.shortcuts.options; onInvoked: root.togglePage("options") }
       OmaCommands.WindowCommand { commandLayer: commandLayer; sequence: root.shortcuts.edit; available: root.page === "options"; onInvoked: { root.close(); settingsEditor.running = true } }
-      OmaCommands.WindowCommand { commandLayer: commandLayer; sequence: root.shortcuts.generalTab; available: root.page === "options"; onInvoked: settingsPage.settingsTab = "general" }
-      OmaCommands.WindowCommand { commandLayer: commandLayer; sequence: root.shortcuts.breaksTab; available: root.page === "options"; onInvoked: settingsPage.settingsTab = "breaks" }
-      OmaCommands.WindowCommand { commandLayer: commandLayer; sequence: root.shortcuts.contextTab; available: root.page === "options"; onInvoked: settingsPage.settingsTab = "context" }
-      OmaCommands.WindowCommand { commandLayer: commandLayer; sequence: root.shortcuts.experienceTab; available: root.page === "options"; onInvoked: settingsPage.settingsTab = "experience" }
+      OmaCommands.WindowCommand { commandLayer: commandLayer; sequence: root.shortcuts.generalTab; available: root.page === "options"; onInvoked: settingsPage.selectTab("general") }
+      OmaCommands.WindowCommand { commandLayer: commandLayer; sequence: root.shortcuts.breaksTab; available: root.page === "options"; onInvoked: settingsPage.selectTab("breaks") }
+      OmaCommands.WindowCommand { commandLayer: commandLayer; sequence: root.shortcuts.plansTab; available: root.page === "options"; onInvoked: settingsPage.selectTab("plans") }
+      OmaCommands.WindowCommand { commandLayer: commandLayer; sequence: root.shortcuts.contextTab; available: root.page === "options"; onInvoked: settingsPage.selectTab("context") }
+      OmaCommands.WindowCommand { commandLayer: commandLayer; sequence: root.shortcuts.experienceTab; available: root.page === "options"; onInvoked: settingsPage.selectTab("experience") }
       OmaCommands.WindowCommand {
         commandLayer: commandLayer
         sequence: root.shortcuts.close
@@ -190,6 +207,7 @@ Panel {
         || settingsButton.activeFocus
       onMoveRequested: function(dx, dy) {
         if (dy !== 0) settingsPage.moveCursor(dy)
+        else if (dx !== 0) settingsPage.moveHorizontal(dx)
       }
       onActivateRequested: settingsPage.activateCursor()
       onCloseRequested: root.close()
@@ -344,6 +362,10 @@ Panel {
           idlePaused: root.idlePaused
           manuallyPaused: root.manuallyPaused
           nextBreakIsLong: root.service && root.service.nextBreakIsLong
+          plannedActive: root.service && root.service.plannedActive
+          plannedReady: root.service && root.service.plannedReady
+          plannedDeferred: root.service && root.service.plannedDeferred
+          plannedName: root.service ? root.service.plannedName : ""
           totalSeconds: root.remainingSeconds
           remainingText: root.service ? root.service.remainingText : qsTr("Starting")
           reducedMotion: root.service && root.service.config.reducedMotion
@@ -362,6 +384,10 @@ Panel {
           settingsTarget: settingsButton
           onBreakNowRequested: root.takeBreakAndClose()
           onPostponeRequested: function(minutes) { root.postponeAndClose(minutes) }
+          onSkipRequested: {
+            if (root.service) root.service.skipBreak()
+            root.close()
+          }
           onEscapeRequested: root.dismissHintsOrClose()
         }
 

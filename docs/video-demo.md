@@ -20,14 +20,17 @@ The cycle is:
 11. Due soon
 12. Warning
 13. Final warning
-14. Casual break
-15. Balanced break
-16. Hardcore break
-17. Long break
-18. Statistics
-19. Paused
-20. Snoozed
-21. Real schedule restored
+14. Planned warning
+15. Planned break ready
+16. Planned break
+17. Casual break
+18. Balanced break
+19. Hardcore break
+20. Long break
+21. Statistics
+22. Paused
+23. Snoozed
+24. Real schedule restored
 
 Use fixtures for context detection, countdown thresholds, warnings, and break
 enforcement. Demonstrate keyboard navigation, settings, theme integration,

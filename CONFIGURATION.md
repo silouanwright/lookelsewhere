@@ -59,6 +59,31 @@ uses the default declared by the plugin manifest.
 | `officeStart` | `"08:00"` | `HH:MM`, 24-hour time | Beginning of the schedule. |
 | `officeEnd` | `"18:00"` | `HH:MM`, 24-hour time | End of the schedule. Earlier end times create an overnight schedule. |
 
+## Planned breaks
+
+Create and edit recurring routines under **Settings → Plans**. Each routine
+has a name, local start time, duration, selected weekdays, and enabled state.
+LookElsewhere stores the complete bounded schedule in `plannedBreaks`; the
+settings panel is the recommended editor.
+
+Planned breaks run independently of Office Hours, but still respect global
+pause, protected context, and maximum delay. Time already spent away after the
+scheduled start is credited toward the planned duration. A nearby ordinary eye
+break is coalesced instead of interrupting again, and **Skip Today** is always
+available, including in Hardcore mode. LookElsewhere accepts at most eight
+routines and disables later routines whose schedules overlap.
+
+| Key | Default | Accepted values | Meaning |
+|---|---:|---|---|
+| `plannedBreaks` | `"[]"` | JSON-encoded array of up to 8 routines | Recurring local-time planned breaks. Use the Plans panel unless scripting. |
+
+```json
+[{"id":"lunch","name":"Lunch","startMinute":720,"durationMs":1800000,"days":[1,2,3,4,5],"enabled":true}]
+```
+
+`startMinute` is minutes after local midnight. Weekdays use JavaScript day
+numbers: Sunday is `0`, Monday is `1`, through Saturday `6`.
+
 ## Smart context
 
 | Key | Default | Accepted values | Meaning |
@@ -106,12 +131,14 @@ conventions.
 | `shortcutSnooze1` | `"1"` | Snooze one minute. |
 | `shortcutSnooze5` | `"2"` | Snooze five minutes. |
 | `shortcutSnooze15` | `"3"` | Snooze fifteen minutes. |
+| `shortcutSkipToday` | `"S"` | Skip the active planned routine for today. |
 | `shortcutPause` | `"P"` | Pause or resume scheduling. |
 | `shortcutHistory` | `"H"` | Open break history. |
 | `shortcutOptions` | `"O"` | Open options. |
 | `shortcutEdit` | `"E"` | Open the configuration file from Options. |
 | `shortcutGeneralTab` | `"G"` | Open General settings. |
 | `shortcutBreaksTab` | `"R"` | Open Breaks settings. |
+| `shortcutPlansTab` | `"L"` | Open Plans settings. |
 | `shortcutContextTab` | `"C"` | Open Context settings. |
 | `shortcutExperienceTab` | `"X"` | Open Experience settings. |
 | `shortcutClose` | `"Q"` | Close the panel. |
@@ -132,6 +159,9 @@ the complete default value set in one copyable shape:
   "enforcement": "balanced",
   "maximumDelayMinutes": 15,
   "snoozeBudget": 3,
+
+  // Recurring local-time routines; edit under Settings → Plans
+  "plannedBreaks": "[]",
 
   // Break copy
   "breakTitle": "Look elsewhere",
@@ -172,12 +202,14 @@ the complete default value set in one copyable shape:
   "shortcutSnooze1": "1",
   "shortcutSnooze5": "2",
   "shortcutSnooze15": "3",
+  "shortcutSkipToday": "S",
   "shortcutPause": "P",
   "shortcutHistory": "H",
   "shortcutOptions": "O",
   "shortcutEdit": "E",
   "shortcutGeneralTab": "G",
   "shortcutBreaksTab": "R",
+  "shortcutPlansTab": "L",
   "shortcutContextTab": "C",
   "shortcutExperienceTab": "X",
   "shortcutClose": "Q",

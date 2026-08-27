@@ -101,6 +101,8 @@ TestCase {
     compare(defaults.breakNow, "B")
     compare(defaults.generalTab, "G")
     compare(defaults.breaksTab, "R")
+    compare(defaults.plansTab, "L")
+    compare(defaults.skipToday, "S")
     compare(defaults.hints, "?")
 
     var customized = CommandModel.resolve({
@@ -747,6 +749,118 @@ TestCase {
     var copied = Model.copySnapshot(snapshot)
     compare(copied.activePlannedOccurrence.name, "Lunch")
     verify(copied.activePlannedOccurrence.deferred)
+  }
+
+  function plannedConfig(startMinute, overrides) {
+    var value = {
+      focusMs: 20 * 60000,
+      warningMs: 60000,
+      finalMs: 10000,
+      cooldownMs: 2000,
+      maximumDelayMs: 5 * 60000,
+      snoozeBudget: 3,
+      officeHours: { enabled: true, startMinute: 8 * 60, endMinute: 9 * 60 },
+      plannedBreaks: [{
+        id: "lunch", name: "Lunch", startMinute: startMinute,
+        durationMs: 15 * 60000, days: [1], enabled: true
+      }]
+    }
+    for (var key in (overrides || {})) value[key] = overrides[key]
+    return Model.normalizeConfig(value)
+  }
+
+  function test_plannedBreakRunsOutsideOfficeHours() {
+    var scheduled = new Date(2026, 7, 24, 12, 30, 0, 0).getTime()
+    var c = plannedConfig(12 * 60 + 30)
+    var s = Model.defaultSnapshot(scheduled - 60000)
+    s = Model.observe(s, { nowMs: scheduled - 60000, active: true, idle: false, naturalPause: true, evidence: [] }, c)
+    compare(s.state, Model.State.Warning)
+    s = Model.observe(s, { nowMs: scheduled - 10000, active: true, idle: false, naturalPause: true, evidence: [] }, c)
+    compare(s.state, Model.State.Final)
+    s = Model.observe(s, { nowMs: scheduled, active: true, idle: false, naturalPause: true, evidence: [] }, c)
+    compare(s.state, Model.State.Breaking)
+    verify(s.activeBreakIsPlanned)
+    compare(s.activeBreakDurationMs, 15 * 60000)
+  }
+
+  function test_plannedBreakProtectionThenReady() {
+    var scheduled = new Date(2026, 7, 24, 12, 30, 0, 0).getTime()
+    var c = plannedConfig(12 * 60 + 30)
+    var evidence = [{ category: "meeting", active: true, confidence: 1 }]
+    var s = Model.defaultSnapshot(scheduled - 60000)
+    s = Model.observe(s, { nowMs: scheduled, active: true, idle: false, naturalPause: true, evidence: evidence }, c)
+    compare(s.state, Model.State.Protected)
+    s = Model.observe(s, { nowMs: scheduled + 1000, active: true, idle: false, naturalPause: true, evidence: [] }, c)
+    compare(s.state, Model.State.Waiting)
+    s = Model.observe(s, { nowMs: scheduled + 3001, active: true, idle: false, naturalPause: true, evidence: [] }, c)
+    compare(s.state, Model.State.PlannedReady)
+  }
+
+  function test_plannedBreakCreditsAwayTime() {
+    var scheduled = new Date(2026, 7, 24, 12, 30, 0, 0).getTime()
+    var c = plannedConfig(12 * 60 + 30)
+    var s = Model.defaultSnapshot(scheduled - 1000)
+    s.lastActiveAtMs = scheduled
+    s = Model.observe(s, { nowMs: scheduled, active: true, idle: true, evidence: [] }, c)
+    s = Model.observe(s, { nowMs: scheduled + 15 * 60000, active: true, idle: true, evidence: [] }, c)
+    compare(s.state, Model.State.Working)
+    compare(s.statistics.today.plannedBreaks, 1)
+    compare(s.breaksSinceLong, 0)
+    compare(s.handledPlannedOccurrences[0], "lunch@2026-08-24")
+  }
+
+  function test_plannedBreakCoalescesOnlyNearbyInterval() {
+    var scheduled = new Date(2026, 7, 24, 12, 30, 0, 0).getTime()
+    var c = plannedConfig(12 * 60 + 30)
+    var nearby = Model.defaultSnapshot(scheduled)
+    nearby.accumulatedActiveMs = c.focusMs - 5 * 60000
+    nearby = Model.beginPlannedOccurrence(nearby, Model.nextActionablePlannedOccurrence(c, scheduled, []), scheduled, c)
+    nearby = Model.finishPlannedOccurrence(nearby, scheduled, c, "completed")
+    compare(nearby.accumulatedActiveMs, 0)
+
+    // A distant routine preserves the current interval rather than granting
+    // an extra eye-break reset.
+    var distant = Model.defaultSnapshot(scheduled)
+    distant.accumulatedActiveMs = 2 * 60000
+    distant = Model.beginPlannedOccurrence(distant, Model.nextActionablePlannedOccurrence(c, scheduled, []), scheduled, c)
+    distant = Model.finishPlannedOccurrence(distant, scheduled, c, "completed")
+    compare(distant.accumulatedActiveMs, 2 * 60000)
+  }
+
+  function test_plannedBreakPartialAwayTimeAndSnoozeBudget() {
+    var scheduled = new Date(2026, 7, 24, 12, 30, 0, 0).getTime()
+    var c = plannedConfig(12 * 60 + 30, { snoozeBudget: 1, enforcement: "hardcore" })
+    var s = Model.defaultSnapshot(scheduled - 1000)
+    s.lastActiveAtMs = scheduled
+    s = Model.observe(s, { nowMs: scheduled, active: true, idle: true, evidence: [] }, c)
+    s = Model.observe(s, { nowMs: scheduled + 5 * 60000, active: true, idle: false, naturalPause: false, evidence: [] }, c)
+    compare(s.state, Model.State.PlannedReady)
+    verify(Model.canSkipBreak(c, s))
+    s = Model.postpone(s, scheduled + 5 * 60000, 60000, c)
+    verify(!Model.canPostpone(s, c))
+    s = Model.observe(s, { nowMs: scheduled + 6 * 60000, active: true, idle: false, naturalPause: false, evidence: [] }, c)
+    compare(s.state, Model.State.PlannedReady)
+    s = Model.startPlannedBreak(s, scheduled + 6 * 60000, c)
+    compare(s.activeBreakDurationMs, 10 * 60000)
+  }
+
+  function test_plannedBreakRecoveryAndLateExpiryAreDeterministic() {
+    var scheduled = new Date(2026, 7, 24, 23, 55, 0, 0).getTime()
+    var c = plannedConfig(23 * 60 + 55)
+    var occurrence = Model.nextActionablePlannedOccurrence(c, scheduled, [])
+    var s = Model.beginPlannedOccurrence(Model.defaultSnapshot(scheduled), occurrence, scheduled, c)
+    s = Model.postpone(s, scheduled, 60000, c)
+    var restored = Model.recoverSnapshot(JSON.parse(JSON.stringify(s)), scheduled + 1000)
+    compare(restored.activePlannedOccurrence.key, occurrence.key)
+    compare(restored.activePlannedOccurrence.snoozesUsed, 1)
+
+    restored = Model.observe(restored, {
+      nowMs: occurrence.expiresAtMs + 1, active: true, idle: false,
+      naturalPause: true, evidence: []
+    }, c)
+    compare(restored.state, Model.State.Working)
+    compare(restored.statistics.today.plannedIgnored, 1)
+    compare(restored.handledPlannedOccurrences[0], occurrence.key)
   }
 
   function test_manualPauseLabel() {

@@ -13,6 +13,11 @@ Working → DueSoon → WaitingForPause → Warning → FinalCountdown → Break
                          ↘ Suppressed/Recovered
 ```
 
+A planned occurrence joins the same warning and break path. When it is late but
+still actionable, `PlannedReady` holds it until the user starts, snoozes, or
+skips it for that day. Planned outcomes do not advance the ordinary long-break
+cadence.
+
 The persisted model records semantic state and timestamps. UI surfaces derive presentation from the snapshot; they do not invent independent timers.
 
 ## Core transitions
@@ -27,6 +32,10 @@ The persisted model records semantic state and timestamps. UI surfaces derive pr
 - **FinalCountdown → Breaking:** countdown reaches zero.
 - **Breaking → Working:** duration completes or the permitted completion action is used.
 - **Any active state → Paused:** explicit user pause or outside office hours where configured.
+- **Scheduled occurrence → Warning/FinalCountdown:** a planned routine reaches
+  its local time, independent of Office Hours.
+- **Protected planned occurrence → PlannedReady:** its protection or grace
+  ends after the scheduled time; away time is credited against its duration.
 - **Any state → recovered equivalent:** shell restart, suspend/resume, or clock change causes re-evaluation from timestamps and current evidence.
 
 ## Active-use accounting
@@ -66,11 +75,12 @@ The persisted model records semantic state and timestamps. UI surfaces derive pr
 ## Precedence
 
 1. Disabled or explicit pause
-2. Outside active schedule
-3. Active break
-4. Final countdown/warning already presented
-5. Protected context and cooldown
-6. Due state and natural-pause policy
-7. Normal working state
+2. Active break
+3. Planned occurrence
+4. Outside the ordinary active-use schedule
+5. Final countdown/warning already presented
+6. Protected context and cooldown
+7. Due state and natural-pause policy
+8. Normal working state
 
 The feasibility prototype must turn these rules into pure transition tests before visual implementation is considered authoritative.

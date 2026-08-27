@@ -18,6 +18,10 @@ ColumnLayout {
   property bool manuallyPaused: false
   readonly property bool timerPaused: idlePaused || manuallyPaused
   property bool nextBreakIsLong: false
+  property bool plannedActive: false
+  property bool plannedReady: false
+  property bool plannedDeferred: false
+  property string plannedName: ""
   property int totalSeconds: 20 * 60
   property string remainingText: qsTr("20 minutes")
   property bool reducedMotion: true
@@ -39,9 +43,11 @@ ColumnLayout {
   readonly property Item postpone1Target: postpone1Button
   readonly property Item postpone5Target: postpone5Button
   readonly property Item postpone15Target: postpone15Button
+  readonly property Item skipTodayTarget: skipTodayButton
 
   signal breakNowRequested()
   signal postponeRequested(int minutes)
+  signal skipRequested()
   signal escapeRequested()
 
   Layout.fillWidth: true
@@ -72,6 +78,9 @@ ColumnLayout {
       Layout.bottomMargin: -Style.space(10)
       text: root.manuallyPaused ? qsTr("Breaks paused")
         : root.idlePaused ? qsTr("LookElsewhere is paused")
+        : root.plannedReady ? qsTr("%1 is ready").arg(root.plannedName)
+        : root.plannedDeferred ? qsTr("%1 is waiting").arg(root.plannedName)
+        : root.plannedActive ? qsTr("%1 starts in").arg(root.plannedName)
         : root.nextBreakIsLong ? qsTr("Long break starts in") : qsTr("Break starts in")
       color: root.foreground
       font.family: root.fontFamily
@@ -148,7 +157,7 @@ ColumnLayout {
 
       LookUi.WeightedButton {
         id: breakNowButton
-        label: qsTr("Break now")
+        label: root.plannedReady ? qsTr("Start break") : qsTr("Break now")
         labelWeight: Font.Bold
         selected: true
         focusable: true
@@ -258,10 +267,10 @@ ColumnLayout {
         fontFamily: root.fontFamily
         fontSize: Style.font.bodySmall
         horizontalPadding: Style.space(6)
-        KeyNavigation.tab: root.shortcutsTarget
+        KeyNavigation.tab: root.plannedReady ? skipTodayButton : root.shortcutsTarget
         KeyNavigation.backtab: postpone5Button
         KeyNavigation.left: postpone5Button
-        KeyNavigation.right: root.settingsTarget
+        KeyNavigation.right: root.plannedReady ? skipTodayButton : root.settingsTarget
         KeyNavigation.up: root.settingsTarget
         Keys.onEscapePressed: root.escapeRequested()
         Accessible.role: Accessible.Button
@@ -275,6 +284,34 @@ ColumnLayout {
           commandLayer: root.commandLayer
           keyText: CommandModel.label(root.shortcuts.snooze15)
           available: postpone15Button.actionEnabled
+          centerOnCorner: true
+        }
+      }
+
+      LookUi.WeightedButton {
+        id: skipTodayButton
+        visible: root.plannedReady
+        label: qsTr("Skip today")
+        labelWeight: Font.Bold
+        bordered: true
+        focusable: root.plannedReady
+        foreground: root.foreground
+        accent: root.accent
+        fontFamily: root.fontFamily
+        fontSize: Style.font.bodySmall
+        horizontalPadding: Style.space(6)
+        KeyNavigation.backtab: postpone15Button
+        KeyNavigation.left: postpone15Button
+        KeyNavigation.right: root.settingsTarget
+        Keys.onEscapePressed: root.escapeRequested()
+        Accessible.role: Accessible.Button
+        Accessible.name: label
+        Accessible.onPressAction: clicked()
+        onClicked: root.skipRequested()
+
+        OmaCommands.CommandHint {
+          commandLayer: root.commandLayer
+          keyText: CommandModel.label(root.shortcuts.skipToday)
           centerOnCorner: true
         }
       }

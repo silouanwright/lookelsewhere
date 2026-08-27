@@ -36,6 +36,7 @@ ColumnLayout {
 
   function outcomeLabel(outcome) {
     if (outcome === "long-break") return qsTr("Long break")
+    if (outcome === "planned-break") return qsTr("Planned break")
     if (outcome === "away") return qsTr("Time away")
     return qsTr("Eye break")
   }
@@ -137,9 +138,10 @@ ColumnLayout {
   Text {
     Layout.fillWidth: true
     Layout.leftMargin: Style.space(4)
-    text: qsTr("%1 short · %2 long · %3 snoozed · %4 skipped")
+    text: qsTr("%1 short · %2 long · %3 planned · %4 snoozed · %5 skipped")
       .arg(Number(root.today.shortBreaks || 0)).arg(Number(root.today.longBreaks || 0))
-      .arg(Number(root.today.snoozed || 0)).arg(Number(root.today.skipped || 0))
+      .arg(Number(root.today.plannedBreaks || 0)).arg(Number(root.today.snoozed || 0))
+      .arg(Number(root.today.skipped || 0))
     color: root.muted
     font.family: root.fontFamily
     font.pixelSize: Style.font.caption

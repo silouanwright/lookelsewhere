@@ -39,11 +39,11 @@ ColumnLayout {
     || longBreakSecondsField.editorActive
     || snoozeBudgetField.editorActive
     || maximumDelayField.editorActive
-    || soundVolumeField.editorActive
+    || soundVolumeField.editorActive || plannedBreaksPage.editorActive
   readonly property bool dropdownOpen: enforcementDropdown.popupOpen
     || officeStartDropdown.popupOpen || officeEndDropdown.popupOpen
     || outputModeDropdown.popupOpen || displayModeDropdown.popupOpen
-    || panelPatternDropdown.popupOpen
+    || panelPatternDropdown.popupOpen || plannedBreaksPage.dropdownOpen
   readonly property string activeAppId: service ? String(service.activeAppId || "").trim() : ""
   readonly property bool activeAppProtected: service
     && Model.matchesProtectedApp(activeAppId, service.config.protectedApps)
@@ -68,10 +68,15 @@ ColumnLayout {
   spacing: Style.space(10)
 
   function focusInitial() { settingsTabs.forceActiveFocus() }
-  function reset() {
-    settingsTab = "general"
+  function selectTab(name) {
+    settingsTab = ["general", "breaks", "plans", "context", "experience"].indexOf(name) >= 0
+      ? name : "general"
     cursorActive = false
     cursorIndex = 0
+    if (scrollFlickable) scrollFlickable.contentY = 0
+  }
+  function reset() {
+    selectTab("general")
   }
   function persistSettings(values) { persistRequested(values) }
   function toggleManualPause() { pauseRequested() }
@@ -95,6 +100,12 @@ ColumnLayout {
       breaks: [focusMinutesField, shortBreakField, longBreakEveryField,
         longBreakSecondsField, snoozeBudgetField, maximumDelayField,
         enforcementDropdown],
+      plans: [plannedBreaksPage.routineTarget, plannedBreaksPage.enabledTarget,
+        plannedBreaksPage.nameTarget, plannedBreaksPage.startTarget,
+        plannedBreaksPage.durationTarget, plannedBreaksPage.daysTarget,
+        plannedBreaksPage.removeTarget, plannedBreaksPage.addTarget].filter(function(item) {
+          return item && item.visible
+        }),
       experience: [reduceMotionRow, panelPatternDropdown, soundRow, soundVolumeField,
         startSoundRow, completionSoundRow, outputModeDropdown, displayModeDropdown,
         keyboardHintRow]
@@ -130,6 +141,11 @@ ColumnLayout {
     var target = targets()[cursorIndex]
     if (target && typeof target.activate === "function") target.activate()
   }
+  function moveHorizontal(delta) {
+    var target = targets()[cursorIndex]
+    if (settingsTab === "plans" && target === plannedBreaksPage.daysTarget)
+      plannedBreaksPage.moveDays(delta)
+  }
   function toggleCurrentProtectedApp() {
     if (!service || !activeAppId) return
     persistSettings({ protectedApps: Model.toggleProtectedApp(service.config.protectedApps, activeAppId) })
@@ -152,6 +168,7 @@ ColumnLayout {
     options: [
       { value: "general", label: qsTr("General"), key: CommandModel.label(settingsPage.shortcuts.generalTab) },
       { value: "breaks", label: qsTr("Breaks"), key: CommandModel.label(settingsPage.shortcuts.breaksTab) },
+      { value: "plans", label: qsTr("Plans"), key: CommandModel.label(settingsPage.shortcuts.plansTab) },
       { value: "context", label: qsTr("Context"), key: CommandModel.label(settingsPage.shortcuts.contextTab) },
       { value: "experience", label: qsTr("Experience"), key: CommandModel.label(settingsPage.shortcuts.experienceTab) }
     ]
@@ -165,6 +182,7 @@ ColumnLayout {
     KeyNavigation.tab: settingsPage.settingsTab === "general" ? pauseBreaksButton
       : settingsPage.settingsTab === "context" ? idleDetectionRow
       : settingsPage.settingsTab === "breaks" ? focusMinutesField.field
+      : settingsPage.settingsTab === "plans" ? plannedBreaksPage
       : reduceMotionRow
     Keys.onEscapePressed: settingsPage.dismissHintsOrClose()
     Keys.onTabPressed: {
@@ -178,10 +196,25 @@ ColumnLayout {
     }
     onUpRequested: settingsPage.settingsButtonTarget.forceActiveFocus()
     onChanged: function(next) {
-      settingsPage.settingsTab = next
-      settingsPage.cursorActive = false
-      settingsPage.scrollFlickable.contentY = 0
+      settingsPage.selectTab(next)
     }
+  }
+
+  PlannedBreaksPage {
+    id: plannedBreaksPage
+    Layout.fillWidth: true
+    Layout.topMargin: Style.space(8)
+    visible: settingsPage.settingsTab === "plans"
+    settings: settingsPage.settings
+    foreground: settingsPage.foreground
+    muted: settingsPage.muted
+    accent: settingsPage.accent
+    fontFamily: settingsPage.fontFamily
+    cursorTarget: settingsPage.cursorActive ? settingsPage.targets()[settingsPage.cursorIndex] : null
+    onPersistRequested: function(values) { settingsPage.persistSettings(values) }
+    onEditorClosed: if (settingsPage.active) Qt.callLater(function() {
+      settingsPage.focusProxy.forceActiveFocus()
+    })
   }
 
   ColumnLayout {

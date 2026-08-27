@@ -61,7 +61,8 @@ Item {
   property int maximumObserveDurationMs: 0
   readonly property var demoSequence: [
     "idle", "typing", "meeting", "microphone", "camera", "screen-sharing",
-    "video", "media", "fullscreen", "dictation", "due", "warning", "final", "casual-break",
+    "video", "media", "fullscreen", "dictation", "due", "warning", "final",
+    "planned-warning", "planned-ready", "planned-break", "casual-break",
     "balanced-break", "hardcore-break", "long-break", "stats", "paused", "postponed"
   ]
 
@@ -124,6 +125,12 @@ Item {
   readonly property string contextLabel: typingHoldActive ? "Active"
     : currentProtection ? Model.contextShortLabel(currentProtection.category) : ""
   readonly property string phase: snapshot.state || Model.State.Working
+  readonly property bool plannedActive: !!snapshot.activePlannedOccurrence
+  readonly property bool plannedReady: phase === Model.State.PlannedReady
+  readonly property bool plannedDeferred: plannedActive && !plannedReady
+    && snapshot.activePlannedOccurrence.deferred === true
+  readonly property string plannedName: plannedActive
+    ? String(snapshot.activePlannedOccurrence.name || qsTr("Planned break")) : ""
   readonly property string label: idlePauseActive ? "Paused while you’re away" : Model.stateLabel(snapshot)
   readonly property string remainingText: Model.formatDuration(remainingMs)
   readonly property string naturalBreakMessage: Model.naturalBreakMessage(snapshot)
@@ -141,9 +148,11 @@ Item {
   readonly property string protectedSummary: phase === Model.State.Protected
     ? Model.protectedExplanation(snapshot.protectedCategory)
     : ""
-  readonly property bool interrupting: phase === Model.State.Warning || phase === Model.State.Final || phase === Model.State.Breaking
+  readonly property bool interrupting: phase === Model.State.Warning || phase === Model.State.Final
+    || phase === Model.State.Breaking || phase === Model.State.PlannedReady
   readonly property bool canPostpone: Model.canPostpone(snapshot, config)
-  readonly property bool canSkipBreak: phase === Model.State.Breaking && Model.canSkipBreak(config)
+  readonly property bool canSkipBreak: (phase === Model.State.Breaking || phase === Model.State.PlannedReady)
+    && Model.canSkipBreak(config, snapshot)
   readonly property bool nextBreakIsLong: Model.isNextBreakLong(snapshot, config)
   readonly property bool soundAvailable: startSoundAvailable && completionSoundAvailable
   readonly property string soundVolumeDb: {
@@ -158,6 +167,12 @@ Item {
     if (phase === Model.State.Breaking) return Math.max(0, Number(snapshot.breakEndsAtMs || 0) - now)
     if (phase === Model.State.Warning || phase === Model.State.Final) return Math.max(0, Number(snapshot.warningEndsAtMs || 0) - now)
     if (phase === Model.State.Waiting && snapshot.postponedUntilMs > now) return snapshot.postponedUntilMs - now
+    if (snapshot.activePlannedOccurrence) {
+      var untilStart = Number(snapshot.activePlannedOccurrence.scheduledAtMs || 0) - now
+      if (untilStart > 0) return untilStart
+      return Math.max(0, Number(snapshot.activePlannedOccurrence.durationMs || 0)
+        - Model.plannedAwayCredit(snapshot, now))
+    }
     return Math.max(0, config.focusMs - Number(snapshot.accumulatedActiveMs || 0))
   }
 
@@ -233,7 +248,9 @@ Item {
 
   function takeBreak() {
     var beforeState = snapshot.state
-    snapshot = Model.startBreak(snapshot, Date.now(), config)
+    snapshot = snapshot.activePlannedOccurrence
+      ? Model.startPlannedBreak(snapshot, Date.now(), config)
+      : Model.startBreak(snapshot, Date.now(), config)
     playTransitionSound(beforeState, snapshot.state)
     scheduleSave()
   }
@@ -285,7 +302,7 @@ Item {
   function skipBreak() {
     if (!canSkipBreak) return
     var beforeState = snapshot.state
-    snapshot = Model.skipBreak(snapshot, Date.now())
+    snapshot = Model.skipBreak(snapshot, Date.now(), config)
     playTransitionSound(beforeState, snapshot.state)
     scheduleSave()
   }
@@ -407,6 +424,19 @@ Item {
     } else if (name === "warning" || name === "final") {
       next = Model.startWarning(next, now, config)
       if (name === "final") next.warningEndsAtMs = now + config.finalMs
+    } else if (["planned-warning", "planned-ready", "planned-break"].indexOf(name) >= 0) {
+      var plannedAt = name === "planned-warning" ? now + 30000 : now - 60000
+      next = Model.beginPlannedOccurrence(next, {
+        key: "demo-lunch@demo", routineId: "demo-lunch", name: "Lunch",
+        scheduledAtMs: plannedAt, durationMs: 30 * 60000,
+        expiresAtMs: now + 60 * 60000
+      }, now, config)
+      if (name === "planned-warning") next = Model.startWarning(next, now, config, 30000)
+      else {
+        next.activePlannedOccurrence.deferred = true
+        next.state = Model.State.PlannedReady
+        if (name === "planned-break") next = Model.startPlannedBreak(next, now, config)
+      }
     } else if (["break", "casual-break", "balanced-break", "hardcore-break", "gentle-break", "focused-break"].indexOf(name) >= 0) {
       if (name !== "break") {
         var demoConfig = JSON.parse(JSON.stringify(config))

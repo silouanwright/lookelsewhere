@@ -23,6 +23,7 @@ Item {
   readonly property bool naturalBreakToastVisible: service && service.naturalBreakToastVisible
   readonly property bool breaking: service && service.phase === "breaking"
   readonly property bool finalCountdown: service && service.phase === "final-countdown"
+  readonly property bool plannedReady: service && service.plannedReady
   readonly property int remainingSeconds: service ? Math.max(0, Math.ceil(service.remainingMs / 1000)) : 0
   readonly property int remainingMinutesPart: Math.floor(remainingSeconds / 60)
   readonly property int remainingSecondsPart: remainingSeconds % 60
@@ -229,7 +230,9 @@ Item {
             blurMax: 32
             blurMultiplier: 1
           }
-          title: root.service ? root.service.config.breakTitle : qsTr("Look elsewhere")
+          title: root.service && root.service.plannedActive
+            ? root.service.plannedName
+            : root.service ? root.service.config.breakTitle : qsTr("Look elsewhere")
           subtitle: root.service ? root.service.config.breakSubtitle
             : qsTr("Let your eyes settle on something distant. Breathe. The screen will still be here.")
           longBreak: root.service && root.service.snapshot.activeBreakIsLong
@@ -327,7 +330,9 @@ Item {
               Text {
                 Layout.fillWidth: true
                 Layout.topMargin: -Style.space(3)
-                text: root.service && root.service.nextBreakIsLong
+                text: root.service && root.service.plannedActive
+                  ? root.service.plannedName
+                  : root.service && root.service.nextBreakIsLong
                   ? qsTr("Long break")
                   : qsTr("Short break")
                 color: root.popupMuted
@@ -344,7 +349,7 @@ Item {
             visible: window.authoritative
             spacing: Style.space(6)
             OverlayButton {
-              text: qsTr("Break now")
+              text: root.plannedReady ? qsTr("Start break") : qsTr("Break now")
               primary: true
               verticalPadding: Style.space(3)
               onClicked: if (root.service) root.service.takeBreak()
@@ -370,6 +375,12 @@ Item {
               disabledTooltipText: qsTr("No snoozes available")
               onClicked: if (root.service) root.service.delayNextBreakMinutes(15)
             }
+            OverlayButton {
+              visible: root.plannedReady
+              text: qsTr("Skip today")
+              verticalPadding: Style.space(3)
+              onClicked: if (root.service) root.service.skipBreak()
+            }
           }
         }
       }
@@ -388,7 +399,9 @@ Item {
         }
         Text {
           Layout.fillWidth: true
-          text: qsTr("Starting break in")
+          text: root.service && root.service.plannedActive
+            ? qsTr("%1 starts in").arg(root.service.plannedName)
+            : qsTr("Starting break in")
           color: root.popupMuted
           font.family: Style.font.family
           font.pixelSize: Style.font.bodySmall

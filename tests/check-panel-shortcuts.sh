@@ -12,7 +12,7 @@ first_shortcut_line=$(grep -n -m1 'OmaCommands.WindowCommand {' "$panel" | cut -
 window_shortcuts=$(grep -c 'OmaCommands.WindowCommand {' "$panel")
 
 test "$first_shortcut_line" -gt "$keyboard_line"
-test "$window_shortcuts" -eq 14
+test "$window_shortcuts" -eq 16
 ! grep -q 'context: Qt.ApplicationShortcut' "$panel"
 grep -q 'suspended: root.numberEditorActive || root.dropdownOpen' "$panel"
 grep -q 'context: Qt.WindowShortcut' "$repo/vendor/qmlpack/oma-command-layer/Ui/WindowCommand.qml"
@@ -42,6 +42,7 @@ grep -q 'Keys.onTabPressed:' "$settings_page"
 grep -q 'if (focusProxy) focusProxy.forceActiveFocus()' "$settings_page"
 grep -q 'function hasCursorFor(target)' "$settings_page"
 grep -q 'function setCursorTarget(target)' "$settings_page"
+grep -q 'nameField.activeFocus || durationRow.editorActive' "$repo/Views/PlannedBreaksPage.qml"
 ! grep -q 'hasCursor: settingsPage.cursorActive && settingsPage.cursorIndex ===' "$settings_page"
 ! grep -Eq 'onHovered:.*settingsPage\.setCursor\([0-9]+\)' "$settings_page"
 grep -q 'PanelNowView {' "$panel"
@@ -50,5 +51,7 @@ grep -q 'checked: !!settingsPage.service && !settingsPage.manuallyPaused' "$sett
 grep -q 'text: root.manuallyPaused ? qsTr("Breaks paused")' "$now_view"
 grep -q 'KeyNavigation.tab: root.delayActionsEnabled ? postpone1Button : root.shortcutsTarget' "$now_view"
 grep -q 'KeyNavigation.right: root.settingsTarget' "$now_view"
+grep -q 'sequence: root.shortcuts.skipToday' "$panel"
+grep -q 'keyText: CommandModel.label(root.shortcuts.skipToday)' "$now_view"
 
 echo "Panel shortcuts and spatial keyboard navigation are wired to KeyboardPanel."

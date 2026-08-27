@@ -46,6 +46,8 @@ rebuilt with Omarchy and Linux flair.
   meetings, full-screen apps, protected apps, and away time
 - Progressive warnings, short breaks, periodic long breaks, snoozing, office
   hours, enforcement modes, and configurable sounds
+- Recurring planned breaks for lunch, prayer, walks, or shutdown routines, with
+  weekday schedules, away-time credit, snoozing, and Skip Today
 - Private by design: no account, telemetry, screen capture, audio recording, or
   retained window and media titles
 - Private daily statistics for active screen time, breaks, snoozes, skips, and
@@ -117,8 +119,8 @@ Shortcuts are window-local and can be changed in
 
 ## Configuration
 
-Open the gear in the plugin panel for categorized General, Breaks, Context, and
-Experience settings. Changes are saved directly to Omarchy's configuration;
+Open the gear in the plugin panel for categorized General, Breaks, Plans,
+Context, and Experience settings. Changes are saved directly to Omarchy's configuration;
 LookElsewhere does not maintain a second settings file.
 
 The Context page can add or remove the currently focused application from the
@@ -169,7 +171,8 @@ in [Upstream Opportunities](docs/upstream-opportunities.md).
 
 - More trustworthy context controls, detector corrections, and per-app
   exclusions
-- Planned lunch, walk, and shutdown breaks that cooperate with regular breaks
+- Calendar-backed planned breaks, after the native recurring scheduler has had
+  real-world use
 - Custom short- and long-break guidance without turning breaks into more screen
   time
 - Accessibility completion across themes, motion preferences, and screen
