@@ -7,6 +7,7 @@ var State = {
   DueSoon: "due-soon",
   Protected: "protected-context",
   Waiting: "waiting-for-pause",
+  PlannedReady: "planned-ready",
   Warning: "warning",
   Final: "final-countdown",
   Breaking: "breaking"
@@ -21,6 +22,14 @@ var MaximumStatisticMs = 48 * 60 * 60 * 1000
 var MaximumStatisticCount = 10000
 var MaximumStatisticDays = 7
 var MaximumSessionsPerDay = 12
+var MaximumPlannedBreaks = 8
+var MaximumPlannedNameLength = 40
+var MinimumPlannedDurationMs = 60 * 1000
+var MaximumPlannedDurationMs = 2 * 60 * 60 * 1000
+var PlannedCoalescingMs = 10 * 60 * 1000
+var PlannedMinimumLateWindowMs = 30 * 60 * 1000
+var PlannedMaximumLateWindowMs = 2 * 60 * 60 * 1000
+var MaximumHandledPlannedOccurrences = 32
 
 function clamp(value, low, high) {
   return Math.max(low, Math.min(high, Number(value)))
@@ -53,6 +62,7 @@ function defaultConfig() {
     outputMode: "all",
     panelPattern: "off",
     protectedApps: ["steam"],
+    plannedBreaks: [],
     officeHours: { enabled: false, startMinute: 8 * 60, endMinute: 18 * 60 },
     detectors: { idle: true, recentInput: true, fullscreen: true, media: true, microphone: true, screenSharing: true, dictation: true, applications: true }
   }
@@ -93,6 +103,7 @@ function normalizeConfig(input) {
   base.protectedApps = protectedApps.map(function(app) {
     return String(app || "").trim().toLowerCase().replace(/\.desktop$/, "")
   }).filter(function(app) { return app !== "" })
+  base.plannedBreaks = normalizePlannedBreaks(value.plannedBreaks)
   if (value.officeHours) {
     base.officeHours.enabled = value.officeHours.enabled === true
     base.officeHours.startMinute = clamp(value.officeHours.startMinute === undefined ? base.officeHours.startMinute : value.officeHours.startMinute, 0, 1439)
@@ -116,6 +127,191 @@ function parseClockMinute(value, fallback) {
 function finiteNumber(value, fallback) {
   var number = Number(value)
   return isFinite(number) ? number : fallback
+}
+
+function normalizePlannedDays(value) {
+  var days = Array.isArray(value) ? value : []
+  var result = []
+  for (var i = 0; i < days.length; i++) {
+    var day = Math.round(Number(days[i]))
+    if (day >= 0 && day <= 6 && result.indexOf(day) < 0) result.push(day)
+  }
+  result.sort(function(left, right) { return left - right })
+  return result.length ? result : [1, 2, 3, 4, 5]
+}
+
+function normalizePlannedId(value, index, usedIds) {
+  var id = String(value || "").trim().toLowerCase()
+    .replace(/[^a-z0-9._-]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 64)
+  if (!id) id = "planned-" + (index + 1)
+  var base = id
+  var suffix = 2
+  while (usedIds[id]) id = (base.slice(0, 60) + "-" + suffix++).slice(0, 64)
+  usedIds[id] = true
+  return id
+}
+
+function plannedBreaksOverlap(left, right) {
+  if (!left || !right || left.enabled !== true || right.enabled !== true) return false
+  var weekMinutes = 7 * 24 * 60
+  var leftDuration = left.durationMs / 60000
+  var rightDuration = right.durationMs / 60000
+  for (var i = 0; i < left.days.length; i++) {
+    var leftStart = left.days[i] * 1440 + left.startMinute
+    var leftEnd = leftStart + leftDuration
+    for (var j = 0; j < right.days.length; j++) {
+      var rightStart = right.days[j] * 1440 + right.startMinute
+      for (var shift = -weekMinutes; shift <= weekMinutes; shift += weekMinutes) {
+        var shiftedStart = rightStart + shift
+        if (leftStart < shiftedStart + rightDuration && shiftedStart < leftEnd) return true
+      }
+    }
+  }
+  return false
+}
+
+function normalizePlannedBreaks(value) {
+  var source = value
+  if (!Array.isArray(source)) {
+    try { source = JSON.parse(String(value || "[]")) }
+    catch (error) { source = [] }
+  }
+  if (!Array.isArray(source)) source = []
+  var result = []
+  var usedIds = {}
+  for (var i = 0; i < source.length && result.length < MaximumPlannedBreaks; i++) {
+    var item = source[i] || {}
+    var name = String(item.name || "Planned break").trim().slice(0, MaximumPlannedNameLength)
+    if (!name) name = "Planned break"
+    var routine = {
+      id: normalizePlannedId(item.id, i, usedIds),
+      name: name,
+      startMinute: Math.round(clamp(item.startMinute === undefined ? 12 * 60 : item.startMinute, 0, 1439)),
+      durationMs: Math.round(clamp(item.durationMs === undefined ? 15 * 60 * 1000 : item.durationMs,
+        MinimumPlannedDurationMs, MaximumPlannedDurationMs)),
+      days: normalizePlannedDays(item.days),
+      enabled: item.enabled !== false
+    }
+    for (var existing = 0; existing < result.length; existing++)
+      if (plannedBreaksOverlap(result[existing], routine)) routine.enabled = false
+    result.push(routine)
+  }
+  return result
+}
+
+function plannedOccurrenceForDay(routine, dayMs) {
+  var date = new Date(Number(dayMs))
+  date.setHours(0, 0, 0, 0)
+  if (!routine || routine.enabled !== true || routine.days.indexOf(date.getDay()) < 0) return null
+  var scheduledAtMs = date.getTime() + routine.startMinute * 60000
+  var lateWindowMs = Math.min(PlannedMaximumLateWindowMs,
+    Math.max(PlannedMinimumLateWindowMs, routine.durationMs * 2))
+  return {
+    key: routine.id + "@" + localDayKey(scheduledAtMs),
+    routineId: routine.id,
+    name: routine.name,
+    scheduledAtMs: scheduledAtMs,
+    durationMs: routine.durationMs,
+    expiresAtMs: scheduledAtMs + lateWindowMs
+  }
+}
+
+function copyPlannedOccurrence(value) {
+  if (!value) return null
+  var key = String(value.key || "").slice(0, 80)
+  var routineId = String(value.routineId || "").slice(0, 64)
+  if (!routineId || !key) return null
+  function bounded(value, maximum) {
+    var number = Number(value)
+    return isFinite(number) ? Math.max(0, Math.min(maximum, number)) : 0
+  }
+  return {
+    key: key,
+    routineId: routineId,
+    name: String(value.name || "Planned break").slice(0, MaximumPlannedNameLength),
+    scheduledAtMs: bounded(value.scheduledAtMs, Number.MAX_SAFE_INTEGER),
+    durationMs: bounded(value.durationMs, MaximumPlannedDurationMs),
+    expiresAtMs: bounded(value.expiresAtMs, Number.MAX_SAFE_INTEGER),
+    creditedAwayMs: bounded(value.creditedAwayMs, MaximumPlannedDurationMs),
+    idleStartedAtMs: bounded(value.idleStartedAtMs, Number.MAX_SAFE_INTEGER),
+    deferred: value.deferred === true
+  }
+}
+
+function beginPlannedOccurrence(snapshot, occurrence, nowMs) {
+  var next = copySnapshot(snapshot)
+  var planned = copyPlannedOccurrence(occurrence)
+  if (!planned) return next
+  planned.creditedAwayMs = 0
+  planned.idleStartedAtMs = 0
+  planned.deferred = Number(nowMs) > planned.scheduledAtMs
+  next.activePlannedOccurrence = planned
+  next.dueAtMs = planned.scheduledAtMs
+  return next
+}
+
+function reconcilePlannedAway(snapshot, nowMs, idle) {
+  var next = copySnapshot(snapshot)
+  var planned = next.activePlannedOccurrence
+  if (!planned || Number(nowMs) < planned.scheduledAtMs) return next
+  if (idle === true) {
+    if (!planned.idleStartedAtMs)
+      planned.idleStartedAtMs = Math.max(planned.scheduledAtMs, Number(next.lastActiveAtMs || planned.scheduledAtMs))
+  } else if (planned.idleStartedAtMs) {
+    planned.creditedAwayMs = Math.min(planned.durationMs,
+      planned.creditedAwayMs + Math.max(0, Number(nowMs) - planned.idleStartedAtMs))
+    planned.idleStartedAtMs = 0
+  }
+  next.activePlannedOccurrence = planned
+  return next
+}
+
+function plannedAwayCredit(snapshot, nowMs) {
+  var planned = snapshot && snapshot.activePlannedOccurrence
+  if (!planned) return 0
+  var liveCredit = planned.idleStartedAtMs
+    ? Math.max(0, Number(nowMs) - planned.idleStartedAtMs) : 0
+  return Math.min(planned.durationMs, planned.creditedAwayMs + liveCredit)
+}
+
+function rememberPlannedOccurrence(snapshot, occurrenceKey) {
+  var next = copySnapshot(snapshot)
+  var key = String(occurrenceKey || "")
+  if (key && next.handledPlannedOccurrences.indexOf(key) < 0)
+    next.handledPlannedOccurrences.unshift(key)
+  next.handledPlannedOccurrences = next.handledPlannedOccurrences.slice(0, MaximumHandledPlannedOccurrences)
+  return next
+}
+
+function plannedOccurrencesNear(config, nowMs) {
+  var cfg = config && config.version === 1 ? config : normalizeConfig(config)
+  var now = new Date(Number(nowMs))
+  now.setHours(0, 0, 0, 0)
+  var offsets = [-1, 0, 1]
+  var result = []
+  for (var i = 0; i < cfg.plannedBreaks.length; i++) {
+    for (var j = 0; j < offsets.length; j++) {
+      var day = new Date(now.getTime())
+      day.setDate(day.getDate() + offsets[j])
+      var occurrence = plannedOccurrenceForDay(cfg.plannedBreaks[i], day.getTime())
+      if (occurrence) result.push(occurrence)
+    }
+  }
+  result.sort(function(left, right) { return left.scheduledAtMs - right.scheduledAtMs })
+  return result
+}
+
+function nextActionablePlannedOccurrence(config, nowMs, handledKeys) {
+  var cfg = config && config.version === 1 ? config : normalizeConfig(config)
+  var handled = Array.isArray(handledKeys) ? handledKeys : []
+  var occurrences = plannedOccurrencesNear(cfg, nowMs)
+  for (var i = 0; i < occurrences.length; i++) {
+    var occurrence = occurrences[i]
+    if (handled.indexOf(occurrence.key) >= 0) continue
+    if (nowMs < occurrence.scheduledAtMs - cfg.warningMs) continue
+    if (nowMs <= occurrence.expiresAtMs) return occurrence
+  }
+  return null
 }
 
 // Omarchy injects only the values present on the widget's shell.json entry;
@@ -143,6 +339,7 @@ function configFromSettings(settings) {
   if (incoming.outputMode !== undefined) next.outputMode = String(incoming.outputMode)
   if (incoming.panelPattern !== undefined) next.panelPattern = String(incoming.panelPattern)
   if (incoming.protectedApps !== undefined) next.protectedApps = String(incoming.protectedApps)
+  if (incoming.plannedBreaks !== undefined) next.plannedBreaks = incoming.plannedBreaks
   if (incoming.officeHoursEnabled !== undefined) next.officeHours.enabled = incoming.officeHoursEnabled === true
   if (incoming.officeStart !== undefined) next.officeHours.startMinute = parseClockMinute(incoming.officeStart, next.officeHours.startMinute)
   if (incoming.officeEnd !== undefined) next.officeHours.endMinute = parseClockMinute(incoming.officeEnd, next.officeHours.endMinute)
@@ -170,6 +367,9 @@ function defaultSnapshot(nowMs) {
     breakEndsAtMs: 0,
     activeBreakDurationMs: 0,
     activeBreakIsLong: false,
+    activeBreakIsPlanned: false,
+    activePlannedOccurrence: null,
+    handledPlannedOccurrences: [],
     breaksSinceLong: 0,
     protectedCategory: "",
     pauseReason: "",
@@ -361,6 +561,12 @@ function copySnapshot(snapshot) {
       }
     }
   }
+  var planned = copyPlannedOccurrence(value.activePlannedOccurrence)
+  var handledPlanned = Array.isArray(value.handledPlannedOccurrences)
+    ? value.handledPlannedOccurrences : []
+  handledPlanned = handledPlanned.slice(0, MaximumHandledPlannedOccurrences).map(function(key) {
+    return String(key || "").slice(0, 80)
+  }).filter(function(key) { return /^[a-z0-9._-]+@\d{4}-\d{2}-\d{2}$/.test(key) })
   return {
     version: 1,
     state: state,
@@ -376,6 +582,9 @@ function copySnapshot(snapshot) {
     breakEndsAtMs: nonnegative(value.breakEndsAtMs),
     activeBreakDurationMs: nonnegative(value.activeBreakDurationMs),
     activeBreakIsLong: value.activeBreakIsLong === true,
+    activeBreakIsPlanned: value.activeBreakIsPlanned === true,
+    activePlannedOccurrence: planned,
+    handledPlannedOccurrences: handledPlanned,
     breaksSinceLong: nonnegative(value.breaksSinceLong),
     protectedCategory: String(value.protectedCategory || ""),
     pauseReason: String(value.pauseReason || ""),
@@ -404,6 +613,11 @@ function recoverSnapshot(snapshot, nowMs) {
   if (next.naturalBreakDecision
       && (next.naturalBreakDecision.decidedAtMs > latest
         || next.naturalBreakDecision.undoUntilMs > latest)) return null
+  if (next.activePlannedOccurrence) {
+    var plannedTimestamps = ["scheduledAtMs", "expiresAtMs", "idleStartedAtMs"]
+    for (var plannedIndex = 0; plannedIndex < plannedTimestamps.length; plannedIndex++)
+      if (next.activePlannedOccurrence[plannedTimestamps[plannedIndex]] > latest) return null
+  }
   var statisticDays = [next.statistics.today].concat(next.statistics.days)
   for (var dayIndex = 0; dayIndex < statisticDays.length; dayIndex++)
     for (var sessionIndex = 0; sessionIndex < statisticDays[dayIndex].sessions.length; sessionIndex++)
@@ -416,6 +630,7 @@ function resetSession(snapshot, nowMs) {
   var next = defaultSnapshot(nowMs)
   next.totals = previous.totals
   next.statistics = previous.statistics
+  next.handledPlannedOccurrences = previous.handledPlannedOccurrences
   return next
 }
 

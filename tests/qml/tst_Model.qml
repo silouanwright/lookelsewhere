@@ -664,6 +664,91 @@ TestCase {
     compare(Model.toggleProtectedApp(defaults.protectedApps, ""), "steam")
   }
 
+  function test_plannedBreakConfigurationIsBoundedAndNormalized() {
+    var routines = []
+    for (var i = 0; i < 10; i++) routines.push({
+      id: i === 1 ? "Lunch!" : "routine-" + i,
+      name: i === 1 ? "" : "Routine " + i,
+      startMinute: 720 + i * 5,
+      durationMs: 30 * 1000,
+      days: [5, 1, 1, 9],
+      enabled: true
+    })
+    var config = Model.normalizeConfig({ plannedBreaks: routines })
+    compare(config.plannedBreaks.length, 8)
+    compare(config.plannedBreaks[0].durationMs, 60000)
+    compare(config.plannedBreaks[0].days.join(","), "1,5")
+    compare(config.plannedBreaks[1].id, "lunch")
+    compare(config.plannedBreaks[1].name, "Planned break")
+  }
+
+  function test_plannedBreakOverlapDisablesLaterRoutine() {
+    var config = Model.normalizeConfig({ plannedBreaks: [
+      { id: "lunch", name: "Lunch", startMinute: 720, durationMs: 30 * 60000, days: [1], enabled: true },
+      { id: "walk", name: "Walk", startMinute: 735, durationMs: 10 * 60000, days: [1], enabled: true },
+      { id: "tuesday", name: "Tuesday", startMinute: 735, durationMs: 10 * 60000, days: [2], enabled: true }
+    ] })
+    verify(config.plannedBreaks[0].enabled)
+    verify(!config.plannedBreaks[1].enabled)
+    verify(config.plannedBreaks[2].enabled)
+  }
+
+  function test_plannedBreakOverlapCrossesWeekBoundary() {
+    var config = Model.normalizeConfig({ plannedBreaks: [
+      { id: "sunday", startMinute: 23 * 60 + 30, durationMs: 60 * 60000, days: [0], enabled: true },
+      { id: "monday", startMinute: 15, durationMs: 15 * 60000, days: [1], enabled: true }
+    ] })
+    verify(config.plannedBreaks[0].enabled)
+    verify(!config.plannedBreaks[1].enabled)
+  }
+
+  function test_plannedOccurrenceUsesLocalWeekdayAndLateWindow() {
+    var mondayNoon = new Date(2026, 7, 24, 12, 0, 0, 0).getTime()
+    var config = Model.normalizeConfig({ warningMs: 60000, plannedBreaks: [{
+      id: "lunch", name: "Lunch", startMinute: 12 * 60 + 30,
+      durationMs: 15 * 60000, days: [1], enabled: true
+    }] })
+    verify(Model.nextActionablePlannedOccurrence(config, mondayNoon, []) === null)
+    var warning = Model.nextActionablePlannedOccurrence(config, mondayNoon + 29 * 60000, [])
+    compare(warning.key, "lunch@2026-08-24")
+    compare(warning.scheduledAtMs, mondayNoon + 30 * 60000)
+    compare(warning.expiresAtMs, mondayNoon + 60 * 60000)
+    verify(Model.nextActionablePlannedOccurrence(config, warning.scheduledAtMs, [warning.key]) === null)
+    verify(Model.nextActionablePlannedOccurrence(config, warning.expiresAtMs + 1, []) === null)
+  }
+
+  function test_plannedAwayCreditAccumulatesAcrossIdleIntervals() {
+    var start = new Date(2026, 7, 24, 12, 30, 0, 0).getTime()
+    var snapshot = Model.defaultSnapshot(start - 60000)
+    snapshot.lastActiveAtMs = start
+    snapshot = Model.beginPlannedOccurrence(snapshot, {
+      key: "lunch@2026-08-24", routineId: "lunch", name: "Lunch",
+      scheduledAtMs: start, durationMs: 15 * 60000, expiresAtMs: start + 30 * 60000
+    }, start)
+    snapshot = Model.reconcilePlannedAway(snapshot, start + 60000, true)
+    compare(Model.plannedAwayCredit(snapshot, start + 6 * 60000), 6 * 60000)
+    snapshot = Model.reconcilePlannedAway(snapshot, start + 6 * 60000, false)
+    compare(Model.plannedAwayCredit(snapshot, start + 6 * 60000), 6 * 60000)
+    snapshot.lastActiveAtMs = start + 7 * 60000
+    snapshot = Model.reconcilePlannedAway(snapshot, start + 8 * 60000, true)
+    compare(Model.plannedAwayCredit(snapshot, start + 11 * 60000), 10 * 60000)
+  }
+
+  function test_plannedOccurrencePersistenceIsBounded() {
+    var snapshot = Model.defaultSnapshot(0)
+    for (var i = 0; i < 40; i++)
+      snapshot = Model.rememberPlannedOccurrence(snapshot, "routine@2026-08-" + (i < 9 ? "0" : "") + (i + 1))
+    compare(snapshot.handledPlannedOccurrences.length, 32)
+    snapshot.activePlannedOccurrence = {
+      key: "lunch@2026-08-24", routineId: "lunch", name: "Lunch",
+      scheduledAtMs: 1000, durationMs: 60000, expiresAtMs: 1800000,
+      creditedAwayMs: 10000, idleStartedAtMs: 0, deferred: true
+    }
+    var copied = Model.copySnapshot(snapshot)
+    compare(copied.activePlannedOccurrence.name, "Lunch")
+    verify(copied.activePlannedOccurrence.deferred)
+  }
+
   function test_manualPauseLabel() {
     var snapshot = Model.defaultSnapshot(0)
     snapshot.state = Model.State.Waiting
