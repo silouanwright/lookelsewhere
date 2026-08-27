@@ -17,8 +17,9 @@ The persisted model records semantic state and timestamps. UI surfaces derive pr
 
 ## Core transitions
 
-- **Working → DueSoon:** remaining active-use time crosses the warning threshold.
-- **DueSoon → ProtectedContext:** the break becomes due while high-confidence protected context is active.
+- **Working → DueSoon:** remaining active-use time approaches the warning threshold.
+- **Working/DueSoon → ProtectedContext:** the warning threshold arrives while high-confidence protected context is active; the original due time remains the maximum-delay anchor.
+- **Warning/FinalCountdown → ProtectedContext:** newly appearing high-confidence context withdraws an upcoming interruption before the break begins.
 - **ProtectedContext → WaitingForPause:** context ends; start cooldown and seek a natural pause.
 - **WaitingForPause → Warning:** natural pause appears, cooldown expires, or maximum delay is reached.
 - **Warning → FinalCountdown:** warning grace expires or the user requests immediate start.
@@ -37,7 +38,7 @@ The persisted model records semantic state and timestamps. UI surfaces derive pr
   cadence. LookElsewhere briefly explains either decision with an Undo action.
   Manual pause is never reclassified automatically.
 - Short ambiguous idle may receive partial credit or ask for classification only after the MVP if a nonannoying design is proven.
-- Protected context may continue active-use accumulation while delaying interruption.
+- Protected context continues active-use accumulation while delaying the warning and interruption.
 
 ## Private statistics
 

@@ -146,6 +146,54 @@ TestCase {
     compare(s.state, Model.State.Warning)
   }
 
+  function test_protectionInterceptsNormalCountdownBeforeWarning() {
+    var c = config({ focusMs: 60000, warningMs: 25000, maximumDelayMs: 30000 })
+    var s = Model.defaultSnapshot(1000)
+
+    s = Model.observe(s, {
+      nowMs: 36000, active: true, idle: false,
+      evidence: [{ category: "application", active: true, confidence: 1 }]
+    }, c)
+    compare(s.state, Model.State.Protected)
+    compare(s.protectedCategory, "application")
+    compare(s.dueAtMs, 61000)
+    compare(s.totals.prompted, 0)
+
+    s = Model.observe(s, {
+      nowMs: 61000, active: true, idle: false,
+      evidence: [{ category: "application", active: true, confidence: 1 }]
+    }, c)
+    compare(s.state, Model.State.Protected)
+    compare(s.totals.delayed, 1)
+
+    s = Model.observe(s, {
+      nowMs: 90999, active: true, idle: false,
+      evidence: [{ category: "application", active: true, confidence: 1 }]
+    }, c)
+    compare(s.state, Model.State.Protected)
+    s = Model.observe(s, {
+      nowMs: 91000, active: true, idle: false,
+      evidence: [{ category: "application", active: true, confidence: 1 }]
+    }, c)
+    compare(s.state, Model.State.Warning)
+  }
+
+  function test_protectionCanCancelAnActiveWarning() {
+    var c = config({ focusMs: 60000, warningMs: 25000, maximumDelayMs: 30000 })
+    var s = Model.defaultSnapshot(1000)
+    s = Model.observe(s, {
+      nowMs: 36000, active: true, idle: false, evidence: []
+    }, c)
+    compare(s.state, Model.State.Warning)
+
+    s = Model.observe(s, {
+      nowMs: 40000, active: true, idle: false,
+      evidence: [{ category: "application", active: true, confidence: 1 }]
+    }, c)
+    compare(s.state, Model.State.Protected)
+    compare(s.dueAtMs, 61000)
+  }
+
   function test_warningOccupiesFinalFocusSeconds() {
     var c = config({ focusMs: 60000, warningMs: 25000, finalMs: 3000 })
     var s = Model.defaultSnapshot(1000)

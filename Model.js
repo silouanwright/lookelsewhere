@@ -483,6 +483,16 @@ function observe(snapshot, input, config) {
     if (now >= next.breakEndsAtMs) return completeBreak(next, now)
     return next
   }
+  var protection = strongestEvidence(input.evidence || [], cfg)
+  if ((next.state === State.Warning || next.state === State.Final) && protection) {
+    if (!next.dueAtMs) next.dueAtMs = next.warningEndsAtMs
+    if (now - next.dueAtMs < cfg.maximumDelayMs) {
+      next.state = State.Protected
+      next.protectedCategory = protection.category
+      next.totals.delayed++
+      return next
+    }
+  }
   if ((next.state === State.Warning || next.state === State.Final)
       && input.typingActive === true
       && now >= next.warningEndsAtMs - 10000) {
@@ -509,6 +519,15 @@ function observe(snapshot, input, config) {
 
   if (activeNow) next.accumulatedActiveMs += elapsed
   var remaining = Math.max(0, cfg.focusMs - next.accumulatedActiveMs)
+  if (remaining <= cfg.warningMs && protection) {
+    if (!next.dueAtMs) next.dueAtMs = now + remaining
+    if (now - next.dueAtMs < cfg.maximumDelayMs) {
+      if (next.state !== State.Protected) next.totals.delayed++
+      next.state = State.Protected
+      next.protectedCategory = protection.category
+      return next
+    }
+  }
   // The pre-break warning is part of the focus interval, not an additional
   // countdown after it. Enter it as soon as the configured warning window is
   // reached and end it at the original due moment.
@@ -525,7 +544,6 @@ function observe(snapshot, input, config) {
   }
 
   if (!next.dueAtMs) next.dueAtMs = now
-  var protection = strongestEvidence(input.evidence || [], cfg)
   if (protection && now - next.dueAtMs < cfg.maximumDelayMs) {
     if (next.state !== State.Protected) next.totals.delayed++
     next.state = State.Protected

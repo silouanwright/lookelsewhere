@@ -24,9 +24,9 @@ the application class and fullscreen boolean; never retain the title.
 
 ## Consequences
 
-- Steam games defer a due break up to the existing maximum-delay bound.
+- Steam games defer the warning and due break up to the existing maximum-delay
+  bound, measured from the original due time rather than when protection began.
 - Users can add or remove application IDs without code changes.
 - The bar reports the coarse status `Focus`, not the application name.
 - Application classification remains explicit user policy rather than an
   expanding built-in database.
-
