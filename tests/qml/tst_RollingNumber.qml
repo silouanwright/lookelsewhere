@@ -92,7 +92,7 @@ Item {
     name: "RollingClock"
     when: windowShown
 
-    function test_missedMinuteBoundaryKeepsIntermediateSecond() {
+    function test_missedMinuteBoundarySnapsToAuthoritativeTime() {
       let clock = createTemporaryObject(clockComponent, root, {
         value: 60,
         animationActive: true,
@@ -102,13 +102,11 @@ Item {
       compare(clock.displayedValue, 60)
 
       clock.value = 58
-      tryCompare(clock, "displayedValue", 59)
-      wait(300)
-      compare(clock.displayedValue, 59)
-      tryCompare(clock, "displayedValue", 58, 700)
+      compare(clock.displayedValue, 58)
+      compare(clock.animateChange, false)
     }
 
-    function test_longerVisibleStallDoesNotDropSeconds() {
+    function test_longerVisibleStallDoesNotReplayMissedSeconds() {
       let clock = createTemporaryObject(clockComponent, root, {
         value: 60,
         animationActive: true,
@@ -119,8 +117,21 @@ Item {
       clock.displayedValueChanged.connect(function() { values.push(clock.displayedValue) })
 
       clock.value = 55
-      tryCompare(clock, "displayedValue", 55, 2400)
-      compare(values.join(","), "59,58,57,56,55")
+      compare(clock.displayedValue, 55)
+      compare(values.join(","), "55")
+    }
+
+    function test_ordinarySecondKeepsRollingAnimation() {
+      let clock = createTemporaryObject(clockComponent, root, {
+        value: 60,
+        animationActive: true,
+        reducedMotion: false
+      })
+      verify(!!clock, "Component exists")
+
+      clock.value = 59
+      compare(clock.displayedValue, 59)
+      compare(clock.animateChange, true)
     }
   }
 }

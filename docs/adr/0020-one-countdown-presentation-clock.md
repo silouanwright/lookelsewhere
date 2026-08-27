@@ -6,30 +6,29 @@
 ## Context
 
 The scheduler correctly derives remaining time from timestamps, but QML's
-event loop can miss a one-second sample under load. Independent minute and
-second catch-up components cannot interpret a missed minute boundary: a sample
-change from `01:00` to `00:58` looks like an ordinary `00` to `58` reset and
-drops `00:59`.
+event loop can stall under load. No presentation component can render the
+seconds that elapsed while the shared shell process produced no frames.
+Replaying every missed value afterward makes the clock visibly accelerate and
+extends a brief system stall into a longer product defect.
 
 ## Decision
 
-Keep scheduler timestamps authoritative, but give every visible clock one
-presentation queue measured in total seconds. Derive minutes and seconds only
-after selecting the next displayed total. When a visible sample is missed,
-present each intermediate second in order.
+Keep scheduler timestamps authoritative and derive each visible clock from one
+total-seconds value. Animate only an ordinary one-second decrement. After a
+missed sample, immediately snap to the current authoritative value without
+replaying intermediate seconds.
 
 ## Alternatives
 
 - Increase scheduler polling: rejected because it adds permanent model work
   without fixing an event-loop stall.
-- Animate minute and second fields independently: rejected because rollover
-  destroys the information needed to recover a missed second.
+- Replay missed seconds: rejected because it cannot reconstruct frames that
+  were never rendered and creates a visible fast-forward afterward.
 - Show only static text: rejected because the rolling treatment is an intentional
   part of the product experience.
 
 ## Consequences
 
-The scheduler remains wall-clock correct while the presentation may briefly
-catch up after a stall. A compositor that produces no frame cannot display an
-intermediate value during that frozen interval, but the next rendered sequence
-does not silently discard it.
+The scheduler and visible clock return to the correct wall-clock value as soon
+as the event loop recovers. Ordinary ticks retain the rolling treatment;
+multi-second changes and resets are immediate and do not race to catch up.
