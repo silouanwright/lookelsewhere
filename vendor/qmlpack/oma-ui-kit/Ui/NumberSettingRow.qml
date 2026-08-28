@@ -52,8 +52,22 @@ Item {
     foreground: root.foreground
     accent: root.accent
     fontFamily: root.fontFamily
-    hasCursor: root.hasCursor
-    onHovered: function(on) { root.hovered(on) }
+    hasCursor: root.hasCursor || rowHover.hovered
     onModified: function(next) { root.modified(next) }
+  }
+
+  HoverHandler {
+    id: rowHover
+    onHoveredChanged: root.hovered(hovered)
+  }
+
+  MouseArea {
+    anchors.left: parent.left
+    anchors.right: field.left
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    anchors.rightMargin: Style.space(12)
+    cursorShape: Qt.PointingHandCursor
+    onClicked: root.activate()
   }
 }

@@ -4,6 +4,7 @@ import QtQuick.Layouts
 import qs.Commons
 import qs.Ui
 import "../Model.js" as Model
+import "../Ui" as ProductUi
 import "../vendor/qmlpack/oma-command-layer/Ui" as OmaCommands
 import "../vendor/qmlpack/oma-command-layer/Ui/CommandModel.js" as CommandModel
 import "../vendor/qmlpack/oma-ui-kit/Ui" as LookUi
@@ -31,10 +32,8 @@ ColumnLayout {
   property int cursorIndex: 0
   property bool cursorActive: false
 
-  readonly property bool editorActive: focusMinutesField.field.activeFocus
-    || focusMinutesField.field.contentItem.activeFocus
-    || shortBreakField.field.activeFocus
-    || shortBreakField.field.contentItem.activeFocus
+  readonly property bool editorActive: focusMinutesField.editorActive
+    || shortBreakField.editorActive
     || longBreakEveryField.editorActive
     || longBreakSecondsField.editorActive
     || snoozeBudgetField.editorActive
@@ -69,8 +68,10 @@ ColumnLayout {
 
   function focusInitial() { settingsTabs.forceActiveFocus() }
   function selectTab(name) {
-    settingsTab = ["general", "breaks", "plans", "context", "experience"].indexOf(name) >= 0
-      ? name : "general"
+    var aliases = { appearance: "general", experience: "general", plans: "schedule" }
+    var next = aliases[name] || name
+    settingsTab = ["general", "breaks", "schedule", "context"].indexOf(next) >= 0
+      ? next : "general"
     cursorActive = false
     cursorIndex = 0
     if (scrollFlickable) scrollFlickable.contentY = 0
@@ -93,22 +94,21 @@ ColumnLayout {
   }
   function targets() {
     var byTab = {
-      general: [pauseBreaksButton, editSettingsButton, officeHoursRow,
-        officeStartDropdown, officeEndDropdown],
+      general: [panelPatternDropdown, soundRow, soundVolumeField,
+        startSoundRow, completionSoundRow, outputModeDropdown, displayModeDropdown,
+        reduceMotionRow, keyboardHintRow, editSettingsButton],
       context: [idleDetectionRow, recentInputDetectionRow, fullscreenDetectionRow, mediaDetectionRow,
         microphoneDetectionRow, screenSharingDetectionRow, dictationDetectionRow, protectedAppsRow],
-      breaks: [focusMinutesField, shortBreakField, longBreakEveryField,
+      breaks: [pauseBreaksButton, focusMinutesField, shortBreakField, longBreakEveryField,
         longBreakSecondsField, snoozeBudgetField, maximumDelayField,
         enforcementDropdown],
-      plans: [plannedBreaksPage.routineTarget, plannedBreaksPage.enabledTarget,
+      schedule: [plannedBreaksPage.routineTarget, plannedBreaksPage.enabledTarget,
         plannedBreaksPage.nameTarget, plannedBreaksPage.startTarget,
         plannedBreaksPage.durationTarget, plannedBreaksPage.daysTarget,
-        plannedBreaksPage.removeTarget, plannedBreaksPage.addTarget].filter(function(item) {
+        plannedBreaksPage.removeTarget, plannedBreaksPage.addTarget,
+        officeHoursRow, officeStartDropdown, officeEndDropdown].filter(function(item) {
           return item && item.visible
-        }),
-      experience: [reduceMotionRow, panelPatternDropdown, soundRow, soundVolumeField,
-        startSoundRow, completionSoundRow, outputModeDropdown, displayModeDropdown,
-        keyboardHintRow]
+        })
     }
     return byTab[settingsTab] || []
   }
@@ -143,7 +143,7 @@ ColumnLayout {
   }
   function moveHorizontal(delta) {
     var target = targets()[cursorIndex]
-    if (settingsTab === "plans" && target === plannedBreaksPage.daysTarget)
+    if (settingsTab === "schedule" && target === plannedBreaksPage.daysTarget)
       plannedBreaksPage.moveDays(delta)
   }
   function toggleCurrentProtectedApp() {
@@ -161,16 +161,15 @@ ColumnLayout {
       flick.contentY = Math.min(Math.max(0, flick.contentHeight - flick.height),
         point.y + item.height + margin - flick.height)
   }
-  LookUi.SettingsTabBar {
+  ProductUi.SettingsCategoryBar {
     id: settingsTabs
     Layout.alignment: Qt.AlignHCenter
     Layout.topMargin: settingsPage.topInset + Style.space(8)
     options: [
-      { value: "general", label: qsTr("General"), key: CommandModel.label(settingsPage.shortcuts.generalTab) },
-      { value: "breaks", label: qsTr("Breaks"), key: CommandModel.label(settingsPage.shortcuts.breaksTab) },
-      { value: "plans", label: qsTr("Plans"), key: CommandModel.label(settingsPage.shortcuts.plansTab) },
-      { value: "context", label: qsTr("Context"), key: CommandModel.label(settingsPage.shortcuts.contextTab) },
-      { value: "experience", label: qsTr("Experience"), key: CommandModel.label(settingsPage.shortcuts.experienceTab) }
+      { value: "general", label: qsTr("General"), key: CommandModel.label(settingsPage.shortcuts.generalTab), iconPath: "M40,88H73a32,32,0,0,0,62,0h81a8,8,0,0,0,0-16H135a32,32,0,0,0-62,0H40a8,8,0,0,0,0,16Zm64-24A16,16,0,1,1,88,80,16,16,0,0,1,104,64ZM216,168H199a32,32,0,0,0-62,0H40a8,8,0,0,0,0,16h97a32,32,0,0,0,62,0h17a8,8,0,0,0,0-16Zm-48,24a16,16,0,1,1,16-16A16,16,0,0,1,168,192Z" },
+      { value: "breaks", label: qsTr("Breaks"), key: CommandModel.label(settingsPage.shortcuts.breaksTab), iconPath: "M128,40a96,96,0,1,0,96,96A96.11,96.11,0,0,0,128,40Zm0,176a80,80,0,1,1,80-80A80.09,80.09,0,0,1,128,216ZM173.66,90.34a8,8,0,0,1,0,11.32l-40,40a8,8,0,0,1-11.32-11.32l40-40A8,8,0,0,1,173.66,90.34ZM96,16a8,8,0,0,1,8-8h48a8,8,0,0,1,0,16H104A8,8,0,0,1,96,16Z" },
+      { value: "schedule", label: qsTr("Schedule"), key: CommandModel.label(settingsPage.shortcuts.plansTab), iconPath: "M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM72,48v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24V80H48V48ZM208,208H48V96H208V208Zm-68-76a12,12,0,1,1-12-12A12,12,0,0,1,140,132Zm44,0a12,12,0,1,1-12-12A12,12,0,0,1,184,132ZM96,172a12,12,0,1,1-12-12A12,12,0,0,1,96,172Zm44,0a12,12,0,1,1-12-12A12,12,0,0,1,140,172Zm44,0a12,12,0,1,1-12-12A12,12,0,0,1,184,172Z" },
+      { value: "context", label: qsTr("Context"), key: CommandModel.label(settingsPage.shortcuts.contextTab), iconPath: "M208,40H48A16,16,0,0,0,32,56v56c0,52.72,25.52,84.67,46.93,102.19,23.06,18.86,46,25.26,47,25.53a8,8,0,0,0,4.2,0c1-.27,23.91-6.67,47-25.53C198.48,196.67,224,164.72,224,112V56A16,16,0,0,0,208,40Zm0,72c0,37.07-13.66,67.16-40.6,89.42A129.3,129.3,0,0,1,128,223.62a128.25,128.25,0,0,1-38.92-21.81C61.82,179.51,48,149.3,48,112l0-56,160,0ZM82.34,141.66a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35a8,8,0,0,1,11.32,11.32l-56,56a8,8,0,0,1-11.32,0Z" }
     ]
     value: settingsPage.settingsTab
     hintsVisible: settingsPage.keyboardHintsVisible
@@ -178,12 +177,10 @@ ColumnLayout {
     background: Color.popups.background
     accent: settingsPage.accent
     fontFamily: settingsPage.fontFamily
-    fontSize: Style.font.bodySmall
-    KeyNavigation.tab: settingsPage.settingsTab === "general" ? pauseBreaksButton
-      : settingsPage.settingsTab === "context" ? idleDetectionRow
-      : settingsPage.settingsTab === "breaks" ? focusMinutesField.field
-      : settingsPage.settingsTab === "plans" ? plannedBreaksPage
-      : reduceMotionRow
+    KeyNavigation.tab: settingsPage.settingsTab === "general" ? panelPatternDropdown
+      : settingsPage.settingsTab === "breaks" ? pauseBreaksButton
+      : settingsPage.settingsTab === "schedule" ? plannedBreaksPage
+      : idleDetectionRow
     Keys.onEscapePressed: settingsPage.dismissHintsOrClose()
     Keys.onTabPressed: {
       settingsPage.focusProxy.forceActiveFocus()
@@ -204,7 +201,7 @@ ColumnLayout {
     id: plannedBreaksPage
     Layout.fillWidth: true
     Layout.topMargin: Style.space(8)
-    visible: settingsPage.settingsTab === "plans"
+    visible: settingsPage.settingsTab === "schedule"
     settings: settingsPage.settings
     foreground: settingsPage.foreground
     muted: settingsPage.muted
@@ -220,11 +217,11 @@ ColumnLayout {
   ColumnLayout {
     Layout.fillWidth: true
     spacing: Style.space(10)
-    visible: settingsPage.settingsTab === "general"
+    visible: settingsPage.settingsTab === "breaks"
 
   LookUi.SectionHeader {
     Layout.fillWidth: true
-    label: qsTr("App controls")
+    label: qsTr("Reminders")
     foreground: settingsPage.muted
     fontFamily: settingsPage.fontFamily
   }
@@ -242,7 +239,7 @@ ColumnLayout {
     fontFamily: settingsPage.fontFamily
     hasCursor: settingsPage.hasCursorFor(pauseBreaksButton)
     onHovered: function(on) { if (on) settingsPage.setCursorTarget(pauseBreaksButton) }
-    KeyNavigation.tab: editSettingsButton
+    KeyNavigation.tab: focusMinutesField
     Keys.onEscapePressed: settingsPage.dismissHintsOrClose()
     onClicked: settingsPage.toggleManualPause()
 
@@ -256,60 +253,12 @@ ColumnLayout {
     }
   }
 
-  PanelSeparator { Layout.fillWidth: true; foreground: settingsPage.foreground }
-
-  Item {
-    Layout.fillWidth: true
-    Layout.preferredHeight: Math.max(editSettingsLabels.implicitHeight, editSettingsButton.implicitHeight)
-
-    Column {
-      id: editSettingsLabels
-      anchors.left: parent.left
-      anchors.right: editSettingsButton.left
-      anchors.rightMargin: Style.space(12)
-      anchors.verticalCenter: parent.verticalCenter
-      spacing: Style.space(2)
-      Text { width: parent.width; text: qsTr("Omarchy configuration"); color: settingsPage.foreground; font.family: settingsPage.fontFamily; font.pixelSize: Style.font.body; font.weight: Font.DemiBold; elide: Text.ElideRight }
-      Text { width: parent.width; text: qsTr("Open the Omarchy Shell configuration file"); color: settingsPage.muted; font.family: settingsPage.fontFamily; font.pixelSize: Style.font.bodySmall; wrapMode: Text.WordWrap }
-    }
-
-    LookUi.WeightedButton {
-      id: editSettingsButton
-      anchors.right: parent.right
-      anchors.verticalCenter: parent.verticalCenter
-      label: qsTr("Open file")
-      labelWeight: Font.DemiBold
-      bordered: true
-      focusable: true
-      foreground: settingsPage.foreground
-      accent: settingsPage.accent
-      fontFamily: settingsPage.fontFamily
-      hasCursor: settingsPage.hasCursorFor(editSettingsButton)
-      onHovered: function(on) { if (on) settingsPage.setCursorTarget(editSettingsButton) }
-      KeyNavigation.backtab: pauseBreaksButton
-      Keys.onEscapePressed: settingsPage.dismissHintsOrClose()
-      Accessible.role: Accessible.Button
-      Accessible.name: qsTr("Open Omarchy Shell configuration file")
-      Accessible.onPressAction: clicked()
-      onClicked: settingsPage.editRequested()
-
-    }
-
-    OmaCommands.CommandHint {
-      commandLayer: settingsPage.commandLayer
-      keyText: CommandModel.label(settingsPage.shortcuts.edit)
-      customPosition: true
-      badgeX: parent.width - badgeWidth
-      badgeY: editSettingsButton.y - badgeHeight / 2
-    }
-  }
-
   }
 
   ColumnLayout {
     Layout.fillWidth: true
     spacing: Style.space(10)
-    visible: settingsPage.settingsTab === "general"
+    visible: settingsPage.settingsTab === "schedule"
 
   LookUi.SectionHeader {
     Layout.fillWidth: true
@@ -469,6 +418,10 @@ ColumnLayout {
 
     function activate() { settingsPage.toggleCurrentProtectedApp() }
 
+    HoverHandler {
+      onHoveredChanged: if (hovered) settingsPage.setCursorTarget(protectedAppsRow)
+    }
+
     LookUi.SettingLabels {
       id: protectedAppsLabels
       anchors.left: parent.left
@@ -497,6 +450,16 @@ ColumnLayout {
       onHovered: if (hovered) settingsPage.setCursorTarget(protectedAppsRow)
       onClicked: settingsPage.toggleCurrentProtectedApp()
     }
+
+    MouseArea {
+      anchors.left: parent.left
+      anchors.right: currentAppButton.left
+      anchors.top: parent.top
+      anchors.bottom: parent.bottom
+      anchors.rightMargin: Style.space(12)
+      cursorShape: settingsPage.activeAppId ? Qt.PointingHandCursor : Qt.ArrowCursor
+      onClicked: protectedAppsRow.activate()
+    }
   }
 
   }
@@ -514,73 +477,32 @@ ColumnLayout {
     fontFamily: settingsPage.fontFamily
   }
 
-  Item {
+  LookUi.NumberSettingRow {
+    id: focusMinutesField
     Layout.fillWidth: true
-    Layout.preferredHeight: Math.max(focusLabels.implicitHeight, focusMinutesField.implicitHeight)
-
-    Column {
-      id: focusLabels
-      anchors.left: parent.left
-      anchors.right: focusMinutesField.left
-      anchors.rightMargin: Style.space(12)
-      anchors.verticalCenter: parent.verticalCenter
-      spacing: Style.space(2)
-      Text { width: parent.width; text: qsTr("Focus interval"); color: settingsPage.foreground; font.family: settingsPage.fontFamily; font.pixelSize: Style.font.body; font.weight: Font.DemiBold; elide: Text.ElideRight }
-      Text { width: parent.width; text: qsTr("Minutes of active screen time between breaks"); color: settingsPage.muted; font.family: settingsPage.fontFamily; font.pixelSize: Style.font.bodySmall; wrapMode: Text.WordWrap }
-    }
-
-    NumberField {
-      id: focusMinutesField
-      width: Style.space(72)
-      anchors.right: parent.right
-      anchors.verticalCenter: parent.verticalCenter
-      value: settingsPage.settings && settingsPage.settings.focusMinutes !== undefined ? Number(settingsPage.settings.focusMinutes) : 20
-      from: 1
-      to: 180
-      fieldWidth: Style.space(72)
-      foreground: settingsPage.foreground
-      accent: settingsPage.accent
-      fontFamily: settingsPage.fontFamily
-      hasCursor: settingsPage.hasCursorFor(focusMinutesField)
-      onHovered: function(on) { if (on) settingsPage.setCursorTarget(focusMinutesField) }
-      onModified: function(next) { settingsPage.persistSettings({ focusMinutes: next }) }
-    }
+    label: qsTr("Focus interval")
+    description: qsTr("Minutes of active screen time between breaks")
+    value: settingsPage.settings && settingsPage.settings.focusMinutes !== undefined ? Number(settingsPage.settings.focusMinutes) : 20
+    from: 1; to: 180
+    hasCursor: settingsPage.hasCursorFor(focusMinutesField)
+    foreground: settingsPage.foreground; muted: settingsPage.muted; accent: settingsPage.accent; fontFamily: settingsPage.fontFamily
+    onHovered: function(on) { if (on) settingsPage.setCursorTarget(focusMinutesField) }
+    onModified: function(next) { settingsPage.persistSettings({ focusMinutes: next }) }
   }
 
   PanelSeparator { Layout.fillWidth: true; foreground: settingsPage.foreground }
 
-  Item {
+  LookUi.NumberSettingRow {
+    id: shortBreakField
     Layout.fillWidth: true
-    Layout.preferredHeight: Math.max(shortBreakLabels.implicitHeight, shortBreakField.implicitHeight)
-
-    Column {
-      id: shortBreakLabels
-      anchors.left: parent.left
-      anchors.right: shortBreakField.left
-      anchors.rightMargin: Style.space(12)
-      anchors.verticalCenter: parent.verticalCenter
-      spacing: Style.space(2)
-      Text { width: parent.width; text: qsTr("Short break"); color: settingsPage.foreground; font.family: settingsPage.fontFamily; font.pixelSize: Style.font.body; font.weight: Font.DemiBold; elide: Text.ElideRight }
-      Text { width: parent.width; text: qsTr("Seconds for an ordinary eye break"); color: settingsPage.muted; font.family: settingsPage.fontFamily; font.pixelSize: Style.font.bodySmall; wrapMode: Text.WordWrap }
-    }
-
-    NumberField {
-      id: shortBreakField
-      width: Style.space(72)
-      anchors.right: parent.right
-      anchors.verticalCenter: parent.verticalCenter
-      value: settingsPage.settings && settingsPage.settings.breakSeconds !== undefined ? Number(settingsPage.settings.breakSeconds) : 20
-      from: 5
-      to: 600
-      stepSize: 5
-      fieldWidth: Style.space(72)
-      foreground: settingsPage.foreground
-      accent: settingsPage.accent
-      fontFamily: settingsPage.fontFamily
-      hasCursor: settingsPage.hasCursorFor(shortBreakField)
-      onHovered: function(on) { if (on) settingsPage.setCursorTarget(shortBreakField) }
-      onModified: function(next) { settingsPage.persistSettings({ breakSeconds: next }) }
-    }
+    label: qsTr("Short break")
+    description: qsTr("Seconds for an ordinary eye break")
+    value: settingsPage.settings && settingsPage.settings.breakSeconds !== undefined ? Number(settingsPage.settings.breakSeconds) : 20
+    from: 5; to: 600; stepSize: 5
+    hasCursor: settingsPage.hasCursorFor(shortBreakField)
+    foreground: settingsPage.foreground; muted: settingsPage.muted; accent: settingsPage.accent; fontFamily: settingsPage.fontFamily
+    onHovered: function(on) { if (on) settingsPage.setCursorTarget(shortBreakField) }
+    onModified: function(next) { settingsPage.persistSettings({ breakSeconds: next }) }
   }
 
   PanelSeparator { Layout.fillWidth: true; foreground: settingsPage.foreground }
@@ -645,42 +567,23 @@ ColumnLayout {
 
   PanelSeparator { Layout.fillWidth: true; foreground: settingsPage.foreground }
 
-  Item {
+  LookUi.DropdownSettingRow {
+    id: enforcementDropdown
     Layout.fillWidth: true
-    Layout.preferredHeight: Math.max(enforcementLabels.implicitHeight, enforcementDropdown.implicitHeight)
-
-    Column {
-      id: enforcementLabels
-      anchors.left: parent.left
-      anchors.right: enforcementDropdown.left
-      anchors.rightMargin: Style.space(12)
-      anchors.verticalCenter: parent.verticalCenter
-      spacing: Style.space(2)
-      Text { width: parent.width; text: qsTr("Break enforcement"); color: settingsPage.foreground; font.family: settingsPage.fontFamily; font.pixelSize: Style.font.body; font.weight: Font.DemiBold; elide: Text.ElideRight }
-      Text { width: parent.width; text: qsTr("Choose when an active break may be skipped"); color: settingsPage.muted; font.family: settingsPage.fontFamily; font.pixelSize: Style.font.bodySmall; wrapMode: Text.WordWrap }
-    }
-
-    Dropdown {
-      id: enforcementDropdown
-      width: Style.space(132)
-      anchors.right: parent.right
-      anchors.verticalCenter: parent.verticalCenter
-      showLabel: false
-      value: settingsPage.settings && settingsPage.settings.enforcement !== undefined ? String(settingsPage.settings.enforcement) : "balanced"
-      options: [
-        { value: "casual", label: qsTr("Casual") },
-        { value: "balanced", label: qsTr("Balanced") },
-        { value: "hardcore", label: qsTr("Hardcore") }
-      ]
-      foreground: settingsPage.foreground
-      accent: settingsPage.accent
-      fontFamily: settingsPage.fontFamily
-      hasCursor: settingsPage.hasCursorFor(enforcementDropdown)
-      onPopupOpenChanged: if (!popupOpen && settingsPage.active)
-        Qt.callLater(function() { settingsPage.focusProxy.forceActiveFocus() })
-      onHovered: function(on) { if (on) settingsPage.setCursorTarget(enforcementDropdown) }
-      onChanged: function(next) { settingsPage.persistSettings({ enforcement: next }) }
-    }
+    label: qsTr("Break enforcement")
+    description: qsTr("Choose when an active break may be skipped")
+    value: settingsPage.settings && settingsPage.settings.enforcement !== undefined ? String(settingsPage.settings.enforcement) : "balanced"
+    options: [
+      { value: "casual", label: qsTr("Casual") },
+      { value: "balanced", label: qsTr("Balanced") },
+      { value: "hardcore", label: qsTr("Hardcore") }
+    ]
+    foreground: settingsPage.foreground; muted: settingsPage.muted; accent: settingsPage.accent; fontFamily: settingsPage.fontFamily
+    hasCursor: settingsPage.hasCursorFor(enforcementDropdown)
+    onPopupClosed: if (settingsPage.active)
+      Qt.callLater(function() { settingsPage.focusProxy.forceActiveFocus() })
+    onHovered: function(on) { if (on) settingsPage.setCursorTarget(enforcementDropdown) }
+    onChanged: function(next) { settingsPage.persistSettings({ enforcement: next }) }
   }
 
   }
@@ -688,36 +591,15 @@ ColumnLayout {
   ColumnLayout {
     Layout.fillWidth: true
     spacing: Style.space(10)
-    visible: settingsPage.settingsTab === "experience"
+    visible: settingsPage.settingsTab === "general"
 
   LookUi.SectionHeader {
     Layout.fillWidth: true
     Layout.topMargin: Style.space(8)
-    label: qsTr("Experience")
+    label: qsTr("Interface")
     foreground: settingsPage.muted
     fontFamily: settingsPage.fontFamily
   }
-
-  LookUi.ToggleSettingRow {
-    id: reduceMotionRow
-    Layout.fillWidth: true
-    label: qsTr("Reduce motion")
-    description: qsTr("Remove movement and soft-focus reveals")
-    checked: settingsPage.settings && settingsPage.settings.reducedMotion === true
-    foreground: settingsPage.foreground
-    accent: settingsPage.accent
-    fontFamily: settingsPage.fontFamily
-    hasCursor: settingsPage.hasCursorFor(reduceMotionRow)
-    Accessible.role: Accessible.CheckBox
-    Accessible.name: label
-    Accessible.checked: checked
-    Accessible.onPressAction: clicked()
-    onHovered: function(on) { if (on) settingsPage.setCursorTarget(reduceMotionRow) }
-    KeyNavigation.tab: soundRow
-    onClicked: settingsPage.persistSettings({ reducedMotion: !checked })
-  }
-
-  PanelSeparator { Layout.fillWidth: true; foreground: settingsPage.foreground }
 
   LookUi.DropdownSettingRow {
     id: panelPatternDropdown
@@ -743,6 +625,14 @@ ColumnLayout {
 
   PanelSeparator { Layout.fillWidth: true; foreground: settingsPage.foreground }
 
+  LookUi.SectionHeader {
+    Layout.fillWidth: true
+    Layout.topMargin: Style.space(8)
+    label: qsTr("Sounds")
+    foreground: settingsPage.muted
+    fontFamily: settingsPage.fontFamily
+  }
+
   LookUi.ToggleSettingRow {
     id: soundRow
     Layout.fillWidth: true
@@ -759,7 +649,7 @@ ColumnLayout {
     Accessible.onPressAction: clicked()
     onHovered: function(on) { if (on) settingsPage.setCursorTarget(soundRow) }
     KeyNavigation.tab: soundVolumeField
-    KeyNavigation.backtab: reduceMotionRow
+    KeyNavigation.backtab: panelPatternDropdown
     onClicked: settingsPage.persistSettings({ soundEnabled: !checked })
   }
 
@@ -808,6 +698,14 @@ ColumnLayout {
 
   PanelSeparator { Layout.fillWidth: true; foreground: settingsPage.foreground }
 
+  LookUi.SectionHeader {
+    Layout.fillWidth: true
+    Layout.topMargin: Style.space(8)
+    label: qsTr("Displays")
+    foreground: settingsPage.muted
+    fontFamily: settingsPage.fontFamily
+  }
+
   LookUi.DropdownSettingRow {
     id: outputModeDropdown
     Layout.fillWidth: true
@@ -844,6 +742,34 @@ ColumnLayout {
 
   PanelSeparator { Layout.fillWidth: true; foreground: settingsPage.foreground }
 
+  LookUi.SectionHeader {
+    Layout.fillWidth: true
+    Layout.topMargin: Style.space(8)
+    label: qsTr("Accessibility")
+    foreground: settingsPage.muted
+    fontFamily: settingsPage.fontFamily
+  }
+
+  LookUi.ToggleSettingRow {
+    id: reduceMotionRow
+    Layout.fillWidth: true
+    label: qsTr("Reduce motion")
+    description: qsTr("Remove movement and soft-focus reveals")
+    checked: settingsPage.settings && settingsPage.settings.reducedMotion === true
+    foreground: settingsPage.foreground
+    accent: settingsPage.accent
+    fontFamily: settingsPage.fontFamily
+    hasCursor: settingsPage.hasCursorFor(reduceMotionRow)
+    Accessible.role: Accessible.CheckBox
+    Accessible.name: label
+    Accessible.checked: checked
+    Accessible.onPressAction: clicked()
+    onHovered: function(on) { if (on) settingsPage.setCursorTarget(reduceMotionRow) }
+    onClicked: settingsPage.persistSettings({ reducedMotion: !checked })
+  }
+
+  PanelSeparator { Layout.fillWidth: true; foreground: settingsPage.foreground }
+
   LookUi.ToggleSettingRow {
     id: keyboardHintRow
     Layout.fillWidth: true
@@ -860,8 +786,76 @@ ColumnLayout {
     Accessible.onPressAction: clicked()
     onHovered: function(on) { if (on) settingsPage.setCursorTarget(keyboardHintRow) }
     KeyNavigation.tab: settingsPage.shortcutsButtonTarget
-    KeyNavigation.backtab: soundRow
+    KeyNavigation.backtab: reduceMotionRow
     onClicked: settingsPage.persistSettings({ showKeyboardHints: !checked })
+  }
+
+  LookUi.SectionHeader {
+    Layout.fillWidth: true
+    Layout.topMargin: Style.space(8)
+    label: qsTr("Configuration")
+    foreground: settingsPage.muted
+    fontFamily: settingsPage.fontFamily
+  }
+
+  Item {
+    Layout.fillWidth: true
+    Layout.preferredHeight: Math.max(editSettingsLabels.implicitHeight, editSettingsButton.implicitHeight)
+
+    function activate() { settingsPage.editRequested() }
+
+    HoverHandler {
+      onHoveredChanged: if (hovered) settingsPage.setCursorTarget(editSettingsButton)
+    }
+
+    Column {
+      id: editSettingsLabels
+      anchors.left: parent.left
+      anchors.right: editSettingsButton.left
+      anchors.rightMargin: Style.space(12)
+      anchors.verticalCenter: parent.verticalCenter
+      spacing: Style.space(2)
+      Text { width: parent.width; text: qsTr("Omarchy configuration"); color: settingsPage.foreground; font.family: settingsPage.fontFamily; font.pixelSize: Style.font.body; font.weight: Font.DemiBold; elide: Text.ElideRight }
+      Text { width: parent.width; text: qsTr("Open the Omarchy Shell configuration file"); color: settingsPage.muted; font.family: settingsPage.fontFamily; font.pixelSize: Style.font.bodySmall; wrapMode: Text.WordWrap }
+    }
+
+    LookUi.WeightedButton {
+      id: editSettingsButton
+      anchors.right: parent.right
+      anchors.verticalCenter: parent.verticalCenter
+      label: qsTr("Open file")
+      labelWeight: Font.DemiBold
+      bordered: true
+      focusable: true
+      foreground: settingsPage.foreground
+      accent: settingsPage.accent
+      fontFamily: settingsPage.fontFamily
+      hasCursor: settingsPage.hasCursorFor(editSettingsButton)
+      onHovered: function(on) { if (on) settingsPage.setCursorTarget(editSettingsButton) }
+      Keys.onEscapePressed: settingsPage.dismissHintsOrClose()
+      Accessible.role: Accessible.Button
+      Accessible.name: qsTr("Open Omarchy Shell configuration file")
+      Accessible.onPressAction: clicked()
+      onClicked: settingsPage.editRequested()
+    }
+
+    MouseArea {
+      anchors.left: parent.left
+      anchors.right: editSettingsButton.left
+      anchors.top: parent.top
+      anchors.bottom: parent.bottom
+      anchors.rightMargin: Style.space(12)
+      cursorShape: Qt.PointingHandCursor
+      onClicked: parent.activate()
+    }
+
+    OmaCommands.CommandHint {
+      commandLayer: settingsPage.commandLayer
+      keyText: CommandModel.label(settingsPage.shortcuts.edit)
+      customPosition: true
+      badgeX: parent.width - badgeWidth
+      badgeY: editSettingsButton.y - badgeHeight / 2
+    }
   }
 
   }

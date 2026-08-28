@@ -4,6 +4,7 @@ set -euo pipefail
 panel="${1:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/Views/Panel.qml}"
 repo=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 settings_page="$repo/Views/SettingsPage.qml"
+category_bar="$repo/Ui/SettingsCategoryBar.qml"
 now_view="$repo/Views/PanelNowView.qml"
 ui="$repo/vendor/qmlpack/oma-ui-kit/Ui"
 command_hint="$repo/vendor/qmlpack/oma-command-layer/Ui/CommandHint.qml"
@@ -12,7 +13,7 @@ first_shortcut_line=$(grep -n -m1 'OmaCommands.WindowCommand {' "$panel" | cut -
 window_shortcuts=$(grep -c 'OmaCommands.WindowCommand {' "$panel")
 
 test "$first_shortcut_line" -gt "$keyboard_line"
-test "$window_shortcuts" -eq 16
+test "$window_shortcuts" -eq 15
 ! grep -q 'context: Qt.ApplicationShortcut' "$panel"
 grep -q 'suspended: root.numberEditorActive || root.dropdownOpen' "$panel"
 grep -q 'context: Qt.WindowShortcut' "$repo/vendor/qmlpack/oma-command-layer/Ui/WindowCommand.qml"
@@ -33,15 +34,26 @@ grep -q 'onUpRequested: settingsPage.settingsButtonTarget.forceActiveFocus()' "$
 grep -q 'focusTarget: root.page === "options" ? settingsPage.initialFocusTarget : neutralFocus' "$panel"
 grep -q 'displayIconPath: root.page === "options"' "$panel"
 grep -q 'property bool suppressTriggerRelease: false' "$ui/DropdownSettingRow.qml"
-grep -q 'if (triggerGuard.containsMouse) root.suppressTriggerRelease = true' "$ui/DropdownSettingRow.qml"
+grep -q 'id: rowGuard' "$ui/DropdownSettingRow.qml"
+grep -q 'anchors.fill: parent' "$ui/DropdownSettingRow.qml"
+grep -q 'if (rowGuard.containsMouse) root.suppressTriggerRelease = true' "$ui/DropdownSettingRow.qml"
+grep -q 'onClicked: root.activate()' "$ui/NumberSettingRow.qml"
+grep -q 'onClicked: nameRow.activate()' "$repo/Views/PlannedBreaksPage.qml"
+grep -q 'onClicked: protectedAppsRow.activate()' "$settings_page"
 grep -q 'event.key === Qt.Key_Space' "$ui/SettingDropdown.qml"
 grep -q 'onClicked: root.clicked()' "$ui/ToggleSettingRow.qml"
 grep -q 'persistSettings({ showKeyboardHints: !keyboardHintsVisible })' "$panel"
-grep -q 'experience: \[reduceMotionRow, panelPatternDropdown, soundRow, soundVolumeField,' "$settings_page"
+grep -q 'general: \[panelPatternDropdown, soundRow, soundVolumeField,' "$settings_page"
+grep -q 'value: "general", label: qsTr("General")' "$settings_page"
+grep -q 'value: "schedule", label: qsTr("Schedule")' "$settings_page"
 grep -q 'Keys.onTabPressed:' "$settings_page"
 grep -q 'if (focusProxy) focusProxy.forceActiveFocus()' "$settings_page"
 grep -q 'function hasCursorFor(target)' "$settings_page"
 grep -q 'function setCursorTarget(target)' "$settings_page"
+grep -q 'ProductUi.SettingsCategoryBar {' "$settings_page"
+grep -q 'Accessible.role: Accessible.PageTab' "$category_bar"
+grep -q 'event.key === Qt.Key_Left' "$category_bar"
+grep -q 'event.key === Qt.Key_Right' "$category_bar"
 grep -q 'nameField.activeFocus || durationRow.editorActive' "$repo/Views/PlannedBreaksPage.qml"
 ! grep -q 'hasCursor: settingsPage.cursorActive && settingsPage.cursorIndex ===' "$settings_page"
 ! grep -Eq 'onHovered:.*settingsPage\.setCursor\([0-9]+\)' "$settings_page"
@@ -53,5 +65,7 @@ grep -q 'KeyNavigation.tab: root.delayActionsEnabled ? postpone1Button : root.sh
 grep -q 'KeyNavigation.right: root.settingsTarget' "$now_view"
 grep -q 'sequence: root.shortcuts.skipToday' "$panel"
 grep -q 'keyText: CommandModel.label(root.shortcuts.skipToday)' "$now_view"
+grep -q 'if (root.breakActive) root.close()' "$panel"
+grep -q 'if (breakActive) close()' "$panel"
 
 echo "Panel shortcuts and spatial keyboard navigation are wired to KeyboardPanel."

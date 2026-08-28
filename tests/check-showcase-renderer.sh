@@ -2,6 +2,7 @@
 set -euo pipefail
 
 repo=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
+grep -q 'Qt.resolvedUrl("../assets/"' "$repo/Ui/PanelPattern.qml"
 output=$(mktemp /tmp/lookelsewhere-showcase-test.XXXXXX.png)
 pattern_output=$(mktemp /tmp/lookelsewhere-showcase-pattern-test.XXXXXX.png)
 trap 'find "$output" "$pattern_output" -delete 2>/dev/null || true' EXIT

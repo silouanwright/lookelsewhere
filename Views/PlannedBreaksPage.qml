@@ -164,6 +164,8 @@ ColumnLayout {
     visible: !!root.selectedRoutine
     function activate() { nameField.forceActiveFocus(); nameField.selectAll() }
 
+    HoverHandler { id: nameRowHover }
+
     LookUi.SettingLabels {
       id: nameLabels
       anchors.left: parent.left
@@ -187,8 +189,8 @@ ColumnLayout {
       background: Rectangle {
         color: "transparent"
         radius: Style.cornerRadius
-        border.width: nameField.activeFocus || root.cursorTarget === nameRow ? Math.max(1, Style.normalBorderWidth) : 1
-        border.color: nameField.activeFocus || root.cursorTarget === nameRow ? root.accent : Color.popups.border
+        border.width: nameField.activeFocus || nameRowHover.hovered || root.cursorTarget === nameRow ? Math.max(1, Style.normalBorderWidth) : 1
+        border.color: nameField.activeFocus || nameRowHover.hovered || root.cursorTarget === nameRow ? root.accent : Color.popups.border
       }
       onActiveFocusChanged: if (activeFocus) {
         root.editingRoutineId = root.selectedRoutine ? root.selectedRoutine.id : ""
@@ -200,6 +202,16 @@ ColumnLayout {
         root.editingRoutineId = ""
         root.editorClosed()
       }
+    }
+
+    MouseArea {
+      anchors.left: parent.left
+      anchors.right: nameField.left
+      anchors.top: parent.top
+      anchors.bottom: parent.bottom
+      anchors.rightMargin: Style.space(12)
+      cursorShape: Qt.PointingHandCursor
+      onClicked: nameRow.activate()
     }
   }
 

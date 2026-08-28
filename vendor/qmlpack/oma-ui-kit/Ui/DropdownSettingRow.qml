@@ -50,25 +50,22 @@ Item {
     foreground: root.foreground
     accent: root.accent
     fontFamily: root.fontFamily
-    hasCursor: root.hasCursor
-    onHovered: function(on) { root.hovered(on) }
+    hasCursor: root.hasCursor || rowGuard.containsMouse
     onChanged: function(next) { root.changed(next) }
     onPopupOpenChanged: if (!popupOpen) {
-      if (triggerGuard.containsMouse) root.suppressTriggerRelease = true
+      if (rowGuard.containsMouse) root.suppressTriggerRelease = true
       root.popupClosed()
     }
   }
 
   MouseArea {
-    id: triggerGuard
-    x: field.x
-    y: field.y
-    width: field.width
-    height: field.height
+    id: rowGuard
+    anchors.fill: parent
     z: 1
     hoverEnabled: true
     cursorShape: Qt.PointingHandCursor
     preventStealing: true
+    onContainsMouseChanged: root.hovered(containsMouse)
     onPressed: function(mouse) {
       mouse.accepted = true
     }

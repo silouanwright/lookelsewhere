@@ -24,8 +24,8 @@ Item {
 
   OmaUi.PanelPattern {
     anchors.fill: parent
-    source: root.assetName === "" ? "" : "../assets/" + root.assetName
-      + (root.backgroundLuminance > 0.5 ? "" : "-light") + ".svg"
+    source: root.assetName === "" ? "" : Qt.resolvedUrl("../assets/" + root.assetName
+      + (root.backgroundLuminance > 0.5 ? "" : "-light") + ".svg")
     visible: root.assetName !== ""
     backgroundColor: root.backgroundColor
     patternOpacity: 0.035

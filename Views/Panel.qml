@@ -28,6 +28,7 @@ Panel {
   readonly property color accent: Color.accent
   readonly property string fontFamily: bar ? bar.fontFamily : Style.font.family
   readonly property bool manuallyPaused: service && service.phase === "waiting-for-pause" && service.snapshot.pauseReason === "manual"
+  readonly property bool breakActive: service && service.phase === Model.State.Breaking
   readonly property bool idlePaused: service && service.idlePauseActive
   readonly property bool delayActionsVisible: !manuallyPaused && service
   readonly property bool delayActionsEnabled: !!delayActionsVisible && !!service.canPostpone
@@ -111,13 +112,22 @@ Panel {
   function dismissHintsOrClose() { close() }
   onSettingsChanged: syncSettings()
   onServiceChanged: syncSettings()
+  Connections {
+    target: root.service
+    function onPhaseChanged() {
+      if (root.breakActive) root.close()
+    }
+  }
   onPageChanged: if (opened) Qt.callLater(function() {
     if (root.page === "options") settingsPage.focusInitial()
     else neutralFocus.forceActiveFocus()
   })
   onOpenedChanged: if (opened) {
-    page = "now"
-    settingsPage.reset()
+    if (breakActive) close()
+    else {
+      page = "now"
+      settingsPage.reset()
+    }
   }
 
   KeyboardPanel {
@@ -160,9 +170,8 @@ Panel {
       OmaCommands.WindowCommand { commandLayer: commandLayer; sequence: root.shortcuts.edit; available: root.page === "options"; onInvoked: { root.close(); settingsEditor.running = true } }
       OmaCommands.WindowCommand { commandLayer: commandLayer; sequence: root.shortcuts.generalTab; available: root.page === "options"; onInvoked: settingsPage.selectTab("general") }
       OmaCommands.WindowCommand { commandLayer: commandLayer; sequence: root.shortcuts.breaksTab; available: root.page === "options"; onInvoked: settingsPage.selectTab("breaks") }
-      OmaCommands.WindowCommand { commandLayer: commandLayer; sequence: root.shortcuts.plansTab; available: root.page === "options"; onInvoked: settingsPage.selectTab("plans") }
+      OmaCommands.WindowCommand { commandLayer: commandLayer; sequence: root.shortcuts.plansTab; available: root.page === "options"; onInvoked: settingsPage.selectTab("schedule") }
       OmaCommands.WindowCommand { commandLayer: commandLayer; sequence: root.shortcuts.contextTab; available: root.page === "options"; onInvoked: settingsPage.selectTab("context") }
-      OmaCommands.WindowCommand { commandLayer: commandLayer; sequence: root.shortcuts.experienceTab; available: root.page === "options"; onInvoked: settingsPage.selectTab("experience") }
       OmaCommands.WindowCommand {
         commandLayer: commandLayer
         sequence: root.shortcuts.close
