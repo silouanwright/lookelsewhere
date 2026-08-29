@@ -45,14 +45,19 @@ possible follow-up only if they change a user decision.
 
 ### P1: Detector correction and exclusions
 
-- explain the active detector in the panel and bar;
-- implemented: add or remove the currently focused application from the
-  protected-app list without manually discovering its application ID;
-- allow application exclusions for microphone/video heuristics;
-- distinguish foreground video from background audio where the platform can;
-- warn when a keep-awake inhibitor prevents away detection;
-- provide a correction action when a detector is wrong;
+Implemented:
+
+- explain active context compactly in the bar;
+- add or remove the currently focused application from protection without
+  manually discovering its application ID;
+- distinguish foreground media where MPRIS or explicit PipeWire roles allow;
 - retain cooldown and maximum-delay boundaries.
+
+Deferred until a reproducible misclassification justifies the added controls:
+
+- application exceptions scoped to microphone or video heuristics;
+- a direct correction action for a wrong detector;
+- keep-awake inhibitor warnings.
 
 ### P1: Planned breaks
 

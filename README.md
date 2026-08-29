@@ -169,8 +169,7 @@ in [Upstream Opportunities](docs/upstream-opportunities.md).
 
 ## Roadmap
 
-- More trustworthy context controls, detector corrections, and per-app
-  exclusions
+- Per-detector application exceptions when a real misclassification needs one
 - Calendar-backed planned breaks, after the native recurring scheduler has had
   real-world use
 - Custom short- and long-break guidance without turning breaks into more screen

@@ -1,6 +1,6 @@
 # Product Roadmap
 
-Updated August 27, 2026. This is the current priority list for LookElsewhere.
+Updated August 29, 2026. This is the current priority list for LookElsewhere.
 The README carries the public summary; research documents and completion
 matrices preserve the evidence behind these decisions but do not supersede
 this file.
@@ -10,9 +10,6 @@ this file.
 - **Countdown reliability:** keep the displayed timer authoritative and smooth
   under Quickshell stalls, with diagnostics that can distinguish scheduling
   delay from presentation delay.
-- **Detector correction and exclusions:** explain why a break is delayed, let
-  users add or remove the focused application from protection, and add narrow
-  per-detector exclusions where PipeWire or MPRIS heuristics are wrong.
 - **Context acceptance:** continue live verification with Steam games, Chromium
   video, calls, screen sharing, dictation, fullscreen applications, suspend,
   and mixed-monitor setups without overstating what Wayland can identify.
@@ -33,6 +30,8 @@ this file.
 
 ## Later
 
+- Narrow per-detector application exceptions when PipeWire or MPRIS
+  classifications are demonstrably wrong.
 - Optional start/end hooks and arbitrary-duration on-demand breaks.
 - MPRIS pause-and-resume that never starts media which was already paused.
 - Longer-term private trends only when they answer a useful question.
@@ -50,6 +49,8 @@ this file.
   sharing, and explicit video roles.
 - Focused-app protection with Steam defaults and an in-panel **Add current app**
   / **Remove current app** action.
+- Compact bar explanations for active context, with cooldown and maximum-delay
+  boundaries that prevent indefinite holds.
 - Progressive warnings, long breaks, sounds, enforcement modes, office hours,
   deterministic demo states, and complete keyboard control.
 
