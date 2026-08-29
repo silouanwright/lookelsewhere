@@ -21,6 +21,18 @@ this file.
 
 - **Custom break guidance:** short and long breaks now have independently
   configurable titles and guidance in the Breaks settings tab.
+- Native recurring planned breaks with weekday scheduling, protected-context
+  grace, away-time credit, coalescing, snoozing, and Skip Today.
+- Reversible fresh-session handling after meaningful time away.
+- Private, chart-free daily statistics and bounded recent history.
+- Privacy-safe PipeWire context for microphones, meetings, cameras, screen
+  sharing, and explicit video roles.
+- Focused-app protection with Steam defaults and an in-panel **Add current app**
+  / **Remove current app** action.
+- Compact bar explanations for active context, with cooldown and maximum-delay
+  boundaries that prevent indefinite holds.
+- Progressive warnings, long breaks, sounds, enforcement modes, office hours,
+  deterministic demo states, and complete keyboard control.
 
 ## Next: accessibility completion
 
@@ -40,21 +52,6 @@ this file.
 - Blink reminders and other independent wellness routines.
 - Broader Quickshell and Wayland support, with a standalone scheduler only if
   the shell lifecycle becomes the wrong reliability boundary.
-
-## Recently shipped
-
-- Native recurring planned breaks with weekday scheduling, protected-context
-  grace, away-time credit, coalescing, snoozing, and Skip Today.
-- Reversible fresh-session handling after meaningful time away.
-- Private, chart-free daily statistics and bounded recent history.
-- Privacy-safe PipeWire context for microphones, meetings, cameras, screen
-  sharing, and explicit video roles.
-- Focused-app protection with Steam defaults and an in-panel **Add current app**
-  / **Remove current app** action.
-- Compact bar explanations for active context, with cooldown and maximum-delay
-  boundaries that prevent indefinite holds.
-- Progressive warnings, long breaks, sounds, enforcement modes, office hours,
-  deterministic demo states, and complete keyboard control.
 
 ## Product constraints
 
