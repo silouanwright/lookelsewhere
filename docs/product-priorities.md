@@ -5,20 +5,23 @@ The README carries the public summary; research documents and completion
 matrices preserve the evidence behind these decisions but do not supersede
 this file.
 
-## Now: trust and context
+## Ongoing acceptance
 
-- **Countdown reliability:** keep the displayed timer authoritative and smooth
-  under Quickshell stalls, with diagnostics that can distinguish scheduling
-  delay from presentation delay.
-- **Context acceptance:** continue live verification with Steam games, Chromium
+- Continue live verification with Steam games, Chromium
   video, calls, screen sharing, dictation, fullscreen applications, suspend,
-  and mixed-monitor setups without overstating what Wayland can identify.
-- **Release hardening:** keep keyboard navigation, light and dark themes,
+  and mixed-monitor setups without overstating what Wayland can identify. This
+  is a recurring release gate, not an unfinished feature.
+- Keep keyboard navigation, light and dark themes,
   persistence recovery, bounded external input, and shell reload behavior under
   regression coverage.
 
 ## Recently shipped
 
+- **Countdown reliability:** wall-clock deadlines remain authoritative;
+  ordinary ticks animate, missed samples snap current, and scheduler gap/work
+  diagnostics plus a timer-driven live acceptance check expose real stalls.
+- **Context acceptance harness:** every protected-context fixture now passes
+  through the installed service and restores the exact real configuration.
 - **Custom break guidance:** short and long breaks now have independently
   configurable titles and guidance in the Breaks settings tab.
 - Native recurring planned breaks with weekday scheduling, protected-context

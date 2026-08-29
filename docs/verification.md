@@ -21,6 +21,8 @@ that every intermediate visible second is presented in order.
 - `tests/check-input-bounds.sh`
 - `tests/check-pipewire-evidence.sh`
 - `tests/check-live-plugin.sh` after deploying to the installed plugin directory
+- `tests/check-live-reliability.sh` for protected-context fixtures, the real
+  timer-driven warning/final/break flow, and exact configuration restoration
 - `qmllint` with installed Omarchy Shell imports
 - JSON schema/version checks for configuration and state fixtures
 - No symlinks or undeclared entry points in the distributable repository

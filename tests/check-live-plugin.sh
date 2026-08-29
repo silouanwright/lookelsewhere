@@ -3,6 +3,7 @@ set -euo pipefail
 
 shell=(quickshell ipc -n -p /usr/share/omarchy/shell)
 plugin="${LOOKELSEWHERE_PLUGIN_DIR:-$HOME/.config/omarchy/plugins/io.github.silouanwright.look-elsewhere}"
+script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 "${shell[@]}" call look-elsewhere-panel open
 "${shell[@]}" show | grep -q '^target look-elsewhere-panel$'
 
@@ -25,5 +26,7 @@ test -x "$plugin/tools/pipewire-evidence"
 
 state_home=${XDG_STATE_HOME:-$HOME/.local/state}
 test "$(stat -c %a "$state_home/look-elsewhere")" = 700
+
+test -x "$script_dir/check-live-reliability.sh"
 
 echo "LookElsewhere loads and opens in the running Omarchy Shell."
