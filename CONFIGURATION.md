@@ -48,8 +48,10 @@ uses the default declared by the plugin manifest.
 
 | Key | Default | Accepted values | Meaning |
 |---|---|---|---|
-| `breakTitle` | `"Look elsewhere"` | String | Full-screen break title. |
-| `breakSubtitle` | `"Let your eyes settle on something distant. Breathe. The screen will still be here."` | String | Supporting guidance beneath the title. |
+| `breakTitle` | `"Look elsewhere"` | String | Short-break title. |
+| `breakSubtitle` | `"Let your eyes settle on something distant. Breathe. The screen will still be here."` | String | Short-break guidance. |
+| `longBreakTitle` | `"Look elsewhere"` | String | Long-break title. |
+| `longBreakSubtitle` | `"Stand up, stretch, and leave the screen for a few minutes."` | String | Long-break guidance. |
 
 ## Office hours
 
@@ -166,6 +168,8 @@ the complete default value set in one copyable shape:
   // Break copy
   "breakTitle": "Look elsewhere",
   "breakSubtitle": "Let your eyes settle on something distant. Breathe. The screen will still be here.",
+  "longBreakTitle": "Look elsewhere",
+  "longBreakSubtitle": "Stand up, stretch, and leave the screen for a few minutes.",
 
   // Office hours
   "officeHoursEnabled": false,

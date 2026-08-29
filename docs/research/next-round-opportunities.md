@@ -75,11 +75,10 @@ set:
 
 ### P1: Brief customizable break guidance
 
-- separate short-break and long-break message pools;
-- optional random message selection;
-- independent title and subtitle visibility;
-- a few concise defaults such as look far, blink slowly, or stand and move;
-- no instruction carousel that keeps the user reading.
+Shipped in the minimal form that serves the actual need: short and long breaks
+have independent configurable titles and guidance. Message pools, random
+selection, and instruction carousels remain deferred because they would keep
+adding copy to an experience whose purpose is to leave the screen.
 
 ### P1: Accessibility completion
 

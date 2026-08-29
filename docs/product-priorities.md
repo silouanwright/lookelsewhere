@@ -17,15 +17,17 @@ this file.
   persistence recovery, bounded external input, and shell reload behavior under
   regression coverage.
 
-## Next: stronger routines
+## Recently shipped
 
-1. **Custom break guidance:** separate short- and long-break message pools with
-   a few calm defaults and optional random selection. Guidance should help the
-   user look away, not create another screen to read.
-2. **Accessibility completion:** screen-reader announcements, increased-
+- **Custom break guidance:** short and long breaks now have independently
+  configurable titles and guidance in the Breaks settings tab.
+
+## Next: accessibility completion
+
+1. **Accessibility completion:** screen-reader announcements, increased-
    contrast verification, non-color state cues, focus restoration, and reduced
    transparency testing across Omarchy themes.
-3. **Sound refinement:** a small set of optional cues, in-panel preview, and
+2. **Sound refinement:** a small set of optional cues, in-panel preview, and
    clearer custom-sound configuration.
 
 ## Later

@@ -52,6 +52,8 @@ function defaultConfig() {
     snoozeBudget: 3,
     breakTitle: "Look elsewhere",
     breakSubtitle: "Let your eyes settle on something distant. Breathe. The screen will still be here.",
+    longBreakTitle: "Look elsewhere",
+    longBreakSubtitle: "Stand up, stretch, and leave the screen for a few minutes.",
     reducedMotion: false,
     soundEnabled: true,
     soundVolume: 65,
@@ -88,6 +90,8 @@ function normalizeConfig(input) {
   base.snoozeBudget = Math.round(clamp(value.snoozeBudget === undefined ? base.snoozeBudget : value.snoozeBudget, 0, 20))
   base.breakTitle = String(value.breakTitle === undefined ? base.breakTitle : value.breakTitle).trim()
   base.breakSubtitle = String(value.breakSubtitle === undefined ? base.breakSubtitle : value.breakSubtitle).trim()
+  base.longBreakTitle = String(value.longBreakTitle === undefined ? base.longBreakTitle : value.longBreakTitle).trim()
+  base.longBreakSubtitle = String(value.longBreakSubtitle === undefined ? base.longBreakSubtitle : value.longBreakSubtitle).trim()
   base.reducedMotion = value.reducedMotion === true
   base.soundEnabled = value.soundEnabled === true
   base.soundVolume = Math.round(clamp(value.soundVolume === undefined ? base.soundVolume : value.soundVolume, 0, 100))
@@ -434,6 +438,8 @@ function configFromSettings(settings) {
   if (incoming.snoozeBudget !== undefined) next.snoozeBudget = finiteNumber(incoming.snoozeBudget, next.snoozeBudget)
   if (incoming.breakTitle !== undefined) next.breakTitle = String(incoming.breakTitle)
   if (incoming.breakSubtitle !== undefined) next.breakSubtitle = String(incoming.breakSubtitle)
+  if (incoming.longBreakTitle !== undefined) next.longBreakTitle = String(incoming.longBreakTitle)
+  if (incoming.longBreakSubtitle !== undefined) next.longBreakSubtitle = String(incoming.longBreakSubtitle)
   if (incoming.reducedMotion !== undefined) next.reducedMotion = incoming.reducedMotion === true
   if (incoming.soundEnabled !== undefined) next.soundEnabled = incoming.soundEnabled === true
   if (incoming.soundVolume !== undefined) next.soundVolume = finiteNumber(incoming.soundVolume, next.soundVolume)

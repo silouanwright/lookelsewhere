@@ -77,8 +77,8 @@ intermission. A short break gives your eyes a moment away. After a configurable
 number of short breaks, a longer one gives you time to walk, stretch, and
 properly leave the screen.
 
-The title, guidance, duration, long-break cadence, sounds, output behavior,
-snoozing, and enforcement policy are all configurable.
+Short- and long-break titles and guidance, duration, cadence, sounds, output
+behavior, snoozing, and enforcement policy are all configurable.
 
 [Watch the 23-second warning-to-break demo](docs/assets/demo.mp4). It uses
 synthetic state and restores the real schedule when it finishes.
@@ -172,8 +172,6 @@ in [Upstream Opportunities](docs/upstream-opportunities.md).
 - Per-detector application exceptions when a real misclassification needs one
 - Calendar-backed planned breaks, after the native recurring scheduler has had
   real-world use
-- Custom short- and long-break guidance without turning breaks into more screen
-  time
 - Accessibility completion across themes, motion preferences, and screen
   readers
 - More sound choices and in-panel previews

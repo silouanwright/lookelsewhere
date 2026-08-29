@@ -38,6 +38,8 @@ ColumnLayout {
     || longBreakSecondsField.editorActive
     || snoozeBudgetField.editorActive
     || maximumDelayField.editorActive
+    || shortBreakTitleField.editorActive || shortBreakSubtitleField.editorActive
+    || longBreakTitleField.editorActive || longBreakSubtitleField.editorActive
     || soundVolumeField.editorActive || plannedBreaksPage.editorActive
   readonly property bool dropdownOpen: enforcementDropdown.popupOpen
     || officeStartDropdown.popupOpen || officeEndDropdown.popupOpen
@@ -101,7 +103,8 @@ ColumnLayout {
         microphoneDetectionRow, screenSharingDetectionRow, dictationDetectionRow, protectedAppsRow],
       breaks: [pauseBreaksButton, focusMinutesField, shortBreakField, longBreakEveryField,
         longBreakSecondsField, snoozeBudgetField, maximumDelayField,
-        enforcementDropdown],
+        enforcementDropdown, shortBreakTitleField, shortBreakSubtitleField,
+        longBreakTitleField, longBreakSubtitleField],
       schedule: [plannedBreaksPage.routineTarget, plannedBreaksPage.enabledTarget,
         plannedBreaksPage.nameTarget, plannedBreaksPage.startTarget,
         plannedBreaksPage.durationTarget, plannedBreaksPage.daysTarget,
@@ -584,6 +587,76 @@ ColumnLayout {
       Qt.callLater(function() { settingsPage.focusProxy.forceActiveFocus() })
     onHovered: function(on) { if (on) settingsPage.setCursorTarget(enforcementDropdown) }
     onChanged: function(next) { settingsPage.persistSettings({ enforcement: next }) }
+  }
+
+  PanelSeparator { Layout.fillWidth: true; foreground: settingsPage.foreground }
+
+  LookUi.SectionHeader {
+    Layout.fillWidth: true
+    Layout.topMargin: Style.space(8)
+    label: qsTr("Break screen")
+    foreground: settingsPage.muted
+    fontFamily: settingsPage.fontFamily
+  }
+
+  ProductUi.TextSettingRow {
+    id: shortBreakTitleField
+    Layout.fillWidth: true
+    label: qsTr("Short-break title")
+    description: qsTr("Heading for ordinary eye breaks")
+    value: settingsPage.settings && settingsPage.settings.breakTitle !== undefined
+      ? String(settingsPage.settings.breakTitle) : "Look elsewhere"
+    hasCursor: settingsPage.hasCursorFor(shortBreakTitleField)
+    foreground: settingsPage.foreground; muted: settingsPage.muted; accent: settingsPage.accent; fontFamily: settingsPage.fontFamily
+    onHovered: function(on) { if (on) settingsPage.setCursorTarget(shortBreakTitleField) }
+    onModified: function(next) { settingsPage.persistSettings({ breakTitle: next }) }
+  }
+
+  PanelSeparator { Layout.fillWidth: true; foreground: settingsPage.foreground }
+
+  ProductUi.TextSettingRow {
+    id: shortBreakSubtitleField
+    Layout.fillWidth: true
+    label: qsTr("Short-break guidance")
+    description: qsTr("Message beneath the short-break title")
+    value: settingsPage.settings && settingsPage.settings.breakSubtitle !== undefined
+      ? String(settingsPage.settings.breakSubtitle)
+      : "Let your eyes settle on something distant. Breathe. The screen will still be here."
+    hasCursor: settingsPage.hasCursorFor(shortBreakSubtitleField)
+    foreground: settingsPage.foreground; muted: settingsPage.muted; accent: settingsPage.accent; fontFamily: settingsPage.fontFamily
+    onHovered: function(on) { if (on) settingsPage.setCursorTarget(shortBreakSubtitleField) }
+    onModified: function(next) { settingsPage.persistSettings({ breakSubtitle: next }) }
+  }
+
+  PanelSeparator { Layout.fillWidth: true; foreground: settingsPage.foreground }
+
+  ProductUi.TextSettingRow {
+    id: longBreakTitleField
+    Layout.fillWidth: true
+    label: qsTr("Long-break title")
+    description: qsTr("Heading for longer recovery breaks")
+    value: settingsPage.settings && settingsPage.settings.longBreakTitle !== undefined
+      ? String(settingsPage.settings.longBreakTitle) : "Look elsewhere"
+    hasCursor: settingsPage.hasCursorFor(longBreakTitleField)
+    foreground: settingsPage.foreground; muted: settingsPage.muted; accent: settingsPage.accent; fontFamily: settingsPage.fontFamily
+    onHovered: function(on) { if (on) settingsPage.setCursorTarget(longBreakTitleField) }
+    onModified: function(next) { settingsPage.persistSettings({ longBreakTitle: next }) }
+  }
+
+  PanelSeparator { Layout.fillWidth: true; foreground: settingsPage.foreground }
+
+  ProductUi.TextSettingRow {
+    id: longBreakSubtitleField
+    Layout.fillWidth: true
+    label: qsTr("Long-break guidance")
+    description: qsTr("Message beneath the long-break title")
+    value: settingsPage.settings && settingsPage.settings.longBreakSubtitle !== undefined
+      ? String(settingsPage.settings.longBreakSubtitle)
+      : "Stand up, stretch, and leave the screen for a few minutes."
+    hasCursor: settingsPage.hasCursorFor(longBreakSubtitleField)
+    foreground: settingsPage.foreground; muted: settingsPage.muted; accent: settingsPage.accent; fontFamily: settingsPage.fontFamily
+    onHovered: function(on) { if (on) settingsPage.setCursorTarget(longBreakSubtitleField) }
+    onModified: function(next) { settingsPage.persistSettings({ longBreakSubtitle: next }) }
   }
 
   }

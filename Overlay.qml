@@ -232,8 +232,12 @@ Item {
           }
           title: root.service && root.service.plannedActive
             ? root.service.plannedName
-            : root.service ? root.service.config.breakTitle : qsTr("Look elsewhere")
-          subtitle: root.service ? root.service.config.breakSubtitle
+            : root.service && root.service.snapshot.activeBreakIsLong
+              ? root.service.config.longBreakTitle
+              : root.service ? root.service.config.breakTitle : qsTr("Look elsewhere")
+          subtitle: root.service && root.service.snapshot.activeBreakIsLong
+            ? root.service.config.longBreakSubtitle
+            : root.service ? root.service.config.breakSubtitle
             : qsTr("Let your eyes settle on something distant. Breathe. The screen will still be here.")
           longBreak: root.service && root.service.snapshot.activeBreakIsLong
           totalSeconds: root.remainingSeconds

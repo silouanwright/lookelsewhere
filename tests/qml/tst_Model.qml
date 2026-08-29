@@ -37,6 +37,8 @@ TestCase {
       focusMinutes: 25,
       breakTitle: "Rest your eyes",
       breakSubtitle: "Look across the room.",
+      longBreakTitle: "Take a real break",
+      longBreakSubtitle: "Stand up and walk around.",
       officeHoursEnabled: true,
       officeStart: "22:30",
       mediaDetection: false,
@@ -51,6 +53,8 @@ TestCase {
     compare(customized.focusMs, 25 * 60000)
     compare(customized.breakTitle, "Rest your eyes")
     compare(customized.breakSubtitle, "Look across the room.")
+    compare(customized.longBreakTitle, "Take a real break")
+    compare(customized.longBreakSubtitle, "Stand up and walk around.")
     verify(customized.officeHours.enabled)
     compare(customized.officeHours.startMinute, 22 * 60 + 30)
     verify(!customized.detectors.media)
@@ -79,6 +83,8 @@ TestCase {
     compare(restored.completionSoundPath, "")
     compare(restored.outputMode, "all")
     compare(restored.panelPattern, "off")
+    compare(restored.longBreakTitle, "Look elsewhere")
+    compare(restored.longBreakSubtitle, "Stand up, stretch, and leave the screen for a few minutes.")
   }
 
   function test_settingsNormalizeInvalidValues() {
