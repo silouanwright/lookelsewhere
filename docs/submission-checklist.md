@@ -12,8 +12,8 @@ submission.
 
 - [x] `git status --short` is empty.
 - [x] `manifest.json` identifies `io.github.silouanwright.look-elsewhere`,
-  version `0.1.0`, author Silouan Wright, and MIT licensing.
-- [x] The plugin ID is still absent from the public marketplace registry.
+  version `0.2.0`, author Silouan Wright, and MIT licensing.
+- [x] The plugin ID matches the existing public marketplace listing.
 - [x] README installation and removal commands match the current Omarchy CLI.
 - [x] `LICENSE` and `THIRD_PARTY_NOTICES.md` cover the shipped code and icons.
 - [x] Root `preview.png` and every README asset are original LookElsewhere
