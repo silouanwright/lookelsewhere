@@ -54,7 +54,11 @@ Item {
     fontFamily: root.fontFamily
     hasCursor: root.hasCursor || rowHover.hovered
     onModified: function(next) { root.modified(next) }
+
   }
+
+  Binding { target: field.field.Accessible; property: "name"; value: root.label }
+  Binding { target: field.field.Accessible; property: "description"; value: root.description }
 
   HoverHandler {
     id: rowHover

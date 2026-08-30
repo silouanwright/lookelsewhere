@@ -91,7 +91,8 @@ BorderSurface {
       id: nowView
       Layout.fillWidth: true
       foreground: Color.popups.text
-      muted: Color.muted
+      muted: Qt.tint(Color.popups.background,
+        Qt.rgba(Color.popups.text.r, Color.popups.text.g, Color.popups.text.b, 0.82))
       accent: Color.accent
       fontFamily: Style.font.family
       totalSeconds: 30

@@ -21,18 +21,18 @@
       }
     },
     "oma-command-layer": {
-      "source": "github:silouanwright/omatools/packages/oma-command-layer@0.2.3",
+      "source": "github:silouanwright/omatools/packages/oma-command-layer@0.2.6",
       "resolution": {
         "transport": "github",
         "repository_id": 1345448296,
         "repository_name": "silouanwright/omatools",
         "package_path": "packages/oma-command-layer",
-        "requested": "0.2.3",
-        "version": "0.2.3",
-        "tag": "packages/oma-command-layer/v0.2.3",
-        "commit": "89227ebdbc331b6be2ce0d0888d5b5d7603f82f1"
+        "requested": "0.2.6",
+        "version": "0.2.6",
+        "tag": "packages/oma-command-layer/v0.2.6",
+        "commit": "2ef5711658cea2e5482b14b8bd7d0e69cb4fef4a"
       },
-      "digest": "sha256:07d5c6632aea5c8e041aa680d2e9a3484a7cb9b1ebd8e674c6a253e832cd44fe",
+      "digest": "sha256:413a3fc96cd4e369ca56dd8297fabbc0e10a47d3f64aca2ecc1692da7085425b",
       "files": {
         "LICENSE": "sha256:0c088bc264e3ae0398a852410ed879ead024daa8806895963f83ce1fc688d317",
         "README.md": "sha256:60380aa1fe0b61eb0395ff9536c21ea3384fa406897204ad77f830b56389ea50",
@@ -63,33 +63,33 @@
       }
     },
     "oma-ui-kit": {
-      "source": "github:silouanwright/omatools/packages/oma-ui-kit@0.1.3",
+      "source": "github:silouanwright/omatools/packages/oma-ui-kit@0.1.6",
       "resolution": {
         "transport": "github",
         "repository_id": 1345448296,
         "repository_name": "silouanwright/omatools",
         "package_path": "packages/oma-ui-kit",
-        "requested": "0.1.3",
-        "version": "0.1.3",
-        "tag": "packages/oma-ui-kit/v0.1.3",
-        "commit": "89227ebdbc331b6be2ce0d0888d5b5d7603f82f1"
+        "requested": "0.1.6",
+        "version": "0.1.6",
+        "tag": "packages/oma-ui-kit/v0.1.6",
+        "commit": "2ef5711658cea2e5482b14b8bd7d0e69cb4fef4a"
       },
-      "digest": "sha256:bc2ec14926dfd3920422dc326b2fc90fe89f3da86d9ba915cde899bd0da37540",
+      "digest": "sha256:16546c02428a82feebf9083e9642640fd270d45d34501ebaba9c8d2804df4062",
       "files": {
         "LICENSE": "sha256:0c088bc264e3ae0398a852410ed879ead024daa8806895963f83ce1fc688d317",
         "README.md": "sha256:1e476f2c262505967cd4c029aa1fdef6413f041350240078c5e41e36e9b229cf",
         "THIRD_PARTY_NOTICES.md": "sha256:4b9d048b2a51fe9e2aeb980bb084e8e4cb8fe967e6606710e52910ff00461fab",
-        "Ui/DropdownSettingRow.qml": "sha256:faa1e8bb649beea217e68cd7e9b0ded7a1906963b3982ebe765cf62ae424bfb0",
+        "Ui/DropdownSettingRow.qml": "sha256:065f1a01df368ed0b80ea6070ce3eb452618886bb4eb325df48767fa289ffe3a",
         "Ui/KeyHintBadge.qml": "sha256:c6ea0fe76873ecb952ab380863536f3d0e5718ecca97dbd234bfa979a4d1a42f",
-        "Ui/NumberSettingRow.qml": "sha256:8f23f3a3f5a9b113f143cc673709ecf9d0b9d912103d1862e7a16acb32ac3db6",
+        "Ui/NumberSettingRow.qml": "sha256:688a2b1366fa068369f025cf74bc9e09d2a44e59c94c1ba5cb4b148267cc527f",
         "Ui/PanelPattern.qml": "sha256:5a84f85f2d0643f48101e4b01ca9460809d4e64a5473a5015def40b41aa14574",
         "Ui/PhosphorIconButton.qml": "sha256:3d8e92e2196cafb1bb5e90c1f667c4e695e71410e23efb4c179e9a403da71668",
-        "Ui/SectionHeader.qml": "sha256:859a91a9ea00444c3f211a11531ba4529e3e7f4b857404436e58d8b90e1c4f86",
-        "Ui/SettingDropdown.qml": "sha256:5cb774eba063968a5819ae89426d4df2db0cdc07b39e1561b1bd6922dc6911c9",
+        "Ui/SectionHeader.qml": "sha256:f1a059a2f3a9e02f8b269f559eee270a097942335efaffc61a494641d7587d26",
+        "Ui/SettingDropdown.qml": "sha256:14fc1712607baa3b89954a531f0612a5a6e56a2d372d89507ab132d39f3b4d03",
         "Ui/SettingLabels.qml": "sha256:a2ec5049319584277f6e953b7ea057c19760da2200a951f111a2f4fc65011b21",
-        "Ui/SettingsTabBar.qml": "sha256:f010d884896cb7a3db09a167695af095e4cebbf5510804e1dfdfa7c88a73f43f",
-        "Ui/ToggleSettingRow.qml": "sha256:bc1b03cb85526a1b357715a4937aee4876dbcee5ef6efbf53ff3f30c8ace8c11",
-        "Ui/WeightedButton.qml": "sha256:778078209ca0de0511e7939b934148ea4124eaef43917aca5ff729529a1ada75",
+        "Ui/SettingsTabBar.qml": "sha256:da78f322aa99922e9304c2e2860fc6ff6988e2671ad1dc9871de9136741ff823",
+        "Ui/ToggleSettingRow.qml": "sha256:ba227cd2eb6884d0d3d2aa7b3838532138e723dddfe0bf825aa2f8a7f65003d8",
+        "Ui/WeightedButton.qml": "sha256:9035f34428b1c65e1ba12aa2b2aea73ab69ca1d0571a78cd12f528dcf9b7be9f",
         "Ui/qmldir": "sha256:d1879933e0ffa7e77007c73e74013e8262f394a0c21bd785a69fdf61a69375d7"
       }
     }

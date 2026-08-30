@@ -24,6 +24,13 @@ ColumnLayout {
   signal skipRequested()
   signal postponeRequested()
 
+  readonly property string accessibleRemaining: totalSeconds <= 10
+    ? qsTr("%1 seconds remaining").arg(totalSeconds)
+    : totalSeconds < 60 ? qsTr("Less than one minute remaining")
+    : qsTr("About %1 minutes remaining").arg(Math.ceil(totalSeconds / 60))
+  readonly property color secondaryColor: Qt.tint(Color.lock.background,
+    Qt.rgba(Color.lock.text.r, Color.lock.text.g, Color.lock.text.b, 0.82))
+
   width: Math.min(parent ? parent.width - Style.space(48) : Style.space(520), Style.space(520))
   spacing: Style.space(18)
 
@@ -44,6 +51,8 @@ ColumnLayout {
     font.weight: Font.Bold
     horizontalAlignment: Text.AlignHCenter
     wrapMode: Text.WordWrap
+    maximumLineCount: 2
+    elide: Text.ElideRight
   }
 
   Text {
@@ -51,10 +60,12 @@ ColumnLayout {
     Layout.topMargin: -Style.space(12)
     horizontalAlignment: Text.AlignHCenter
     text: root.subtitle
-    color: Color.lock.placeholder
+    color: root.secondaryColor
     font.family: Style.font.family
     font.pixelSize: Style.font.subtitle
     wrapMode: Text.WordWrap
+    maximumLineCount: 3
+    elide: Text.ElideRight
   }
 
   BorderSurface {
@@ -89,8 +100,7 @@ ColumnLayout {
     reducedMotion: root.reducedMotion
     animationActive: root.animationActive
     Accessible.role: Accessible.StaticText
-    Accessible.name: qsTr("%1 minutes and %2 seconds remaining")
-      .arg(Math.floor(root.totalSeconds / 60)).arg(root.totalSeconds % 60)
+    Accessible.name: root.accessibleRemaining
   }
 
   RowLayout {

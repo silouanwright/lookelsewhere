@@ -48,6 +48,10 @@ The persisted model records semantic state and timestamps. UI surfaces derive pr
   Manual pause is never reclassified automatically.
 - Short ambiguous idle may receive partial credit or ask for classification only after the MVP if a nonannoying design is proven.
 - Protected context continues active-use accumulation while delaying the warning and interruption.
+- A fresh optional Sundown game signal is the deliberate exception: it pauses
+  interval and statistics accumulation without marking the user idle or
+  advancing the away-session reset. Standalone Steam window matching remains
+  ordinary protected context.
 
 ## Private statistics
 

@@ -17,6 +17,12 @@ this file.
 
 ## Recently shipped
 
+- Optional Sundown integration that pauses active-time accounting during an
+  actual Steam or Proton game, retains standalone window protection, expires
+  stale evidence, and explains the active detector in Context and diagnostics.
+- Optional, privacy-bounded Chromium integration for foreground playing video,
+  muted video, paused/buffering transitions, and Picture-in-Picture, with
+  Standard, Enhanced, and Unavailable status plus MPRIS/PipeWire fallback.
 - **Countdown reliability:** wall-clock deadlines remain authoritative;
   ordinary ticks animate, missed samples snap current, and scheduler gap/work
   diagnostics plus a timer-driven live acceptance check expose real stalls.
@@ -36,14 +42,17 @@ this file.
   boundaries that prevent indefinite holds.
 - Progressive warnings, long breaks, sounds, enforcement modes, office hours,
   deterministic demo states, and complete keyboard control.
+- Named and stateful accessibility semantics, focus-preserving editors,
+  non-color state cues, native-sized responsive content, reduced motion,
+  reduced transparency, and verified light/dark contrast.
 
-## Next: accessibility completion
+## Next
 
-1. **Accessibility completion:** screen-reader announcements, increased-
-   contrast verification, non-color state cues, focus restoration, and reduced
-   transparency testing across Omarchy themes.
-2. **Sound refinement:** a small set of optional cues, in-panel preview, and
+1. **Sound refinement:** a small set of optional cues, in-panel preview, and
    clearer custom-sound configuration.
+2. **Host accessibility follow-through:** validate with Orca when Quickshell
+   exports its QML child tree through AT-SPI; track this as an upstream platform
+   dependency rather than duplicating semantics in the plugin.
 
 ## Later
 

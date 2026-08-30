@@ -18,6 +18,7 @@ Strings must be passed as JSON strings. For example:
 omarchy bar set io.github.silouanwright.look-elsewhere enforcement '"hardcore"' --json
 omarchy bar set io.github.silouanwright.look-elsewhere focusMinutes 25 --json
 omarchy bar set io.github.silouanwright.look-elsewhere reducedMotion true --json
+omarchy bar set io.github.silouanwright.look-elsewhere reducedTransparency true --json
 ```
 
 Only values that differ from the defaults need to be stored. Omitting a value
@@ -97,6 +98,7 @@ numbers: Sunday is `0`, Monday is `1`, through Saturday `6`.
 | `microphoneDetection` | `true` | Boolean | Delay while PipeWire reports an active microphone stream; audio is never recorded. |
 | `screenSharingDetection` | `true` | Boolean | Delay when an active PipeWire stream explicitly identifies screen sharing or recording. |
 | `dictationDetection` | `true` | Boolean | Delay while Omarchy Voxtype dictation is active. |
+| `pauseDuringSteamGames` | `true` | Boolean | When optional Sundown is connected, pause active-time accounting while it detects a Steam or Proton game. Without Sundown, focused-window protection remains the fallback. |
 | `protectedApps` | `"steam"` | Comma-separated application IDs | Delay due breaks while listed applications are focused. Add or remove the focused application from **Settings → Context**, or edit the list directly. `steam` also matches `steam_app_<id>` game windows. |
 
 ## Presentation
@@ -104,6 +106,7 @@ numbers: Sunday is `0`, Monday is `1`, through Saturday `6`.
 | Key | Default | Accepted values | Meaning |
 |---|---:|---|---|
 | `reducedMotion` | `false` | Boolean | Remove animated movement and soft-focus reveals. |
+| `reducedTransparency` | `false` | Boolean | Remove decorative patterns, soft-focus effects, and translucent break backdrops. |
 | `outputMode` | `"all"` | `"all"`, `"focused"` | Show interruptions on every output or only the focused output. |
 | `displayMode` | `"icon-and-time"` | `"icon"`, `"time"`, `"icon-and-time"` | Bar-widget presentation. Vertical bars use the icon. |
 | `panelPattern` | `"off"` | `"off"`, `"topography"`, `"graph-paper"`, `"wiggle"`, `"bank-note"`, `"diagonal-lines"` | Optional patterned background for the plugin panel. |
@@ -184,10 +187,12 @@ the complete default value set in one copyable shape:
   "microphoneDetection": true,
   "screenSharingDetection": true,
   "dictationDetection": true,
+  "pauseDuringSteamGames": true,
   "protectedApps": "steam",
 
   // Presentation
   "reducedMotion": false,
+  "reducedTransparency": false,
   "outputMode": "all",
   "displayMode": "icon-and-time",
   "panelPattern": "off",

@@ -20,10 +20,12 @@ BarWidget {
   readonly property bool showTime: displayMode !== "icon" && (!bar || !bar.vertical)
   readonly property bool showingStatus: service
     && (service.idlePauseActive
+      || service.steamPauseActive
       || service.phase === "waiting-for-pause" && service.snapshot.pauseReason === "manual"
       || service.contextLabel !== "")
   readonly property string compactTime: service
-    ? (service.idlePauseActive ? qsTr("Idle")
+    ? (service.steamPauseActive ? qsTr("Game")
+      : service.idlePauseActive ? qsTr("Idle")
       : service.phase === "waiting-for-pause" && service.snapshot.pauseReason === "manual" ? qsTr("Paused")
       : service.contextLabel !== "" ? service.contextLabel
       : Model.formatBarDuration(service.remainingMs))

@@ -48,7 +48,9 @@ TestCase {
       startSoundEnabled: false,
       completionSoundPath: "~/Sounds/done.ogg",
       outputMode: "focused",
-      panelPattern: "wiggle"
+      panelPattern: "wiggle",
+      reducedTransparency: true,
+      pauseDuringSteamGames: false
     })
     compare(customized.focusMs, 25 * 60000)
     compare(customized.breakTitle, "Rest your eyes")
@@ -65,6 +67,8 @@ TestCase {
     compare(customized.completionSoundPath, "~/Sounds/done.ogg")
     compare(customized.outputMode, "focused")
     compare(customized.panelPattern, "wiggle")
+    verify(customized.reducedTransparency)
+    verify(!customized.pauseDuringSteamGames)
     compare(customized.protectedApps.join(","), "steam")
 
     // Omarchy supplies no key after an override is removed. A fresh
@@ -83,6 +87,8 @@ TestCase {
     compare(restored.completionSoundPath, "")
     compare(restored.outputMode, "all")
     compare(restored.panelPattern, "off")
+    verify(!restored.reducedTransparency)
+    verify(restored.pauseDuringSteamGames)
     compare(restored.longBreakTitle, "Look elsewhere")
     compare(restored.longBreakSubtitle, "Stand up, stretch, and leave the screen for a few minutes.")
   }
@@ -100,6 +106,43 @@ TestCase {
     compare(value.panelPattern, "off")
     compare(value.enforcement, "balanced")
     compare(value.officeHours.startMinute, 8 * 60)
+  }
+
+  function test_sundownStatusIsBoundedAndShaped() {
+    var status = Model.parseSundownStatus(JSON.stringify({
+      version: 1,
+      runtime: { steam_sensor: "linux-proc-steam-env" },
+      steam: { active: true, app_ids: ["123"], processes: [{ pid: 42 }] }
+    }))
+    verify(status !== null)
+    verify(status.active)
+    compare(status.sensor, "linux-proc-steam-env")
+    compare(Model.parseSundownStatus('{"version":2,"steam":{"active":true}}'), null)
+    compare(Model.parseSundownStatus('{"version":1,"steam":{"active":"yes"}}'), null)
+    compare(Model.parseSundownStatus(new Array(65538).join("x")), null)
+  }
+
+  function test_gamePauseFreezesAccountingWithoutBecomingAwayTime() {
+    var c = config({ focusMs: 20 * 60 * 1000 })
+    var s = Model.defaultSnapshot(1000)
+    s.accumulatedActiveMs = 2 * 60 * 1000
+    s.statistics.currentSessionActiveMs = 2 * 60 * 1000
+    var gameTick = 10 * 60 * 1000
+    s = Model.observe(s, {
+      nowMs: gameTick,
+      active: true,
+      idle: false,
+      accumulationPaused: true,
+      evidence: [{ category: "game", confidence: 1, active: true }]
+    }, c)
+    compare(s.accumulatedActiveMs, 2 * 60 * 1000)
+    compare(s.statistics.currentSessionActiveMs, 2 * 60 * 1000)
+    compare(s.lastActiveAtMs, gameTick)
+    compare(s.naturalBreakDecision, null)
+
+    s = Model.observe(s, { nowMs: gameTick + 1000, active: true, idle: false, evidence: [] }, c)
+    compare(s.accumulatedActiveMs, 2 * 60 * 1000 + 1000)
+    compare(s.statistics.currentSessionActiveMs, 2 * 60 * 1000 + 1000)
   }
 
   function test_panelShortcutConfiguration() {
@@ -654,6 +697,24 @@ TestCase {
       Model.pipewireRoleEvidence({ role: "screen" }, false),
       Model.pipewireRoleEvidence({ role: "communication" }, false)
     ], config).category, "meeting")
+  }
+
+  function test_browserContextOnlyProtectsForegroundOrPictureInPictureVideo() {
+    var playing = {
+      video_state: "playing", browser_focused: true,
+      video_visible: true, picture_in_picture: false
+    }
+    compare(Model.browserContextEvidence(playing).category, "video")
+    playing.browser_focused = false
+    compare(Model.browserContextEvidence(playing), null)
+    playing.picture_in_picture = true
+    compare(Model.browserContextEvidence(playing).category, "video")
+    playing.picture_in_picture = false
+    playing.browser_focused = true
+    playing.video_state = "paused"
+    compare(Model.browserContextEvidence(playing), null)
+    playing.video_state = "buffering"
+    compare(Model.browserContextEvidence(playing), null)
   }
 
   function test_protectedApplicationsDefaultToSteam() {

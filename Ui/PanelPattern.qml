@@ -6,6 +6,7 @@ Item {
   id: root
 
   property string pattern: "off"
+  property bool reducedTransparency: false
 
   Accessible.ignored: true
 
@@ -26,7 +27,7 @@ Item {
     anchors.fill: parent
     source: root.assetName === "" ? "" : Qt.resolvedUrl("../assets/" + root.assetName
       + (root.backgroundLuminance > 0.5 ? "" : "-light") + ".svg")
-    visible: root.assetName !== ""
+    visible: root.assetName !== "" && !root.reducedTransparency
     backgroundColor: root.backgroundColor
     patternOpacity: 0.035
     tileSize: root.assetSize

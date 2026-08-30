@@ -15,8 +15,9 @@ ColumnLayout {
   property color accent: Color.accent
   property string fontFamily: Style.font.family
   property bool idlePaused: false
+  property bool gamePaused: false
   property bool manuallyPaused: false
-  readonly property bool timerPaused: idlePaused || manuallyPaused
+  readonly property bool timerPaused: idlePaused || gamePaused || manuallyPaused
   property bool nextBreakIsLong: false
   property bool plannedActive: false
   property bool plannedReady: false
@@ -44,6 +45,7 @@ ColumnLayout {
   readonly property Item postpone5Target: postpone5Button
   readonly property Item postpone15Target: postpone15Button
   readonly property Item skipTodayTarget: skipTodayButton
+  readonly property real preferredContentWidth: actionRow.implicitWidth + Style.space(4)
 
   signal breakNowRequested()
   signal postponeRequested(int minutes)
@@ -77,6 +79,7 @@ ColumnLayout {
       Layout.fillWidth: true
       Layout.bottomMargin: -Style.space(10)
       text: root.manuallyPaused ? qsTr("Breaks paused")
+        : root.gamePaused ? qsTr("Steam game detected")
         : root.idlePaused ? qsTr("LookElsewhere is paused")
         : root.plannedReady ? qsTr("%1 is ready").arg(root.plannedName)
         : root.plannedDeferred ? qsTr("%1 is waiting").arg(root.plannedName)
@@ -95,8 +98,11 @@ ColumnLayout {
       Layout.preferredHeight: Math.max(clockRow.implicitHeight, idleClock.implicitHeight)
       Accessible.role: Accessible.StaticText
       Accessible.name: root.manuallyPaused ? qsTr("Break reminders paused")
+        : root.gamePaused ? qsTr("Steam game active; focus timer paused")
         : root.idlePaused ? qsTr("Idle; focus timer paused")
-        : qsTr("Time remaining: %1").arg(root.remainingText)
+        : root.totalSeconds <= 10 ? qsTr("%1 seconds remaining").arg(root.totalSeconds)
+        : root.totalSeconds < 60 ? qsTr("Less than one minute remaining")
+        : qsTr("About %1 minutes remaining").arg(Math.ceil(root.totalSeconds / 60))
 
       ProductUi.RollingClock {
         id: clockRow
@@ -112,13 +118,16 @@ ColumnLayout {
         opacity: root.timerPaused ? 0 : 1
         Accessible.ignored: true
 
-        Behavior on opacity { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
+        Behavior on opacity {
+          enabled: !root.reducedMotion
+          NumberAnimation { duration: 140; easing.type: Easing.OutCubic }
+        }
       }
 
       Text {
         id: idleClock
         anchors.centerIn: parent
-        text: root.manuallyPaused ? qsTr("Paused") : qsTr("Idle")
+        text: root.gamePaused ? qsTr("Game") : root.manuallyPaused ? qsTr("Paused") : qsTr("Idle")
         color: root.foreground
         font.family: root.fontFamily
         font.pixelSize: Style.font.display * 1.55
@@ -126,7 +135,10 @@ ColumnLayout {
         opacity: root.timerPaused ? 1 : 0
         Accessible.ignored: true
 
-        Behavior on opacity { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
+        Behavior on opacity {
+          enabled: !root.reducedMotion
+          NumberAnimation { duration: 140; easing.type: Easing.OutCubic }
+        }
       }
     }
   }
@@ -144,15 +156,12 @@ ColumnLayout {
 
   Item {
     Layout.fillWidth: true
-    Layout.preferredHeight: actionRow.implicitHeight * actionRow.fitScale
+    Layout.preferredHeight: actionRow.implicitHeight
     Layout.topMargin: -Style.space(3)
 
     RowLayout {
       id: actionRow
-      readonly property real fitScale: Math.min(1, (parent.width - Style.space(4)) / Math.max(1, implicitWidth))
       anchors.horizontalCenter: parent.horizontalCenter
-      transformOrigin: Item.Top
-      scale: fitScale
       spacing: Style.space(5)
 
       LookUi.WeightedButton {
@@ -173,7 +182,7 @@ ColumnLayout {
         Keys.onEscapePressed: root.escapeRequested()
         Accessible.role: Accessible.Button
         Accessible.name: label
-        Accessible.onPressAction: clicked()
+        Accessible.onPressAction: if (actionEnabled) clicked()
         onClicked: root.breakNowRequested()
 
         OmaCommands.CommandHint {
@@ -207,7 +216,7 @@ ColumnLayout {
         Accessible.name: root.delayActionsEnabled
           ? qsTr("Snooze next break for 1 minute")
           : qsTr("Snooze unavailable; %1").arg(root.snoozeUnavailableSummary)
-        Accessible.onPressAction: clicked()
+        Accessible.onPressAction: if (actionEnabled) clicked()
         onClicked: root.postponeRequested(1)
 
         OmaCommands.CommandHint {
@@ -242,7 +251,7 @@ ColumnLayout {
         Accessible.name: root.delayActionsEnabled
           ? qsTr("Snooze next break for 5 minutes")
           : qsTr("Snooze unavailable; %1").arg(root.snoozeUnavailableSummary)
-        Accessible.onPressAction: clicked()
+        Accessible.onPressAction: if (actionEnabled) clicked()
         onClicked: root.postponeRequested(5)
 
         OmaCommands.CommandHint {
@@ -277,7 +286,7 @@ ColumnLayout {
         Accessible.name: root.delayActionsEnabled
           ? qsTr("Snooze next break for 15 minutes")
           : qsTr("Snooze unavailable; %1").arg(root.snoozeUnavailableSummary)
-        Accessible.onPressAction: clicked()
+        Accessible.onPressAction: if (actionEnabled) clicked()
         onClicked: root.postponeRequested(15)
 
         OmaCommands.CommandHint {

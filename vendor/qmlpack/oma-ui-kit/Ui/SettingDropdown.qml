@@ -1,3 +1,5 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Controls
 import qs.Commons
@@ -23,6 +25,8 @@ Item {
   id: root
 
   property string label: ""
+  property string accessibleLabel: label
+  property string accessibleDescription: ""
   property string value: ""
   property var options: []
 
@@ -50,6 +54,7 @@ Item {
   function open() { popup.open() }
   function close() { popup.close() }
   function toggle() { popup.opened ? popup.close() : popup.open() }
+  function focusTrigger() { trigger.forceActiveFocus() }
 
   signal changed(string value)
   signal hovered(bool isHovered)
@@ -97,6 +102,13 @@ Item {
       borderSpec: _borderSpec
 
       activeFocusOnTab: true
+
+      Accessible.role: Accessible.ComboBox
+      Accessible.name: qsTr("%1, %2").arg(root.accessibleLabel).arg(root.currentLabel())
+      Accessible.description: root.accessibleDescription + (root.accessibleDescription === "" ? "" : ". ")
+        + (popup.opened ? qsTr("Expanded") : qsTr("Collapsed"))
+      Accessible.focusable: true
+      Accessible.onPressAction: root.toggle()
 
       HoverHandler {
         id: triggerHover
@@ -170,6 +182,8 @@ Item {
           optionList.currentIndex = Math.max(0, optionList.indexOfValue(root.value))
           optionList.forceActiveFocus()
         }
+        onClosed: if (root.visible && trigger.visible)
+          Qt.callLater(function() { trigger.forceActiveFocus() })
 
         contentItem: ListView {
           id: optionList
@@ -203,10 +217,13 @@ Item {
 
           function selectCurrent() {
             if (currentIndex < 0 || currentIndex >= root.options.length) return
-            var v = root.optionValue(root.options[currentIndex])
-            root.value = v
-            root.changed(v)
+            root.changed(root.optionValue(root.options[currentIndex]))
             popup.close()
+          }
+
+          function selectIndex(index) {
+            currentIndex = index
+            selectCurrent()
           }
 
           delegate: Rectangle {
@@ -217,6 +234,12 @@ Item {
             color: index === optionList.currentIndex
               ? Style.hoverFillFor(root.foreground, root.accent)
               : "transparent"
+
+            Accessible.role: Accessible.ListItem
+            Accessible.name: root.optionLabel(modelData)
+            Accessible.selectable: true
+            Accessible.selected: index === optionList.currentIndex
+            Accessible.onPressAction: optionList.selectIndex(index)
 
             Text {
               anchors.left: parent.left
@@ -229,6 +252,7 @@ Item {
               font.family: root.fontFamily
               font.pixelSize: Style.font.body
               elide: Text.ElideRight
+              Accessible.ignored: true
             }
 
             MouseArea {

@@ -18,12 +18,15 @@ that every intermediate visible second is presented in order.
 
 - `omarchy plugin validate <repo>`
 - `tests/check-panel-shortcuts.sh`
+- `tests/check-accessibility.sh`
 - `tests/check-input-bounds.sh`
 - `tests/check-pipewire-evidence.sh`
+- `tests/check-browser-integration.sh`
 - `tests/check-live-plugin.sh` after deploying to the installed plugin directory
 - `tests/check-live-reliability.sh` for protected-context fixtures, the real
   timer-driven warning/final/break flow, and exact configuration restoration
-- `qmllint` with installed Omarchy Shell imports
+- `/usr/lib/qt6/bin/qmllint` with installed Omarchy Shell imports; unresolved
+  `qs.*` types are a known runtime-root limitation
 - JSON schema/version checks for configuration and state fixtures
 - No symlinks or undeclared entry points in the distributable repository
 
@@ -58,6 +61,12 @@ Capture every material state at native scale:
 - Dark and contrasting light/high-contrast theme
 - Rounded and sharp-corner treatment
 - Reduced motion
+- Reduced transparency
+- Screen-reader names, selected/checked/disabled states, and phase announcements
+
+The August 29, 2026 AT-SPI probe discovered Quickshell itself but zero exported
+children, even with Qt accessibility forced on. Orca traversal is therefore a
+host-runtime follow-up; it is not currently a passing release gate.
 
 Review alignment, gutters, baselines, focus, contrast, wrapping, clipping, scroll behavior, and geometry stability.
 

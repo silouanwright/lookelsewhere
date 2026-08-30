@@ -15,15 +15,14 @@ Item {
   property color muted: Color.muted
   property color accent: Color.accent
   property string fontFamily: Style.font.family
-  readonly property bool editorActive: field.activeFocus || field.contentItem.activeFocus
+  readonly property bool editorActive: field.activeFocus
+    || !!(field.contentItem && field.contentItem.activeFocus)
 
   signal modified(string value)
   signal hovered(bool on)
 
   function activate() { if (enabled) { field.forceActiveFocus(); field.selectAll() } }
   function focusEditor() { activate() }
-
-  onValueChanged: if (!field.activeFocus) field.text = value
 
   implicitHeight: Math.max(labels.implicitHeight, field.implicitHeight)
 
@@ -45,7 +44,6 @@ Item {
     width: Style.space(160)
     anchors.right: parent.right
     anchors.verticalCenter: parent.verticalCenter
-    text: root.value
     color: root.foreground
     font.family: root.fontFamily
     font.pixelSize: Style.font.body
@@ -59,6 +57,16 @@ Item {
         ? root.accent : Color.popups.border
     }
     onEditingFinished: root.modified(text.trim())
+    Accessible.name: root.label
+    Accessible.description: root.description
+  }
+
+  Binding {
+    target: field
+    property: "text"
+    value: root.value
+    when: !root.editorActive
+    restoreMode: Binding.RestoreNone
   }
 
   HoverHandler {

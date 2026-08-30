@@ -10,6 +10,9 @@
 - Component tests cover ordinary ticks, minute-boundary misses, and longer
   stalls. The installed timer-driven fixture traversed warning, final
   countdown, breaking, and working successfully.
+- The fixture now enters warning explicitly and disables synthetic natural
+  pause, so it validates the real timer flow rather than depending on an
+  unrelated detector state.
 - Live diagnostics reported a 1,011 ms maximum scheduler gap and 1 ms maximum
   scheduler update duration, with no delayed-tick warning in the journal.
 

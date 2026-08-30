@@ -19,6 +19,14 @@ Button {
   implicitHeight: labelText.implicitHeight + verticalPadding * 2 + Math.max(2, Style.normalBorderWidth * 2)
   opacity: actionEnabled ? 1 : 0.42
 
+  // Keep unavailable actions visible for context and pointer tooltips, but do
+  // not expose them to assistive technology as actionable buttons.
+  Accessible.role: root.actionEnabled && root.enabled ? Accessible.Button : Accessible.StaticText
+  Accessible.name: label
+  Accessible.description: !actionEnabled ? disabledTooltipText : ""
+  Accessible.focusable: root.focusable && root.actionEnabled && root.enabled
+  Accessible.onPressAction: activate()
+
   Behavior on opacity { NumberAnimation { duration: 120 } }
 
   Text {

@@ -29,6 +29,7 @@ Row {
   }
 
   onActiveFocusChanged: if (activeFocus) focusedIndex = selectedIndex()
+  onValueChanged: if (activeFocus) focusedIndex = selectedIndex()
 
   Keys.onPressed: function(event) {
     if (event.key === Qt.Key_Left || event.text === "h") {
@@ -74,6 +75,7 @@ Row {
         fontSize: root.fontSize
         Accessible.role: Accessible.PageTab
         Accessible.name: text
+        Accessible.selected: selected
         Accessible.onPressAction: clicked()
         onClicked: root.changed(String(modelData.value))
       }

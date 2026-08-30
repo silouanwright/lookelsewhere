@@ -45,6 +45,7 @@ Row {
 
   Text {
     text: ":"
+    textFormat: Text.PlainText
     color: root.color
     font.family: root.fontFamily
     font.pixelSize: root.fontSize

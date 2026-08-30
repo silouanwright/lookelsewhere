@@ -98,6 +98,9 @@ ColumnLayout {
     Layout.leftMargin: Style.space(4)
     Layout.rightMargin: Style.space(4)
     spacing: Style.space(7)
+    Accessible.role: Accessible.StaticText
+    Accessible.name: qsTr("Current session, %1").arg(
+      Model.formatDuration(root.statistics.currentSessionActiveMs))
     Rectangle {
       id: liveIndicator
       Layout.preferredWidth: Style.space(5)
@@ -118,6 +121,7 @@ ColumnLayout {
       color: root.muted
       font.family: root.fontFamily
       font.pixelSize: Style.font.bodySmall
+      Accessible.ignored: true
     }
     Text {
       text: "·"
@@ -132,6 +136,7 @@ ColumnLayout {
       font.family: root.fontFamily
       font.pixelSize: Style.font.body
       font.weight: Font.DemiBold
+      Accessible.ignored: true
     }
   }
 
@@ -186,6 +191,11 @@ ColumnLayout {
       required property int index
       Layout.fillWidth: true
       spacing: Style.space(5)
+      Accessible.role: Accessible.StaticText
+      Accessible.name: qsTr("%1, %2, ended %3")
+        .arg(root.outcomeLabel(modelData.outcome))
+        .arg(Model.formatDuration(modelData.durationMs))
+        .arg(root.timeLabel(modelData.endedAtMs))
 
       RowLayout {
         Layout.fillWidth: true
@@ -199,6 +209,7 @@ ColumnLayout {
           font.pixelSize: Style.font.bodySmall
           font.weight: Font.Medium
           elide: Text.ElideRight
+          Accessible.ignored: true
         }
         Text {
           Layout.alignment: Qt.AlignBaseline
@@ -206,6 +217,7 @@ ColumnLayout {
           color: root.foreground
           font.family: root.fontFamily
           font.pixelSize: Style.font.bodySmall
+          Accessible.ignored: true
         }
         Text {
           Layout.alignment: Qt.AlignBaseline
@@ -213,6 +225,7 @@ ColumnLayout {
           color: root.muted
           font.family: root.fontFamily
           font.pixelSize: Style.font.caption
+          Accessible.ignored: true
         }
       }
       PanelSeparator {
@@ -240,6 +253,11 @@ ColumnLayout {
       required property int index
       Layout.fillWidth: true
       spacing: Style.space(5)
+      Accessible.role: Accessible.StaticText
+      Accessible.name: qsTr("%1, %2 active screen time, %3 breaks")
+        .arg(root.dayLabel(modelData.dateKey))
+        .arg(Model.formatDuration(modelData.activeMs))
+        .arg(Number(modelData.completed || 0))
 
       RowLayout {
         Layout.fillWidth: true
@@ -251,18 +269,21 @@ ColumnLayout {
           font.family: root.fontFamily
           font.pixelSize: Style.font.bodySmall
           elide: Text.ElideRight
+          Accessible.ignored: true
         }
         Text {
           text: Model.formatDuration(modelData.activeMs)
           color: root.muted
           font.family: root.fontFamily
           font.pixelSize: Style.font.caption
+          Accessible.ignored: true
         }
         Text {
           text: qsTr("%1 breaks").arg(Number(modelData.completed || 0))
           color: root.muted
           font.family: root.fontFamily
           font.pixelSize: Style.font.caption
+          Accessible.ignored: true
         }
       }
       PanelSeparator {
@@ -280,6 +301,8 @@ ColumnLayout {
     property bool compact: false
     property bool prominent: false
     spacing: Style.space(1)
+    Accessible.role: Accessible.StaticText
+    Accessible.name: qsTr("%1, %2").arg(label).arg(value)
     Text {
       Layout.fillWidth: true
       text: parent.value
@@ -289,6 +312,7 @@ ColumnLayout {
         : (parent.compact ? Style.font.body : Style.font.heading)
       font.weight: Font.DemiBold
       horizontalAlignment: Text.AlignHCenter
+      Accessible.ignored: true
     }
     Text {
       Layout.fillWidth: true
@@ -298,6 +322,7 @@ ColumnLayout {
       font.pixelSize: Style.font.caption
       horizontalAlignment: Text.AlignHCenter
       wrapMode: Text.WordWrap
+      Accessible.ignored: true
     }
   }
 }

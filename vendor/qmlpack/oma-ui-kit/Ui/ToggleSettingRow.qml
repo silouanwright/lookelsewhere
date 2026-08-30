@@ -32,7 +32,7 @@ Item {
   Accessible.role: Accessible.CheckBox
   Accessible.name: label
   Accessible.checked: checked
-  Accessible.onPressAction: clicked()
+  Accessible.onPressAction: root.activate()
 
   SettingLabels {
     id: labels

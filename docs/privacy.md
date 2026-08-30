@@ -9,9 +9,13 @@ LookElsewhere observes the minimum local signals needed to time interruptions. I
 - Idle/active state and durations
 - Fullscreen state and coarse application identifier where needed for a local rule
 - MPRIS playback status and player identity where needed for classification
+- When the optional Chromium integration is installed: browser focus, coarse
+  video state, visual presence, and Picture-in-Picture state
 - Coarse, bounded PipeWire role, capture-audio, and application-identity fields
   required to infer microphone, meeting, camera, sharing, or video activity
 - Omarchy dictation active/inactive state
+- When optional Sundown is installed: its coarse Steam-game active/inactive
+  state and detector name from the root-owned public status file
 - Current output/workspace state required for surface placement
 
 ## Prohibited persistence and default presentation
@@ -38,6 +42,12 @@ Persist user configuration only through Omarchy's `shell.json`. The plugin state
   QML. Active node reads stop at 64 KiB and the complete request stops at 1.5
   seconds, then retain only allowlisted roles, one capture boolean, and bounded
   application identifiers.
+- Browser native messages stop at 16 KiB before parsing. The native host and
+  QML each accept only the documented coarse fields and reject stale sequence
+  numbers; browser evidence expires after 12 seconds without a heartbeat.
+- Sundown status is read from its root-owned, atomically replaced public file,
+  rejected above 64 KiB, reduced to one game-active boolean and a bounded
+  detector name, and expires after five seconds without an update.
 - Do not request elevated privileges.
 
 ## User control

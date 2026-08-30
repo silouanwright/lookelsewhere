@@ -1,0 +1,141 @@
+#!/usr/bin/python3
+"""Relay bounded, coarse Chromium context to LookElsewhere's local socket."""
+
+import json
+import io
+import os
+import socket
+import struct
+import sys
+
+EXPECTED_ORIGIN = "chrome-extension://icmgnmabpjbgfogamiaaadaolhopdhmp/"
+MAX_MESSAGE_BYTES = 16 * 1024
+VIDEO_STATES = {"none", "paused", "buffering", "playing"}
+
+
+def normalize(value):
+    if not isinstance(value, dict) or value.get("version") != 1:
+        raise ValueError("unsupported browser-context protocol")
+    session_id = value.get("session_id")
+    sequence = value.get("sequence")
+    video_state = value.get("video_state")
+    if not isinstance(session_id, str) or not 1 <= len(session_id) <= 64:
+        raise ValueError("invalid session id")
+    if not isinstance(sequence, int) or isinstance(sequence, bool) or not 0 < sequence <= 2**53 - 1:
+        raise ValueError("invalid sequence")
+    if value.get("browser") != "chromium" or video_state not in VIDEO_STATES:
+        raise ValueError("invalid browser context")
+    for key in ("browser_focused", "video_visible", "picture_in_picture"):
+        if not isinstance(value.get(key), bool):
+            raise ValueError(f"invalid {key}")
+    return {
+        "version": 1,
+        "session_id": session_id,
+        "sequence": sequence,
+        "browser": "chromium",
+        "browser_focused": value["browser_focused"],
+        "video_state": video_state,
+        "video_visible": value["video_visible"],
+        "picture_in_picture": value["picture_in_picture"],
+    }
+
+
+def read_exact(stream, length):
+    chunks = []
+    remaining = length
+    while remaining:
+        chunk = stream.read(remaining)
+        if not chunk:
+            raise EOFError
+        chunks.append(chunk)
+        remaining -= len(chunk)
+    return b"".join(chunks)
+
+
+def read_message(stream):
+    header = stream.read(4)
+    if not header:
+        return None
+    if len(header) != 4:
+        raise ValueError("truncated native-message header")
+    (length,) = struct.unpack("=I", header)
+    if length > MAX_MESSAGE_BYTES:
+        raise ValueError("native message exceeds 16 KiB")
+    return json.loads(read_exact(stream, length))
+
+
+def write_message(stream, value):
+    payload = json.dumps(value, separators=(",", ":")).encode()
+    stream.write(struct.pack("=I", len(payload)))
+    stream.write(payload)
+    stream.flush()
+
+
+def socket_path():
+    runtime = os.environ.get("XDG_RUNTIME_DIR") or f"/run/user/{os.getuid()}"
+    return os.path.join(runtime, "look-elsewhere-browser.sock")
+
+
+def forward(connection, value):
+    payload = json.dumps(value, separators=(",", ":")).encode() + b"\n"
+    try:
+        connection.sendall(payload)
+        return connection
+    except (AttributeError, BrokenPipeError, ConnectionError, OSError):
+        if connection:
+            connection.close()
+        replacement = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        replacement.settimeout(1)
+        replacement.connect(socket_path())
+        replacement.sendall(payload)
+        return replacement
+
+
+def self_test():
+    sample = normalize({
+        "version": 1, "session_id": "test", "sequence": 1, "browser": "chromium",
+        "browser_focused": True, "video_state": "playing",
+        "video_visible": True, "picture_in_picture": False,
+    })
+    assert sample["video_state"] == "playing"
+    try:
+        read_message(io.BytesIO(struct.pack("=I", MAX_MESSAGE_BYTES + 1)))
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("oversized native message was accepted")
+    try:
+        normalize({"version": 1, "session_id": "x", "sequence": True})
+    except ValueError:
+        return
+    raise AssertionError("invalid sample was accepted")
+
+
+def main():
+    if sys.argv[1:] == ["--self-test"]:
+        self_test()
+        return 0
+    if len(sys.argv) < 2 or sys.argv[1] != EXPECTED_ORIGIN:
+        print("lookelsewhere-browser-host: unexpected extension origin", file=sys.stderr)
+        return 1
+
+    connection = None
+    try:
+        while (message := read_message(sys.stdin.buffer)) is not None:
+            try:
+                connection = forward(connection, normalize(message))
+                write_message(sys.stdout.buffer, {"accepted": True})
+            except (OSError, ValueError) as error:
+                print(f"lookelsewhere-browser-host: {error}", file=sys.stderr)
+                write_message(sys.stdout.buffer, {"accepted": False})
+    except (EOFError, ValueError, json.JSONDecodeError) as error:
+        print(f"lookelsewhere-browser-host: {error}", file=sys.stderr)
+        return 1
+    finally:
+        if connection:
+            connection.close()
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

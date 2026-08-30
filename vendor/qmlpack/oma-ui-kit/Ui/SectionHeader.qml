@@ -11,6 +11,8 @@ RowLayout {
   property string fontFamily: Style.font.family
 
   spacing: Style.space(8)
+  Accessible.role: Accessible.Heading
+  Accessible.name: root.label
 
   Text {
     text: root.label
@@ -20,6 +22,7 @@ RowLayout {
       pixelSize: Style.font.bodySmall
       weight: Font.DemiBold
     }
+    Accessible.ignored: true
   }
 
   Item {

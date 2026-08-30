@@ -29,11 +29,38 @@ Item {
   readonly property int remainingSecondsPart: remainingSeconds % 60
   readonly property real warningClockFontSize: Style.font.heading
   readonly property real breakClockFontSize: Style.font.display * 1.35
-  readonly property color popupMuted: Qt.darker(Color.popups.text, 1.55)
+  readonly property color popupMuted: Qt.tint(Color.popups.background,
+    Qt.rgba(Color.popups.text.r, Color.popups.text.g, Color.popups.text.b, 0.82))
   readonly property real warningClockSeparatorOverlap: Math.max(0,
     (warningClockColonMetrics.advanceWidth - warningClockColonMetrics.tightBoundingRect.width) / 2)
   readonly property real clockSeparatorOverlap: Math.max(0,
     (clockColonMetrics.advanceWidth - clockColonMetrics.tightBoundingRect.width) / 2)
+
+  function accessibleCountdown(seconds, suffix) {
+    if (seconds <= 10) return qsTr("%1 seconds %2").arg(seconds).arg(suffix)
+    if (seconds < 60) return qsTr("Less than one minute %1").arg(suffix)
+    return qsTr("About %1 minutes %2").arg(Math.ceil(seconds / 60)).arg(suffix)
+  }
+
+  function announcePhase() {
+    if (!service) return
+    if (service.phase === "warning")
+      root.Accessible.announce(qsTr("Break reminder. %1").arg(accessibleCountdown(remainingSeconds, qsTr("until break"))))
+    else if (service.phase === "final-countdown")
+      root.Accessible.announce(qsTr("Break starting soon"), Accessible.Assertive)
+    else if (service.phase === "breaking")
+      root.Accessible.announce(qsTr("Break started"), Accessible.Assertive)
+    else if (service.phase === "working")
+      root.Accessible.announce(qsTr("Break complete"))
+  }
+
+  Accessible.role: Accessible.Pane
+  Accessible.name: qsTr("LookElsewhere alerts")
+
+  Connections {
+    target: root.service
+    function onPhaseChanged() { root.announcePhase() }
+  }
 
   TextMetrics {
     id: warningClockColonMetrics
@@ -98,7 +125,7 @@ Item {
         backdropReveal = 0
         contentOffset = Style.space(24)
         contentOpacity = 0
-        contentBlur = 0.08
+        contentBlur = root.service && root.service.config.reducedTransparency ? 0 : 0.08
         if (!shouldPresent) {
           settleBreakReveal()
           return
@@ -196,14 +223,19 @@ Item {
       WlrLayershell.layer: WlrLayer.Overlay
       WlrLayershell.keyboardFocus: root.breaking && authoritative
         ? WlrKeyboardFocus.Exclusive
-        : WlrKeyboardFocus.None
+        : authoritative && (root.naturalBreakToastVisible
+            || (root.visibleState && !root.finalCountdown))
+          ? WlrKeyboardFocus.OnDemand
+          : WlrKeyboardFocus.None
 
       Item { id: emptyHitArea; width: 0; height: 0 }
 
       Rectangle {
         anchors.fill: parent
         visible: root.breaking || window.backdropReveal > 0
-        color: Color.lock.background
+        color: root.service && root.service.config.reducedTransparency
+          ? Qt.rgba(Color.lock.background.r, Color.lock.background.g, Color.lock.background.b, 1)
+          : Color.lock.background
         opacity: Math.max(0, Math.min(1, window.backdropReveal))
       }
 
@@ -214,15 +246,20 @@ Item {
         enabled: root.breaking && window.authoritative
         focus: enabled
 
-        ProductViews.BreakContent {
+        Flickable {
+          id: breakViewport
           x: Math.round((parent.width - width) / 2)
-          y: Math.round((parent.height - implicitHeight) / 2 + window.contentOffset)
+          y: Math.round((parent.height - height) / 2 + window.contentOffset)
           width: Math.min(parent.width - Style.space(48), Style.space(520))
+          height: Math.min(parent.height - Style.space(48), breakContent.implicitHeight)
+          contentWidth: width
+          contentHeight: breakContent.implicitHeight
+          boundsBehavior: Flickable.StopAtBounds
+          clip: contentHeight > height
+          interactive: contentHeight > height
           opacity: Math.max(0, Math.min(1, window.contentOpacity))
-          scale: Math.min(1, Math.max(0.1,
-            (parent.height - Style.space(48)) / Math.max(1, implicitHeight)))
-            * (1 - 0.008 * Math.min(1, Math.max(0, window.contentOffset / Style.space(24))))
-          layer.enabled: window.contentBlur > 0.001
+          layer.enabled: !(root.service && root.service.config.reducedTransparency)
+            && window.contentBlur > 0.001
           layer.smooth: true
           layer.effect: MultiEffect {
             blurEnabled: true
@@ -230,27 +267,32 @@ Item {
             blurMax: 32
             blurMultiplier: 1
           }
-          title: root.service && root.service.plannedActive
-            ? root.service.plannedName
-            : root.service && root.service.snapshot.activeBreakIsLong
-              ? root.service.config.longBreakTitle
-              : root.service ? root.service.config.breakTitle : qsTr("Look elsewhere")
-          subtitle: root.service && root.service.snapshot.activeBreakIsLong
-            ? root.service.config.longBreakSubtitle
-            : root.service ? root.service.config.breakSubtitle
-            : qsTr("Let your eyes settle on something distant. Breathe. The screen will still be here.")
-          longBreak: root.service && root.service.snapshot.activeBreakIsLong
-          totalSeconds: root.remainingSeconds
-          reducedMotion: root.service && root.service.config.reducedMotion
-          animationActive: window.visible && root.breaking
-          actionsVisible: window.authoritative
-          skipVisible: !!root.service
-          skipEnabled: root.service && root.service.canSkipBreak
-          postponeVisible: root.service && root.service.canPostpone
-          clockFontSize: root.breakClockFontSize
-          clockSeparatorOverlap: root.clockSeparatorOverlap
-          onSkipRequested: if (root.service) root.service.skipBreak()
-          onPostponeRequested: if (root.service) root.service.postponeMinutes(1)
+
+          ProductViews.BreakContent {
+            id: breakContent
+            width: breakViewport.width
+            title: root.service && root.service.plannedActive
+              ? root.service.plannedName
+              : root.service && root.service.snapshot.activeBreakIsLong
+                ? root.service.config.longBreakTitle
+                : root.service ? root.service.config.breakTitle : qsTr("Look elsewhere")
+            subtitle: root.service && root.service.snapshot.activeBreakIsLong
+              ? root.service.config.longBreakSubtitle
+              : root.service ? root.service.config.breakSubtitle
+              : qsTr("Let your eyes settle on something distant. Breathe. The screen will still be here.")
+            longBreak: root.service && root.service.snapshot.activeBreakIsLong
+            totalSeconds: root.remainingSeconds
+            reducedMotion: root.service && root.service.config.reducedMotion
+            animationActive: window.visible && root.breaking
+            actionsVisible: window.authoritative
+            skipVisible: !!root.service
+            skipEnabled: root.service && root.service.canSkipBreak
+            postponeVisible: root.service && root.service.canPostpone
+            clockFontSize: root.breakClockFontSize
+            clockSeparatorOverlap: root.clockSeparatorOverlap
+            onSkipRequested: if (root.service) root.service.skipBreak()
+            onPostponeRequested: if (root.service) root.service.postponeMinutes(1)
+          }
         }
 
         Keys.onPressed: function(event) {
@@ -266,6 +308,8 @@ Item {
         anchors.top: parent.top
         anchors.topMargin: Style.space(48)
         anchors.horizontalCenter: parent.horizontalCenter
+        onVisibleChanged: if (visible && window.authoritative)
+          Qt.callLater(function() { undoNaturalBreakButton.forceActiveFocus() })
         ProductUi.BedIcon {
           Layout.preferredWidth: Style.space(20)
           Layout.preferredHeight: Layout.preferredWidth
@@ -279,6 +323,7 @@ Item {
           font.weight: Font.Medium
         }
         OverlayButton {
+          id: undoNaturalBreakButton
           text: qsTr("Undo")
           verticalPadding: Style.space(2)
           horizontalPadding: Style.space(6)
@@ -297,6 +342,8 @@ Item {
         radius: Style.cornerRadius
         color: Color.popups.background
         borderSpec: Border.surfaceSpec("popups", "border", Color.popups.border, Math.max(1, Style.space(2)))
+        onVisibleChanged: if (visible && window.authoritative)
+          Qt.callLater(function() { warningBreakNowButton.forceActiveFocus() })
 
         ColumnLayout {
           id: warningContent
@@ -328,8 +375,7 @@ Item {
                 reducedMotion: root.service && root.service.config.reducedMotion
                 animationActive: warningCard.visible
                 Accessible.role: Accessible.StaticText
-                Accessible.name: qsTr("%1 minutes and %2 seconds until break")
-                  .arg(root.remainingMinutesPart).arg(root.remainingSecondsPart)
+                Accessible.name: root.accessibleCountdown(root.remainingSeconds, qsTr("until break"))
               }
               Text {
                 Layout.fillWidth: true
@@ -353,6 +399,7 @@ Item {
             visible: window.authoritative
             spacing: Style.space(6)
             OverlayButton {
+              id: warningBreakNowButton
               text: root.plannedReady ? qsTr("Start break") : qsTr("Break now")
               primary: true
               verticalPadding: Style.space(3)
@@ -430,7 +477,7 @@ Item {
     labelWeight: Font.Bold
     selected: primary
     bordered: !primary
-    focusable: root.breaking && actionEnabled
+    focusable: visible && actionEnabled
     foreground: root.breaking ? Color.lock.text : Color.popups.text
     accent: Color.accent
     // Give the full-screen escape action a visible resting affordance. Use

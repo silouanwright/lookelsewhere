@@ -59,6 +59,7 @@ Item {
     anchors.horizontalCenter: parent.horizontalCenter
     y: -root.height
     text: root.previousValue < 0 ? "" : String(root.previousValue)
+    textFormat: Text.PlainText
     color: root.color
     opacity: 0
     font.family: root.fontFamily
@@ -73,6 +74,7 @@ Item {
     anchors.horizontalCenter: parent.horizontalCenter
     y: 0
     text: root.currentValue < 0 ? "" : String(root.currentValue)
+    textFormat: Text.PlainText
     color: root.color
     opacity: 1
     font.family: root.fontFamily

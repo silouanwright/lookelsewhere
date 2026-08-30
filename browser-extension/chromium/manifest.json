@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "LookElsewhere Browser Context",
+  "description": "Provides optional, privacy-safe browser video context to LookElsewhere.",
+  "version": "0.1.0",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwCXoMkR0jB7Yt5n5CN5OrZp2Lggj2q8BRDCgUVMW2gxZF/HvVLS2n+LqGdF+9wXZy14WszRwJJL1vFa7ethC3yW0MVckcFoMal7qBhLrMmCxTJ/aWWY/MQgBtOE0Kz70Y8PZT8tGdk6gET2LcXjHdqqnXQdgKCQ7xT+NPT8yPlVlY6LeHN8kGgv+1tZB7JII+ZfFdNxzaGn/XNxULl0TABpTCvgejjHVfUEc7yW2MarBzs97481/xe8nh6QzDI9I7FIi2pPh3AeEsXe4JtapXhd10+Y1s7zA+yJRx+tvXgFJxu281p1HSyx+wSEVjMT5Mjvvd3sOPu+1c8DWkSuIwQIDAQAB",
+  "background": {
+    "service_worker": "service-worker.js"
+  },
+  "permissions": [
+    "nativeMessaging"
+  ],
+  "host_permissions": [
+    "http://*/*",
+    "https://*/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["model.js", "content.js"],
+      "all_frames": true,
+      "match_origin_as_fallback": true,
+      "run_at": "document_start"
+    }
+  ]
+}

@@ -186,6 +186,8 @@ ColumnLayout {
       font.family: root.fontFamily
       font.pixelSize: Style.font.body
       selectByMouse: true
+      Accessible.name: qsTr("Name")
+      Accessible.description: qsTr("Shown when the routine is due")
       background: Rectangle {
         color: "transparent"
         radius: Style.cornerRadius
@@ -271,17 +273,30 @@ ColumnLayout {
       anchors.verticalCenter: parent.verticalCenter
       spacing: Style.space(2)
       Repeater {
-        model: [qsTr("S"), qsTr("M"), qsTr("T"), qsTr("W"), qsTr("T"), qsTr("F"), qsTr("S")]
+        model: [
+          { shortName: qsTr("S"), fullName: qsTr("Sunday") },
+          { shortName: qsTr("M"), fullName: qsTr("Monday") },
+          { shortName: qsTr("T"), fullName: qsTr("Tuesday") },
+          { shortName: qsTr("W"), fullName: qsTr("Wednesday") },
+          { shortName: qsTr("T"), fullName: qsTr("Thursday") },
+          { shortName: qsTr("F"), fullName: qsTr("Friday") },
+          { shortName: qsTr("S"), fullName: qsTr("Saturday") }
+        ]
         delegate: LookUi.WeightedButton {
-          required property string modelData
+          required property var modelData
           required property int index
-          label: modelData
+          label: String(modelData.shortName)
           selected: root.selectedRoutine && root.selectedRoutine.days.indexOf(index) >= 0
           bordered: true
           horizontalPadding: Style.space(4)
           verticalPadding: Style.space(3)
           foreground: root.foreground; accent: root.accent; fontFamily: root.fontFamily
           hasCursor: root.cursorTarget === daysRow && root.selectedDayIndex === index
+          Accessible.role: Accessible.CheckBox
+          Accessible.name: String(modelData.fullName)
+          Accessible.checkable: true
+          Accessible.checked: selected
+          Accessible.onPressAction: clicked()
           onClicked: root.toggleDay(index)
         }
       }

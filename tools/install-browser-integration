@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+host="$root/browser-extension/native-host/lookelsewhere-browser-host"
+manifest="$HOME/.config/chromium/NativeMessagingHosts/io.github.silouanwright.look_elsewhere.json"
+extension="$root/browser-extension/chromium"
+flags="$HOME/.config/chromium-flags.conf"
+
+mkdir -p -- "$(dirname -- "$manifest")"
+sed "s|@HOST_PATH@|$host|g" \
+  "$root/browser-extension/native-host/io.github.silouanwright.look_elsewhere.json.in" > "$manifest"
+chmod 600 "$manifest"
+
+if ! grep -Fq -- "$extension" "$flags" 2>/dev/null; then
+  if grep -q '^--load-extension=' "$flags" 2>/dev/null; then
+    escaped=${extension//\\/\\\\}
+    escaped=${escaped//&/\\&}
+    escaped=${escaped//|/\\|}
+    sed -i "/^--load-extension=/ s|$|,$escaped|" "$flags"
+  else
+    printf '%s\n' "--load-extension=$extension" >> "$flags"
+  fi
+fi
+
+printf 'LookElsewhere browser integration installed. Restart Chromium to load it.\n'

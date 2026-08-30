@@ -1,3 +1,5 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import Quickshell
 import Quickshell.Hyprland
@@ -25,6 +27,12 @@ Item {
     String(Qt.resolvedUrl("vendor/qmlpack/bounded-read/bin/bounded-read")).replace(/^file:\/\//, ""))
   readonly property string pipewireEvidencePath: decodeURIComponent(
     String(Qt.resolvedUrl("tools/pipewire-evidence")).replace(/^file:\/\//, ""))
+  readonly property string sundownStatusPath: "/run/sundown/status.json"
+  readonly property string browserSocketPath: {
+    var runtime = Quickshell.env("XDG_RUNTIME_DIR")
+    if (!runtime) runtime = "/run/user/" + Quickshell.env("UID")
+    return runtime + "/look-elsewhere-browser.sock"
+  }
 
   property var config: Model.defaultConfig()
   property var snapshot: Model.defaultSnapshot(Date.now())
@@ -47,6 +55,7 @@ Item {
   property bool demoIdle: false
   property bool demoNaturalPause: true
   property bool demoTypingProbe: false
+  property bool demoGame: false
   property var demoEvidence: []
   property var preDemoSnapshot: null
   property var preDemoConfig: null
@@ -59,9 +68,23 @@ Item {
   property int maximumObserveGapMs: 0
   property int lastObserveDurationMs: 0
   property int maximumObserveDurationMs: 0
+  property bool browserContextSeen: false
+  property bool browserContextConnected: false
+  property real browserContextReceivedAtMs: 0
+  property string browserContextSessionId: ""
+  property real browserContextSequence: 0
+  property var browserContext: ({})
+  readonly property string browserIntegrationStatus: browserContextConnected
+    ? "Enhanced" : browserContextSeen ? "Unavailable" : "Standard"
+  property bool sundownSeen: false
+  property bool sundownConnected: false
+  property bool sundownSteamActive: false
+  property string sundownSteamSensor: ""
+  readonly property string sundownIntegrationStatus: sundownConnected
+    ? "Connected" : sundownSeen ? "Unavailable" : "Not installed"
   readonly property var demoSequence: [
     "idle", "typing", "meeting", "microphone", "camera", "screen-sharing",
-    "video", "media", "fullscreen", "dictation", "due", "warning", "final",
+    "video", "media", "fullscreen", "game", "dictation", "due", "warning", "final",
     "planned-warning", "planned-ready", "planned-break", "casual-break",
     "balanced-break", "hardcore-break", "long-break", "stats", "paused", "postponed"
   ]
@@ -121,6 +144,8 @@ Item {
     && remainingMs <= 10000
     && !typingPauseMonitor.isIdle
   readonly property bool idlePauseActive: config.detectors.idle && idle
+  readonly property bool steamPauseActive: config.pauseDuringSteamGames
+    && (demoMode ? demoGame : sundownConnected && sundownSteamActive)
   readonly property var currentProtection: Model.strongestEvidence(evidence(), config)
   readonly property string contextLabel: typingHoldActive ? "Active"
     : currentProtection ? Model.contextShortLabel(currentProtection.category) : ""
@@ -131,7 +156,8 @@ Item {
     && snapshot.activePlannedOccurrence.deferred === true
   readonly property string plannedName: plannedActive
     ? String(snapshot.activePlannedOccurrence.name || qsTr("Planned break")) : ""
-  readonly property string label: idlePauseActive ? "Paused while you’re away" : Model.stateLabel(snapshot)
+  readonly property string label: steamPauseActive ? "Paused during a Steam game"
+    : idlePauseActive ? "Paused while you’re away" : Model.stateLabel(snapshot)
   readonly property string remainingText: Model.formatDuration(remainingMs)
   readonly property string naturalBreakMessage: Model.naturalBreakMessage(snapshot)
   readonly property bool naturalBreakUndoAvailable: snapshot.naturalBreakDecision
@@ -185,11 +211,56 @@ Item {
       value.push(item.category === "microphone" && fullscreenActive
         ? { category: "meeting", confidence: 0.9, active: true } : item)
     }
+    var browserEvidence = config.detectors.media
+      ? Model.browserContextEvidence(browserContextConnected ? browserContext : null) : null
+    if (browserEvidence) value.push(browserEvidence)
+    if (steamPauseActive) value.push({ category: "game", confidence: 1, active: true })
     if (mediaActive) value.push({ category: "media", confidence: 0.8, active: true })
     if (Model.matchesProtectedApp(activeAppId, config.protectedApps))
       value.push({ category: "application", confidence: 1, active: true })
     if (fullscreenActive) value.push({ category: "fullscreen", confidence: 0.65, active: true })
     return value
+  }
+
+  function acceptBrowserContext(line) {
+    try {
+      if (String(line).length > 16384) throw new Error("message exceeds 16 KiB")
+      var value = JSON.parse(line)
+      var session = String(value.session_id || "")
+      var sequence = Number(value.sequence || 0)
+      if (value.version !== 1 || value.browser !== "chromium"
+          || session.length < 1 || session.length > 64
+          || !isFinite(sequence) || Math.floor(sequence) !== sequence || sequence < 1
+          || ["none", "paused", "buffering", "playing"].indexOf(value.video_state) < 0
+          || typeof value.browser_focused !== "boolean"
+          || typeof value.video_visible !== "boolean"
+          || typeof value.picture_in_picture !== "boolean") throw new Error("invalid context")
+      if (session === browserContextSessionId && sequence <= browserContextSequence) return
+      browserContextSessionId = session
+      browserContextSequence = sequence
+      browserContext = value
+      browserContextReceivedAtMs = Date.now()
+      browserContextSeen = true
+      browserContextConnected = true
+    } catch (error) {
+      console.warn("LookElsewhere rejected browser context: " + error)
+    }
+  }
+
+  function acceptSundownStatus(raw) {
+    var status = Model.parseSundownStatus(raw)
+    if (!status) {
+      sundownConnected = false
+      sundownSteamActive = false
+      sundownSteamSensor = ""
+      console.warn("LookElsewhere rejected Sundown status")
+      return
+    }
+    sundownSeen = true
+    sundownConnected = true
+    sundownSteamActive = status.active
+    sundownSteamSensor = status.sensor
+    sundownExpiry.restart()
   }
 
   function observe() {
@@ -210,6 +281,7 @@ Item {
       nowMs: Date.now(),
       active: !effectiveIdle,
       idle: effectiveIdle,
+      accumulationPaused: steamPauseActive,
       naturalPause: naturalPauseReady,
       typingActive: typingHoldActive,
       evidence: evidence()
@@ -350,6 +422,7 @@ Item {
     demoIdle = false
     demoNaturalPause = true
     demoTypingProbe = false
+    demoGame = false
     demoEvidence = []
     recoveryWarning = ""
     persistenceBlocked = false
@@ -361,11 +434,14 @@ Item {
       demoIdle = true
     } else if (name === "flow") {
       var flowConfig = JSON.parse(JSON.stringify(config))
-      flowConfig.warningMs = 8000
+      // Keep every observable phase wide enough for the installed-shell
+      // reliability harness to sample even during a brief compositor stall.
+      flowConfig.warningMs = 6000
       flowConfig.finalMs = 3000
-      flowConfig.breakMs = 10000
+      flowConfig.breakMs = 4000
       config = Model.normalizeConfig(flowConfig)
-      next.accumulatedActiveMs = config.focusMs
+      demoNaturalPause = false
+      next = Model.startWarning(next, now, config, config.warningMs)
     }
     else if (name === "typing") {
       var typingConfig = JSON.parse(JSON.stringify(config))
@@ -375,6 +451,11 @@ Item {
       config = Model.normalizeConfig(typingConfig)
       demoTypingProbe = true
       next = Model.startWarning(next, now, config, 12000)
+    }
+    else if (name === "game") {
+      next.accumulatedActiveMs = config.focusMs * 0.35
+      demoGame = true
+      demoEvidence = [{ category: "game", confidence: 1, active: true }]
     }
     else if (name === "due") next.accumulatedActiveMs = config.focusMs - 30000
     else if (name === "stats") {
@@ -469,6 +550,7 @@ Item {
     demoIdle = false
     demoNaturalPause = true
     demoTypingProbe = false
+    demoGame = false
     demoEvidence = []
     snapshot = preDemoSnapshot || Model.defaultSnapshot(Date.now())
     config = preDemoConfig || config
@@ -540,6 +622,55 @@ Item {
   // groups does not materialize the application-controlled node dictionaries.
   PwObjectTracker {
     objects: service.pipewireLinkGroups
+  }
+
+  SocketServer {
+    active: service.browserSocketPath.indexOf("/") === 0
+    path: service.browserSocketPath
+    handler: Socket {
+      parser: SplitParser {
+        onRead: function(line) { service.acceptBrowserContext(line) }
+      }
+    }
+  }
+
+  // Sundown owns this root-written, atomic, public status file. Watching it
+  // avoids duplicating its /proc scanner or spawning a process every second.
+  FileView {
+    id: sundownStatusFile
+    path: service.sundownStatusPath
+    watchChanges: true
+    printErrors: false
+    onLoaded: service.acceptSundownStatus(text())
+    onFileChanged: reload()
+    onLoadFailed: {
+      service.sundownConnected = false
+      service.sundownSteamActive = false
+      service.sundownSteamSensor = ""
+    }
+  }
+
+  Timer {
+    id: sundownExpiry
+    interval: 5000
+    onTriggered: {
+      service.sundownConnected = false
+      service.sundownSteamActive = false
+      service.sundownSteamSensor = ""
+    }
+  }
+
+  Timer {
+    interval: 2000
+    repeat: true
+    running: true
+    onTriggered: {
+      if (service.browserContextConnected
+          && Date.now() - service.browserContextReceivedAtMs > 12000) {
+        service.browserContextConnected = false
+        service.browserContext = ({})
+      }
+    }
   }
 
   // Quickshell's Wayland toplevel handle has no appId for XWayland games.
@@ -832,9 +963,9 @@ Item {
   IpcHandler {
     target: "look-elsewhere"
 
-    function status(): string { return JSON.stringify({ state: service.phase, remainingMs: service.remainingMs, evidence: service.evidence(), demo: service.demoMode, idlePaused: service.idlePauseActive, naturalPauseReady: service.naturalPauseReady, typingHoldActive: service.typingHoldActive, contextLabel: service.contextLabel, naturalBreakDecision: service.snapshot.naturalBreakDecision || null, recoveryWarning: service.recoveryWarning }) }
+    function status(): string { return JSON.stringify({ state: service.phase, remainingMs: service.remainingMs, evidence: service.evidence(), demo: service.demoMode, idlePaused: service.idlePauseActive, steamPaused: service.steamPauseActive, naturalPauseReady: service.naturalPauseReady, typingHoldActive: service.typingHoldActive, contextLabel: service.contextLabel, browserIntegration: service.browserIntegrationStatus, sundownIntegration: service.sundownIntegrationStatus, naturalBreakDecision: service.snapshot.naturalBreakDecision || null, recoveryWarning: service.recoveryWarning }) }
     function configuration(): string { return JSON.stringify(service.config) }
-    function diagnostics(): string { return JSON.stringify({ fullscreen: service.fullscreenAvailable, dictation: service.dictationAvailable, mpris: true, pipewire: true, pipewireActiveStreams: service.activePipewireNodeIds.length, pipewireEvidenceRecords: service.pipewireEvidenceRecords.length, idle: true, sound: service.soundAvailable, persistenceBlocked: service.persistenceBlocked, schedulerLastGapMs: service.lastObserveGapMs, schedulerMaximumGapMs: service.maximumObserveGapMs, schedulerLastDurationMs: service.lastObserveDurationMs, schedulerMaximumDurationMs: service.maximumObserveDurationMs }) }
+    function diagnostics(): string { return JSON.stringify({ fullscreen: service.fullscreenAvailable, dictation: service.dictationAvailable, mpris: true, pipewire: true, pipewireActiveStreams: service.activePipewireNodeIds.length, pipewireEvidenceRecords: service.pipewireEvidenceRecords.length, browserIntegration: service.browserIntegrationStatus, sundownIntegration: service.sundownIntegrationStatus, sundownSteamSensor: service.sundownSteamSensor, steamGameActive: service.sundownSteamActive, steamPauseActive: service.steamPauseActive, idle: true, sound: service.soundAvailable, persistenceBlocked: service.persistenceBlocked, schedulerLastGapMs: service.lastObserveGapMs, schedulerMaximumGapMs: service.maximumObserveGapMs, schedulerLastDurationMs: service.lastObserveDurationMs, schedulerMaximumDurationMs: service.maximumObserveDurationMs }) }
     function takeBreak(): string { service.takeBreak(); return service.phase }
     function postpone(minutes: int): string { service.postponeMinutes(minutes); return service.phase }
     function pause(minutes: int): string { service.pauseMinutes(minutes); return service.phase }

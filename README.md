@@ -44,6 +44,10 @@ rebuilt with Omarchy and Linux flair.
 - Complete keyboard-first navigation, with full pointer support too
 - Active-use scheduling that can wait through typing, dictation, focused video,
   meetings, full-screen apps, protected apps, and away time
+- Optional Chromium integration that distinguishes playing foreground video
+  and Picture-in-Picture from ordinary browser audio
+- Optional Sundown integration that pauses the focus timer while an actual
+  Steam or Proton game is running
 - Progressive warnings, short breaks, periodic long breaks, snoozing, office
   hours, enforcement modes, and configurable sounds
 - Recurring planned breaks for lunch, prayer, walks, or shutdown routines, with
@@ -117,6 +121,17 @@ shortcut.
 Shortcuts are window-local and can be changed in
 [Configuration](CONFIGURATION.md).
 
+## Accessible by design
+
+- Screen readers receive named controls, selection and checked states, and
+  timely announcements when a warning, break, or completion begins.
+- Disabled actions stay unavailable to pointer, keyboard, and assistive
+  technology alike.
+- Reduce Motion keeps countdowns and transitions still. Reduce Transparency
+  removes decorative patterns, blur, and translucent break backdrops.
+- Primary and secondary text roles are verified on representative light and
+  dark Omarchy themes.
+
 ## Configuration
 
 Open the gear in the plugin panel for categorized General, Breaks, Plans,
@@ -137,16 +152,45 @@ omarchy bar set io.github.silouanwright.look-elsewhere enforcement '"balanced"' 
 See [Configuration](CONFIGURATION.md) for every setting, default, accepted
 value, behavior, and a complete JSONC reference.
 
+### Optional browser integration
+
+LookElsewhere works without a browser extension. Chromium users can optionally
+enable enhanced video detection:
+
+```bash
+~/.config/omarchy/plugins/io.github.silouanwright.look-elsewhere/tools/install-browser-integration
+```
+
+Restart Chromium after installation. The Context settings page reports
+**Enhanced** when it is connected, **Standard** when LookElsewhere is using
+system signals alone, and **Unavailable** if an installed extension
+disconnects. See
+[Browser integration](docs/browser-integration.md) for the privacy contract and
+setup details.
+
+### Optional Steam integration
+
+LookElsewhere's built-in window matching delays due breaks while a focused
+Steam window is identifiable. If [Sundown](https://github.com/silouanwright/sundown)
+is installed, LookElsewhere automatically uses its process-level Steam and
+Proton detection and pauses active-time accounting while a game is running.
+The integration is local, read-only, optional, and can be disabled under
+**Settings → Context**.
+
 ## Limitations
 
 - Hyprland and Omarchy are the supported and tested environment.
-- MPRIS does not identify whether the current item has a video track.
-  LookElsewhere delays for focused-app playback and labels it `Media`; an
-  explicit PipeWire `Movie` role upgrades that to `Video`. This avoids pausing
-  for background music but remains a heuristic when applications omit roles.
+- MPRIS does not identify whether the current item has a video track. Standard
+  detection labels focused-app playback `Media`; an explicit PipeWire `Movie`
+  role or the optional Chromium integration upgrades it to `Video`. Without
+  either signal, browser audio and video cannot be distinguished reliably.
 - Wayland exposes coarse application and device state, not semantic intent.
   Screen sharing, recording, and every meeting state cannot yet be identified
   perfectly without upstream support.
+- Without Sundown, Steam handling depends on the focused window exposing
+  `steam` or `steam_app_<id>` as its application class. Some native games use
+  unrelated classes, so process-level game detection is unavailable in the
+  standalone plugin.
 - The `Active` state means recent keyboard or pointer activity. Ordinary
   Wayland clients cannot tell which kind occurred, so scrolling or moving the
   pointer can hold the final ten seconds just like typing. LookElsewhere never
@@ -172,8 +216,8 @@ in [Upstream Opportunities](docs/upstream-opportunities.md).
 - Per-detector application exceptions when a real misclassification needs one
 - Calendar-backed planned breaks, after the native recurring scheduler has had
   real-world use
-- Accessibility completion across themes, motion preferences, and screen
-  readers
+- Runtime screen-reader testing with Orca as the Linux accessibility stack
+  continues to mature
 - More sound choices and in-panel previews
 
 New features should stay private, explainable, keyboard-accessible, and native

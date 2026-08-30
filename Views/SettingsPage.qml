@@ -53,11 +53,15 @@ ColumnLayout {
     var controls = targets()
     return controls.length ? controls[controls.length - 1] : settingsTabs
   }
-
-  onEditorActiveChanged: if (!editorActive && active) Qt.callLater(function() {
-    if (settingsPage.active && settingsPage.focusProxy)
-      settingsPage.focusProxy.forceActiveFocus()
-  })
+  readonly property string cursorAccessibleName: {
+    var controls = targets()
+    if (!cursorActive || cursorIndex < 0 || cursorIndex >= controls.length)
+      return qsTr("Settings navigation")
+    var target = controls[cursorIndex]
+    return target && target.label !== undefined
+      ? qsTr("Settings: %1").arg(String(target.label))
+      : qsTr("Settings navigation")
+  }
 
   signal persistRequested(var values)
   signal pauseRequested()
@@ -98,9 +102,9 @@ ColumnLayout {
     var byTab = {
       general: [panelPatternDropdown, soundRow, soundVolumeField,
         startSoundRow, completionSoundRow, outputModeDropdown, displayModeDropdown,
-        reduceMotionRow, keyboardHintRow, editSettingsButton],
+        reduceMotionRow, reduceTransparencyRow, keyboardHintRow, editSettingsButton],
       context: [idleDetectionRow, recentInputDetectionRow, fullscreenDetectionRow, mediaDetectionRow,
-        microphoneDetectionRow, screenSharingDetectionRow, dictationDetectionRow, protectedAppsRow],
+        steamPauseRow, microphoneDetectionRow, screenSharingDetectionRow, dictationDetectionRow, protectedAppsRow],
       breaks: [pauseBreaksButton, focusMinutesField, shortBreakField, longBreakEveryField,
         longBreakSecondsField, snoozeBudgetField, maximumDelayField,
         enforcementDropdown, shortBreakTitleField, shortBreakSubtitleField,
@@ -212,9 +216,6 @@ ColumnLayout {
     fontFamily: settingsPage.fontFamily
     cursorTarget: settingsPage.cursorActive ? settingsPage.targets()[settingsPage.cursorIndex] : null
     onPersistRequested: function(values) { settingsPage.persistSettings(values) }
-    onEditorClosed: if (settingsPage.active) Qt.callLater(function() {
-      settingsPage.focusProxy.forceActiveFocus()
-    })
   }
 
   ColumnLayout {
@@ -295,7 +296,6 @@ ColumnLayout {
     hasCursor: settingsPage.hasCursorFor(officeStartDropdown)
     foreground: settingsPage.foreground; muted: settingsPage.muted; accent: settingsPage.accent; fontFamily: settingsPage.fontFamily
     onHovered: function(on) { if (on) settingsPage.setCursorTarget(officeStartDropdown) }
-    onPopupClosed: if (settingsPage.active) Qt.callLater(function() { settingsPage.focusProxy.forceActiveFocus() })
     onChanged: function(next) { settingsPage.persistSettings({ officeStart: next }) }
   }
 
@@ -311,7 +311,6 @@ ColumnLayout {
     hasCursor: settingsPage.hasCursorFor(officeEndDropdown)
     foreground: settingsPage.foreground; muted: settingsPage.muted; accent: settingsPage.accent; fontFamily: settingsPage.fontFamily
     onHovered: function(on) { if (on) settingsPage.setCursorTarget(officeEndDropdown) }
-    onPopupClosed: if (settingsPage.active) Qt.callLater(function() { settingsPage.focusProxy.forceActiveFocus() })
     onChanged: function(next) { settingsPage.persistSettings({ officeEnd: next }) }
   }
 
@@ -340,6 +339,25 @@ ColumnLayout {
     hasCursor: settingsPage.hasCursorFor(idleDetectionRow)
     onHovered: function(on) { if (on) settingsPage.setCursorTarget(idleDetectionRow) }
     onClicked: settingsPage.persistSettings({ idleDetection: !checked })
+  }
+  PanelSeparator { Layout.fillWidth: true; foreground: settingsPage.foreground }
+  LookUi.ToggleSettingRow {
+    id: steamPauseRow
+    Layout.fillWidth: true
+    label: qsTr("Pause during Steam games")
+    description: settingsPage.service && settingsPage.service.sundownIntegrationStatus === "Connected"
+      ? (settingsPage.service.steamPauseActive
+          ? qsTr("Paused now; Sundown detected an active game")
+          : qsTr("Sundown is connected and watching for games"))
+      : settingsPage.service && settingsPage.service.sundownIntegrationStatus === "Unavailable"
+        ? qsTr("Sundown stopped responding; window-based protection remains")
+        : qsTr("Install Sundown for reliable Steam and Proton detection")
+    checked: !settingsPage.settings || settingsPage.settings.pauseDuringSteamGames === undefined
+      || settingsPage.settings.pauseDuringSteamGames === true
+    foreground: settingsPage.foreground; accent: settingsPage.accent; fontFamily: settingsPage.fontFamily
+    hasCursor: settingsPage.hasCursorFor(steamPauseRow)
+    onHovered: function(on) { if (on) settingsPage.setCursorTarget(steamPauseRow) }
+    onClicked: settingsPage.persistSettings({ pauseDuringSteamGames: !checked })
   }
   PanelSeparator { Layout.fillWidth: true; foreground: settingsPage.foreground }
   LookUi.ToggleSettingRow {
@@ -376,6 +394,44 @@ ColumnLayout {
     hasCursor: settingsPage.hasCursorFor(mediaDetectionRow)
     onHovered: function(on) { if (on) settingsPage.setCursorTarget(mediaDetectionRow) }
     onClicked: settingsPage.persistSettings({ mediaDetection: !checked })
+  }
+  PanelSeparator { Layout.fillWidth: true; foreground: settingsPage.foreground }
+  Item {
+    Layout.fillWidth: true
+    Layout.preferredHeight: Math.max(browserStatusLabels.implicitHeight, browserStatus.implicitHeight)
+    Accessible.role: Accessible.StaticText
+    Accessible.name: browserStatusLabels.label + ", " + browserStatus.text + ". "
+      + browserStatusLabels.description
+
+    LookUi.SettingLabels {
+      id: browserStatusLabels
+      anchors.left: parent.left
+      anchors.right: browserStatus.left
+      anchors.rightMargin: Style.space(12)
+      anchors.verticalCenter: parent.verticalCenter
+      label: qsTr("Browser detection")
+      description: settingsPage.service && settingsPage.service.browserIntegrationStatus === "Enhanced"
+        ? qsTr("Foreground video and Picture-in-Picture are detected directly")
+        : settingsPage.service && settingsPage.service.browserIntegrationStatus === "Unavailable"
+          ? qsTr("Extension disconnected; system detection remains active")
+          : qsTr("Using system media signals; the extension is optional")
+      foreground: settingsPage.foreground
+      muted: settingsPage.muted
+      fontFamily: settingsPage.fontFamily
+    }
+
+    Text {
+      id: browserStatus
+      anchors.right: parent.right
+      anchors.verticalCenter: parent.verticalCenter
+      text: settingsPage.service ? settingsPage.service.browserIntegrationStatus : qsTr("Standard")
+      color: text === "Enhanced" ? settingsPage.accent : settingsPage.muted
+      font.family: settingsPage.fontFamily
+      font.pixelSize: Style.font.body
+      font.weight: Font.DemiBold
+      textFormat: Text.PlainText
+      Accessible.ignored: true
+    }
   }
   PanelSeparator { Layout.fillWidth: true; foreground: settingsPage.foreground }
   LookUi.ToggleSettingRow {
@@ -583,8 +639,6 @@ ColumnLayout {
     ]
     foreground: settingsPage.foreground; muted: settingsPage.muted; accent: settingsPage.accent; fontFamily: settingsPage.fontFamily
     hasCursor: settingsPage.hasCursorFor(enforcementDropdown)
-    onPopupClosed: if (settingsPage.active)
-      Qt.callLater(function() { settingsPage.focusProxy.forceActiveFocus() })
     onHovered: function(on) { if (on) settingsPage.setCursorTarget(enforcementDropdown) }
     onChanged: function(next) { settingsPage.persistSettings({ enforcement: next }) }
   }
@@ -692,7 +746,6 @@ ColumnLayout {
     hasCursor: settingsPage.hasCursorFor(panelPatternDropdown)
     foreground: settingsPage.foreground; muted: settingsPage.muted; accent: settingsPage.accent; fontFamily: settingsPage.fontFamily
     onHovered: function(on) { if (on) settingsPage.setCursorTarget(panelPatternDropdown) }
-    onPopupClosed: if (settingsPage.active) Qt.callLater(function() { settingsPage.focusProxy.forceActiveFocus() })
     onChanged: function(next) { settingsPage.persistSettings({ panelPattern: next }) }
   }
 
@@ -789,7 +842,6 @@ ColumnLayout {
     hasCursor: settingsPage.hasCursorFor(outputModeDropdown)
     foreground: settingsPage.foreground; muted: settingsPage.muted; accent: settingsPage.accent; fontFamily: settingsPage.fontFamily
     onHovered: function(on) { if (on) settingsPage.setCursorTarget(outputModeDropdown) }
-    onPopupClosed: if (settingsPage.active) Qt.callLater(function() { settingsPage.focusProxy.forceActiveFocus() })
     onChanged: function(next) { settingsPage.persistSettings({ outputMode: next }) }
   }
 
@@ -809,7 +861,6 @@ ColumnLayout {
     hasCursor: settingsPage.hasCursorFor(displayModeDropdown)
     foreground: settingsPage.foreground; muted: settingsPage.muted; accent: settingsPage.accent; fontFamily: settingsPage.fontFamily
     onHovered: function(on) { if (on) settingsPage.setCursorTarget(displayModeDropdown) }
-    onPopupClosed: if (settingsPage.active) Qt.callLater(function() { settingsPage.focusProxy.forceActiveFocus() })
     onChanged: function(next) { settingsPage.persistSettings({ displayMode: next }) }
   }
 
@@ -844,6 +895,22 @@ ColumnLayout {
   PanelSeparator { Layout.fillWidth: true; foreground: settingsPage.foreground }
 
   LookUi.ToggleSettingRow {
+    id: reduceTransparencyRow
+    Layout.fillWidth: true
+    label: qsTr("Reduce transparency")
+    description: qsTr("Remove decorative patterns and soft-focus effects")
+    checked: settingsPage.settings && settingsPage.settings.reducedTransparency === true
+    foreground: settingsPage.foreground
+    accent: settingsPage.accent
+    fontFamily: settingsPage.fontFamily
+    hasCursor: settingsPage.hasCursorFor(reduceTransparencyRow)
+    onHovered: function(on) { if (on) settingsPage.setCursorTarget(reduceTransparencyRow) }
+    onClicked: settingsPage.persistSettings({ reducedTransparency: !checked })
+  }
+
+  PanelSeparator { Layout.fillWidth: true; foreground: settingsPage.foreground }
+
+  LookUi.ToggleSettingRow {
     id: keyboardHintRow
     Layout.fillWidth: true
     label: qsTr("Show keyboard hints")
@@ -859,7 +926,7 @@ ColumnLayout {
     Accessible.onPressAction: clicked()
     onHovered: function(on) { if (on) settingsPage.setCursorTarget(keyboardHintRow) }
     KeyNavigation.tab: settingsPage.shortcutsButtonTarget
-    KeyNavigation.backtab: reduceMotionRow
+    KeyNavigation.backtab: reduceTransparencyRow
     onClicked: settingsPage.persistSettings({ showKeyboardHints: !checked })
   }
 

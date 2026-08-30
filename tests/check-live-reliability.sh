@@ -2,8 +2,11 @@
 set -euo pipefail
 
 shell=(quickshell ipc -n -p /usr/share/omarchy/shell)
+plugin="${LOOKELSEWHERE_PLUGIN_DIR:-$HOME/.config/omarchy/plugins/io.github.silouanwright.look-elsewhere}"
 call() { "${shell[@]}" call look-elsewhere "$@"; }
 status() { call status; }
+
+grep -q 'demoNaturalPause = false' "$plugin/Service.qml"
 
 original_config=$(call configuration)
 trap 'call demoOff >/dev/null 2>&1 || true' EXIT
@@ -28,12 +31,24 @@ check_fixture media Media
 check_fixture fullscreen Fullscreen
 check_fixture dictation Dictation
 
+call demo game >/dev/null
+game_before=$(status)
+sleep 2
+game_after=$(status)
+jq -e '.demo == true and .state == "working" and .steamPaused == true
+  and .contextLabel == "Game"' <<<"$game_after" >/dev/null
+test "$(jq -r '.remainingMs' <<<"$game_before")" = "$(jq -r '.remainingMs' <<<"$game_after")"
+
 call demo flow >/dev/null
 states=""
 for _ in $(seq 1 22); do
   current=$(status)
   state=$(jq -r .state <<<"$current")
   case " $states " in *" $state "*) ;; *) states="$states $state" ;; esac
+  if [[ " $states " == *" warning "* && " $states " == *" final-countdown "* \
+    && " $states " == *" breaking "* && " $states " == *" working "* ]]; then
+    break
+  fi
   sleep 1
 done
 for required in warning final-countdown breaking working; do
@@ -55,4 +70,4 @@ jq -e '
   and .schedulerMaximumDurationMs >= .schedulerLastDurationMs
 ' <<<"$diagnostics" >/dev/null
 
-echo "Protected-context fixtures, authoritative timer flow, and exact configuration restoration passed."
+echo "Protected-context fixtures, Steam pause, authoritative timer flow, and exact configuration restoration passed."

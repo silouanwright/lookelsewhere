@@ -24,12 +24,14 @@ Panel {
 
   // Popup roles are independent from bar roles in an Omarchy theme.
   readonly property color foreground: Color.popups.text
-  readonly property color muted: Qt.darker(foreground, 1.55)
+  readonly property color muted: Qt.tint(Color.popups.background,
+    Qt.rgba(foreground.r, foreground.g, foreground.b, 0.82))
   readonly property color accent: Color.accent
   readonly property string fontFamily: bar ? bar.fontFamily : Style.font.family
   readonly property bool manuallyPaused: service && service.phase === "waiting-for-pause" && service.snapshot.pauseReason === "manual"
   readonly property bool breakActive: service && service.phase === Model.State.Breaking
   readonly property bool idlePaused: service && service.idlePauseActive
+  readonly property bool gamePaused: service && service.steamPauseActive
   readonly property bool delayActionsVisible: !manuallyPaused && service
   readonly property bool delayActionsEnabled: !!delayActionsVisible && !!service.canPostpone
   readonly property bool numberEditorActive: root.page === "options" && settingsPage.editorActive
@@ -140,14 +142,16 @@ Panel {
     // break surfaces are separate and intentionally centered by Overlay.qml.
     centerOnBar: false
     focusTarget: root.page === "options" ? settingsPage.initialFocusTarget : neutralFocus
-    contentWidth: popup.fittedContentWidth(Style.space(root.page === "options" ? 440
-      : (root.page === "stats" ? 320 : 260)))
+    contentWidth: popup.fittedContentWidth(root.page === "options" ? Style.space(440)
+      : (root.page === "stats" ? Style.space(320)
+        : Math.max(Style.space(260), nowView.preferredContentWidth)))
     contentHeight: popup.fittedContentHeight(content.implicitHeight)
 
     ProductUi.PanelPattern {
       anchors.fill: parent
       anchors.margins: -popup.padding
       pattern: root.service ? root.service.config.panelPattern : "off"
+      reducedTransparency: root.service && root.service.config.reducedTransparency
     }
 
     // Window-local mnemonics must live in the popup's item tree so Qt can
@@ -227,6 +231,12 @@ Panel {
         width: 0
         height: 0
         focus: true
+        Accessible.role: Accessible.ListItem
+        Accessible.name: settingsPage.cursorAccessibleName
+        Accessible.description: qsTr("Use arrow keys to move and Enter to activate")
+        Accessible.focusable: true
+        Accessible.focused: activeFocus
+        Accessible.onPressAction: settingsPage.activateCursor()
       }
 
       ScrollView {
@@ -369,6 +379,7 @@ Panel {
           accent: root.accent
           fontFamily: root.fontFamily
           idlePaused: root.idlePaused
+          gamePaused: root.gamePaused
           manuallyPaused: root.manuallyPaused
           nextBreakIsLong: root.service && root.service.nextBreakIsLong
           plannedActive: root.service && root.service.plannedActive

@@ -1,0 +1,9 @@
+{
+  "name": "io.github.silouanwright.look_elsewhere",
+  "description": "Relays privacy-safe browser video context to LookElsewhere",
+  "path": "@HOST_PATH@",
+  "type": "stdio",
+  "allowed_origins": [
+    "chrome-extension://icmgnmabpjbgfogamiaaadaolhopdhmp/"
+  ]
+}

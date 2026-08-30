@@ -24,6 +24,13 @@ Row {
 
   spacing: Style.space(5)
   activeFocusOnTab: true
+  Accessible.role: Accessible.PageTabList
+  Accessible.name: options.length
+    ? qsTr("Settings categories, %1").arg(String(options[Math.max(0,
+        Math.min(options.length - 1, activeFocus ? focusedIndex : selectedIndex()))].label))
+    : qsTr("Settings categories")
+  Accessible.focusable: true
+  Accessible.focused: activeFocus
 
   function selectedIndex() {
     for (let i = 0; i < options.length; i++)
@@ -32,6 +39,7 @@ Row {
   }
 
   onActiveFocusChanged: if (activeFocus) focusedIndex = selectedIndex()
+  onValueChanged: if (activeFocus) focusedIndex = selectedIndex()
 
   Keys.onPressed: function(event) {
     if (event.key === Qt.Key_Left || event.text === "h") {
@@ -80,6 +88,7 @@ Row {
         verticalPadding: Style.space(6)
         Accessible.role: Accessible.PageTab
         Accessible.name: String(modelData.label)
+        Accessible.selected: selected
         Accessible.onPressAction: clicked()
         onClicked: root.changed(String(modelData.value))
 
@@ -120,6 +129,7 @@ Row {
             font.pixelSize: Style.font.bodySmall
             font.weight: tabButton.selected ? Font.DemiBold : Font.Normal
             anchors.verticalCenter: parent.verticalCenter
+            Accessible.ignored: true
           }
         }
       }

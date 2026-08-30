@@ -55,6 +55,7 @@ function defaultConfig() {
     longBreakTitle: "Look elsewhere",
     longBreakSubtitle: "Stand up, stretch, and leave the screen for a few minutes.",
     reducedMotion: false,
+    reducedTransparency: false,
     soundEnabled: true,
     soundVolume: 65,
     startSoundEnabled: true,
@@ -63,6 +64,7 @@ function defaultConfig() {
     completionSoundPath: "",
     outputMode: "all",
     panelPattern: "off",
+    pauseDuringSteamGames: true,
     protectedApps: ["steam"],
     plannedBreaks: [],
     officeHours: { enabled: false, startMinute: 8 * 60, endMinute: 18 * 60 },
@@ -93,6 +95,7 @@ function normalizeConfig(input) {
   base.longBreakTitle = String(value.longBreakTitle === undefined ? base.longBreakTitle : value.longBreakTitle).trim()
   base.longBreakSubtitle = String(value.longBreakSubtitle === undefined ? base.longBreakSubtitle : value.longBreakSubtitle).trim()
   base.reducedMotion = value.reducedMotion === true
+  base.reducedTransparency = value.reducedTransparency === true
   base.soundEnabled = value.soundEnabled === true
   base.soundVolume = Math.round(clamp(value.soundVolume === undefined ? base.soundVolume : value.soundVolume, 0, 100))
   base.startSoundEnabled = value.startSoundEnabled === undefined ? base.startSoundEnabled : value.startSoundEnabled === true
@@ -102,6 +105,8 @@ function normalizeConfig(input) {
   base.outputMode = ["all", "focused"].indexOf(value.outputMode) >= 0 ? value.outputMode : base.outputMode
   base.panelPattern = ["off", "topography", "graph-paper", "wiggle", "bank-note", "diagonal-lines"].indexOf(value.panelPattern) >= 0
     ? value.panelPattern : base.panelPattern
+  base.pauseDuringSteamGames = value.pauseDuringSteamGames === undefined
+    ? base.pauseDuringSteamGames : value.pauseDuringSteamGames === true
   var protectedApps = value.protectedApps === undefined ? base.protectedApps : value.protectedApps
   if (!Array.isArray(protectedApps)) protectedApps = String(protectedApps || "").split(",")
   base.protectedApps = protectedApps.map(function(app) {
@@ -441,6 +446,7 @@ function configFromSettings(settings) {
   if (incoming.longBreakTitle !== undefined) next.longBreakTitle = String(incoming.longBreakTitle)
   if (incoming.longBreakSubtitle !== undefined) next.longBreakSubtitle = String(incoming.longBreakSubtitle)
   if (incoming.reducedMotion !== undefined) next.reducedMotion = incoming.reducedMotion === true
+  if (incoming.reducedTransparency !== undefined) next.reducedTransparency = incoming.reducedTransparency === true
   if (incoming.soundEnabled !== undefined) next.soundEnabled = incoming.soundEnabled === true
   if (incoming.soundVolume !== undefined) next.soundVolume = finiteNumber(incoming.soundVolume, next.soundVolume)
   if (incoming.startSoundEnabled !== undefined) next.startSoundEnabled = incoming.startSoundEnabled === true
@@ -449,6 +455,7 @@ function configFromSettings(settings) {
   if (incoming.completionSoundPath !== undefined) next.completionSoundPath = String(incoming.completionSoundPath)
   if (incoming.outputMode !== undefined) next.outputMode = String(incoming.outputMode)
   if (incoming.panelPattern !== undefined) next.panelPattern = String(incoming.panelPattern)
+  if (incoming.pauseDuringSteamGames !== undefined) next.pauseDuringSteamGames = incoming.pauseDuringSteamGames === true
   if (incoming.protectedApps !== undefined) next.protectedApps = String(incoming.protectedApps)
   if (incoming.plannedBreaks !== undefined) next.plannedBreaks = incoming.plannedBreaks
   if (incoming.officeHoursEnabled !== undefined) next.officeHours.enabled = incoming.officeHoursEnabled === true
@@ -633,7 +640,7 @@ function inOfficeHours(date, officeHours) {
 
 function strongestEvidence(evidence, config) {
   var enabled = config && config.detectors ? config.detectors : defaultConfig().detectors
-  var priority = ["dictation", "screen-sharing", "meeting", "camera", "microphone", "application", "video", "media", "fullscreen"]
+  var priority = ["dictation", "screen-sharing", "meeting", "camera", "microphone", "game", "application", "video", "media", "fullscreen"]
   var best = null
   for (var i = 0; i < (evidence || []).length; i++) {
     var item = evidence[i] || {}
@@ -641,7 +648,7 @@ function strongestEvidence(evidence, config) {
     var detectorKey = category === "meeting" || category === "camera" ? "microphone"
       : category === "screen-sharing" ? "screenSharing"
       : category === "video" ? "media"
-      : category === "application" ? "applications" : category
+      : category === "application" || category === "game" ? "applications" : category
     if (enabled[detectorKey] !== true || item.active !== true) continue
     var confidence = clamp(item.confidence === undefined ? 0 : item.confidence, 0, 1)
     if (confidence < 0.6) continue
@@ -841,6 +848,7 @@ function observe(snapshot, input, config) {
   var previous = Number(next.lastObservedAtMs || now)
   var elapsed = clamp(now - previous, 0, 5 * 60 * 1000)
   var activeNow = input.active === true && input.idle !== true
+  var accumulationPaused = input.accumulationPaused === true
   next = ensureStatisticsDay(next, now)
   var plannedCandidate = next.activePlannedOccurrence ? null
     : nextActionablePlannedOccurrence(cfg, now, next.handledPlannedOccurrences)
@@ -850,7 +858,8 @@ function observe(snapshot, input, config) {
   var awayMs = now - Number(next.lastActiveAtMs || previous)
   var stableWork = (next.state === State.Working || next.state === State.DueSoon)
     && !next.activePlannedOccurrence && !plannedCandidate
-  if (activeNow && !manuallyPaused && stableWork && awayMs >= NaturalBreakReviewMs) {
+  if (activeNow && !accumulationPaused && !manuallyPaused && stableWork
+      && awayMs >= NaturalBreakReviewMs) {
     var before = {
       state: next.state,
       accumulatedActiveMs: next.accumulatedActiveMs,
@@ -891,7 +900,8 @@ function observe(snapshot, input, config) {
   }
   if (next.activePlannedOccurrence) {
     var plannedWasManuallyPaused = next.state === State.Waiting && next.pauseReason === "manual"
-    if (activeNow && !plannedWasManuallyPaused && inOfficeHours(new Date(now), cfg.officeHours))
+    if (activeNow && !accumulationPaused && !plannedWasManuallyPaused
+        && inOfficeHours(new Date(now), cfg.officeHours))
       next = recordActiveStatistics(next, elapsed, now)
     next = observePlannedOccurrence(next, input, cfg, now, protection)
     if (activeNow) next.lastActiveAtMs = now
@@ -914,7 +924,7 @@ function observe(snapshot, input, config) {
     elapsed = 0
   }
 
-  if (activeNow && !manuallyPaused && next.state !== State.Breaking)
+  if (activeNow && !accumulationPaused && !manuallyPaused && next.state !== State.Breaking)
     next = recordActiveStatistics(next, elapsed, now)
 
   if ((next.state === State.Warning || next.state === State.Final) && protection) {
@@ -950,7 +960,7 @@ function observe(snapshot, input, config) {
     return next
   }
 
-  if (activeNow) next.accumulatedActiveMs += elapsed
+  if (activeNow && !accumulationPaused) next.accumulatedActiveMs += elapsed
   var remaining = Math.max(0, cfg.focusMs - next.accumulatedActiveMs)
   if (remaining <= cfg.warningMs && protection) {
     if (!next.dueAtMs) next.dueAtMs = now + remaining
@@ -1274,6 +1284,7 @@ function protectedExplanation(category) {
     meeting: "your meeting is active",
     camera: "your camera is active",
     microphone: "your microphone is active",
+    game: "a Steam game is active",
     video: "video is playing",
     media: "media is playing",
     application: "a protected application is focused",
@@ -1290,6 +1301,7 @@ function contextShortLabel(category) {
     meeting: "Meeting",
     camera: "Camera",
     microphone: "Mic",
+    game: "Game",
     video: "Video",
     media: "Media",
     application: "Focus",
@@ -1307,6 +1319,28 @@ function pipewireRoleEvidence(record, focused) {
   if (role === "movie" && focused === true) return { category: "video", confidence: 0.9, active: true }
   if (value.captureAudio === true) return { category: "microphone", confidence: 0.85, active: true }
   return null
+}
+
+function browserContextEvidence(context) {
+  var value = context || {}
+  if (value.video_state !== "playing") return null
+  if (value.picture_in_picture === true
+      || (value.browser_focused === true && value.video_visible === true))
+    return { category: "video", confidence: 1, active: true }
+  return null
+}
+
+function parseSundownStatus(raw) {
+  try {
+    var text = String(raw || "")
+    if (text.length < 1 || text.length > 64 * 1024) return null
+    var value = JSON.parse(text)
+    if (value.version !== 1 || !value.steam || typeof value.steam.active !== "boolean") return null
+    var sensor = value.runtime ? String(value.runtime.steam_sensor || "") : ""
+    return { active: value.steam.active, sensor: sensor.slice(0, 64) }
+  } catch (error) {
+    return null
+  }
 }
 
 function pipewireNodeMatchesApp(record, appId) {

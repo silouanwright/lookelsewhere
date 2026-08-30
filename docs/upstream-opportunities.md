@@ -307,6 +307,29 @@ composition for plugin panels.
 **Unlocks.** Consistent keyboard-first plugins without each author rebuilding
 focus and activation semantics.
 
+## 14. Export Quickshell QML trees through AT-SPI
+
+**Problem.** Qt Quick controls can declare accessible names, roles, states, and
+actions, but the installed Quickshell runtime does not expose its child object
+tree to AT-SPI. With toolkit accessibility forced on, AT-SPI discovers the
+Quickshell applications but reports zero children for each one. Orca therefore
+has nothing to traverse.
+
+**Current workaround.** LookElsewhere supplies complete QML accessibility
+metadata, deterministic keyboard operation, non-color cues, reduced motion,
+reduced transparency, and contrast evidence. Those measures improve the product
+today but cannot substitute for the host exporting the semantic tree.
+
+**Proposed upstream work.** Trace Quickshell's custom window and layer-shell
+integration through Qt's accessibility bridge and ensure accessible QML items
+are attached beneath each application/window object. Add a small automated
+AT-SPI smoke test that launches a labeled button and asserts that the child and
+its role are discoverable. A search of the public Quickshell issue tracker on
+August 29, 2026 found no issue specifically covering this failure.
+
+**Unlocks.** Screen-reader access for LookElsewhere and every other Quickshell
+shell or plugin that already declares Qt accessibility semantics.
+
 ## What should not move upstream
 
 The following remain LookElsewhere policy or optional adapters:

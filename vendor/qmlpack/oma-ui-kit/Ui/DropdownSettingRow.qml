@@ -23,6 +23,7 @@ Item {
 
   function activate() { if (enabled) field.toggle() }
   function toggle() { activate() }
+  function focusEditor() { field.focusTrigger() }
 
   implicitHeight: Math.max(labels.implicitHeight, field.implicitHeight)
 
@@ -45,6 +46,8 @@ Item {
     anchors.right: parent.right
     anchors.verticalCenter: parent.verticalCenter
     showLabel: false
+    accessibleLabel: root.label
+    accessibleDescription: root.description
     value: root.value
     options: root.options
     foreground: root.foreground
