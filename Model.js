@@ -1336,8 +1336,28 @@ function parseSundownStatus(raw) {
     if (text.length < 1 || text.length > 64 * 1024) return null
     var value = JSON.parse(text)
     if (value.version !== 1 || !value.steam || typeof value.steam.active !== "boolean") return null
+    var active = value.steam.active
+    var sources = []
+    if (value.games !== undefined) {
+      if (!value.games || typeof value.games.active !== "boolean"
+          || !Array.isArray(value.games.sources) || value.games.sources.length > 8) return null
+      active = value.games.active
+      for (var i = 0; i < value.games.sources.length; i++) {
+        var source = String(value.games.sources[i] || "")
+        if (!source || source.length > 64) return null
+        sources.push(source)
+      }
+    } else {
+      var sharedGroup = String(value.steam.shared_app_group || "").slice(0, 64)
+      var groups = value.apps && Array.isArray(value.apps.groups) ? value.apps.groups : []
+      for (var j = 0; !active && sharedGroup && j < Math.min(groups.length, 32); j++) {
+        var group = groups[j] || {}
+        if (String(group.name || "").slice(0, 64) === sharedGroup && group.active === true)
+          active = true
+      }
+    }
     var sensor = value.runtime ? String(value.runtime.steam_sensor || "") : ""
-    return { active: value.steam.active, sensor: sensor.slice(0, 64) }
+    return { active: active, sources: sources, sensor: sensor.slice(0, 64) }
   } catch (error) {
     return null
   }

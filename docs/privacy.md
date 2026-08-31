@@ -14,7 +14,7 @@ LookElsewhere observes the minimum local signals needed to time interruptions. I
 - Coarse, bounded PipeWire role, capture-audio, and application-identity fields
   required to infer microphone, meeting, camera, sharing, or video activity
 - Omarchy dictation active/inactive state
-- When optional Sundown is installed: its coarse Steam-game active/inactive
+- When optional Sundown is installed: its coarse shared-game active/inactive
   state and detector name from the root-owned public status file
 - Current output/workspace state required for surface placement
 

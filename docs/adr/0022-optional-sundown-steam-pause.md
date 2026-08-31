@@ -1,4 +1,4 @@
-# ADR 0022: Use Optional Sundown Evidence to Pause During Steam Games
+# ADR 0022: Use Optional Sundown Evidence to Pause During Games
 
 - Status: Accepted
 - Date: 2026-08-29
@@ -12,15 +12,18 @@ game, and process-level Proton identity is outside a shell plugin's normal
 scope.
 
 Sundown already distinguishes actual Steam and Proton game processes from the
-client. Copying its `/proc` scanner into LookElsewhere would create two privacy
-boundaries and two implementations of the same platform-specific logic.
+client and identifies games launched through Heroic. Copying those detectors
+into LookElsewhere would create two privacy boundaries and two implementations
+of the same platform-specific logic.
 
 ## Decision
 
 Keep Sundown optional. When its fresh version-1 public status is available,
-consume only the Steam active boolean and bounded detector name. Pause interval
-active-time accounting while a game is active, but continue treating the user
-as present so gameplay cannot trigger LookElsewhere's away-session reset.
+prefer its policy-independent game-active boolean and bounded source names.
+Older Sundown versions fall back to the Steam active boolean and its explicitly
+named shared game group. Pause interval active-time accounting while a game is
+active, but continue treating the user as present so gameplay cannot trigger
+LookElsewhere's away-session reset.
 
 Watch Sundown's root-owned, atomically replaced `/run/sundown/status.json`
 instead of polling its CLI. Reject unsupported or oversized status, expire the
@@ -49,5 +52,5 @@ time under the existing protected-context policy.
 The bar and panel expose `Game` while the timer is paused, and diagnostics name
 the integration state, detector, raw game-active state, and effective pause.
 Sundown upgrades accuracy without becoming a package dependency. Live release
-verification still needs at least one real Steam or Proton game because process
-metadata comes from third-party applications.
+verification still needs real Steam/Proton and Heroic-launched games because
+process and launcher metadata come from third-party applications.

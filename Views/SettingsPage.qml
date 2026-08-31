@@ -344,14 +344,14 @@ ColumnLayout {
   LookUi.ToggleSettingRow {
     id: steamPauseRow
     Layout.fillWidth: true
-    label: qsTr("Pause during Steam games")
+    label: qsTr("Pause during games")
     description: settingsPage.service && settingsPage.service.sundownIntegrationStatus === "Connected"
       ? (settingsPage.service.steamPauseActive
           ? qsTr("Paused now; Sundown detected an active game")
           : qsTr("Sundown is connected and watching for games"))
       : settingsPage.service && settingsPage.service.sundownIntegrationStatus === "Unavailable"
         ? qsTr("Sundown stopped responding; window-based protection remains")
-        : qsTr("Install Sundown for reliable Steam and Proton detection")
+        : qsTr("Install Sundown for reliable Steam, Proton, and Heroic detection")
     checked: !settingsPage.settings || settingsPage.settings.pauseDuringSteamGames === undefined
       || settingsPage.settings.pauseDuringSteamGames === true
     foreground: settingsPage.foreground; accent: settingsPage.accent; fontFamily: settingsPage.fontFamily

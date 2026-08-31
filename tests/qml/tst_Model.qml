@@ -116,7 +116,33 @@ TestCase {
     }))
     verify(status !== null)
     verify(status.active)
+    compare(status.sources.length, 0)
     compare(status.sensor, "linux-proc-steam-env")
+    var canonical = Model.parseSundownStatus(JSON.stringify({
+      version: 1,
+      steam: { active: false },
+      games: { active: true, sources: ["heroic"] }
+    }))
+    verify(canonical.active)
+    compare(canonical.sources[0], "heroic")
+    var heroic = Model.parseSundownStatus(JSON.stringify({
+      version: 1,
+      steam: { active: false, shared_app_group: "gaming" },
+      apps: { groups: [
+        { name: "journaling", active: true },
+        { name: "gaming", active: true, shared_with_steam: true }
+      ] }
+    }))
+    verify(heroic !== null)
+    verify(heroic.active)
+    var unrelated = Model.parseSundownStatus(JSON.stringify({
+      version: 1,
+      steam: { active: false, shared_app_group: "gaming" },
+      apps: { groups: [{ name: "journaling", active: true }] }
+    }))
+    verify(unrelated !== null)
+    verify(!unrelated.active)
+    compare(Model.parseSundownStatus('{"version":1,"steam":{"active":false},"games":{"active":true,"sources":[""]}}'), null)
     compare(Model.parseSundownStatus('{"version":2,"steam":{"active":true}}'), null)
     compare(Model.parseSundownStatus('{"version":1,"steam":{"active":"yes"}}'), null)
     compare(Model.parseSundownStatus(new Array(65538).join("x")), null)

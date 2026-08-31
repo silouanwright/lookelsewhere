@@ -79,7 +79,7 @@ ColumnLayout {
       Layout.fillWidth: true
       Layout.bottomMargin: -Style.space(10)
       text: root.manuallyPaused ? qsTr("Breaks paused")
-        : root.gamePaused ? qsTr("Steam game detected")
+        : root.gamePaused ? qsTr("Game detected")
         : root.idlePaused ? qsTr("LookElsewhere is paused")
         : root.plannedReady ? qsTr("%1 is ready").arg(root.plannedName)
         : root.plannedDeferred ? qsTr("%1 is waiting").arg(root.plannedName)
@@ -98,7 +98,7 @@ ColumnLayout {
       Layout.preferredHeight: Math.max(clockRow.implicitHeight, idleClock.implicitHeight)
       Accessible.role: Accessible.StaticText
       Accessible.name: root.manuallyPaused ? qsTr("Break reminders paused")
-        : root.gamePaused ? qsTr("Steam game active; focus timer paused")
+        : root.gamePaused ? qsTr("Game active; focus timer paused")
         : root.idlePaused ? qsTr("Idle; focus timer paused")
         : root.totalSeconds <= 10 ? qsTr("%1 seconds remaining").arg(root.totalSeconds)
         : root.totalSeconds < 60 ? qsTr("Less than one minute remaining")

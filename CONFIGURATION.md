@@ -98,7 +98,7 @@ numbers: Sunday is `0`, Monday is `1`, through Saturday `6`.
 | `microphoneDetection` | `true` | Boolean | Delay while PipeWire reports an active microphone stream; audio is never recorded. |
 | `screenSharingDetection` | `true` | Boolean | Delay when an active PipeWire stream explicitly identifies screen sharing or recording. |
 | `dictationDetection` | `true` | Boolean | Delay while Omarchy Voxtype dictation is active. |
-| `pauseDuringSteamGames` | `true` | Boolean | When optional Sundown is connected, pause active-time accounting while it detects a Steam or Proton game. Without Sundown, focused-window protection remains the fallback. |
+| `pauseDuringSteamGames` | `true` | Boolean | When optional Sundown is connected, pause active-time accounting while it detects a Steam, Proton, or Heroic-launched game. Without Sundown, focused-window protection remains the fallback. |
 | `protectedApps` | `"steam"` | Comma-separated application IDs | Delay due breaks while listed applications are focused. Add or remove the focused application from **Settings → Context**, or edit the list directly. `steam` also matches `steam_app_<id>` game windows. |
 
 ## Presentation

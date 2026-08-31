@@ -78,8 +78,9 @@ Item {
     ? "Enhanced" : browserContextSeen ? "Unavailable" : "Standard"
   property bool sundownSeen: false
   property bool sundownConnected: false
-  property bool sundownSteamActive: false
+  property bool sundownGameActive: false
   property string sundownSteamSensor: ""
+  property var sundownGameSources: []
   readonly property string sundownIntegrationStatus: sundownConnected
     ? "Connected" : sundownSeen ? "Unavailable" : "Not installed"
   readonly property var demoSequence: [
@@ -145,7 +146,7 @@ Item {
     && !typingPauseMonitor.isIdle
   readonly property bool idlePauseActive: config.detectors.idle && idle
   readonly property bool steamPauseActive: config.pauseDuringSteamGames
-    && (demoMode ? demoGame : sundownConnected && sundownSteamActive)
+    && (demoMode ? demoGame : sundownConnected && sundownGameActive)
   readonly property var currentProtection: Model.strongestEvidence(evidence(), config)
   readonly property string contextLabel: typingHoldActive ? "Active"
     : currentProtection ? Model.contextShortLabel(currentProtection.category) : ""
@@ -156,7 +157,7 @@ Item {
     && snapshot.activePlannedOccurrence.deferred === true
   readonly property string plannedName: plannedActive
     ? String(snapshot.activePlannedOccurrence.name || qsTr("Planned break")) : ""
-  readonly property string label: steamPauseActive ? "Paused during a Steam game"
+  readonly property string label: steamPauseActive ? "Paused during a game"
     : idlePauseActive ? "Paused while you’re away" : Model.stateLabel(snapshot)
   readonly property string remainingText: Model.formatDuration(remainingMs)
   readonly property string naturalBreakMessage: Model.naturalBreakMessage(snapshot)
@@ -251,15 +252,17 @@ Item {
     var status = Model.parseSundownStatus(raw)
     if (!status) {
       sundownConnected = false
-      sundownSteamActive = false
+      sundownGameActive = false
       sundownSteamSensor = ""
+      sundownGameSources = []
       console.warn("LookElsewhere rejected Sundown status")
       return
     }
     sundownSeen = true
     sundownConnected = true
-    sundownSteamActive = status.active
+    sundownGameActive = status.active
     sundownSteamSensor = status.sensor
+    sundownGameSources = status.sources
     sundownExpiry.restart()
   }
 
@@ -645,8 +648,9 @@ Item {
     onFileChanged: reload()
     onLoadFailed: {
       service.sundownConnected = false
-      service.sundownSteamActive = false
+      service.sundownGameActive = false
       service.sundownSteamSensor = ""
+      service.sundownGameSources = []
     }
   }
 
@@ -655,8 +659,9 @@ Item {
     interval: 5000
     onTriggered: {
       service.sundownConnected = false
-      service.sundownSteamActive = false
+      service.sundownGameActive = false
       service.sundownSteamSensor = ""
+      service.sundownGameSources = []
     }
   }
 
@@ -965,7 +970,7 @@ Item {
 
     function status(): string { return JSON.stringify({ state: service.phase, remainingMs: service.remainingMs, evidence: service.evidence(), demo: service.demoMode, idlePaused: service.idlePauseActive, steamPaused: service.steamPauseActive, naturalPauseReady: service.naturalPauseReady, typingHoldActive: service.typingHoldActive, contextLabel: service.contextLabel, browserIntegration: service.browserIntegrationStatus, sundownIntegration: service.sundownIntegrationStatus, naturalBreakDecision: service.snapshot.naturalBreakDecision || null, recoveryWarning: service.recoveryWarning }) }
     function configuration(): string { return JSON.stringify(service.config) }
-    function diagnostics(): string { return JSON.stringify({ fullscreen: service.fullscreenAvailable, dictation: service.dictationAvailable, mpris: true, pipewire: true, pipewireActiveStreams: service.activePipewireNodeIds.length, pipewireEvidenceRecords: service.pipewireEvidenceRecords.length, browserIntegration: service.browserIntegrationStatus, sundownIntegration: service.sundownIntegrationStatus, sundownSteamSensor: service.sundownSteamSensor, steamGameActive: service.sundownSteamActive, steamPauseActive: service.steamPauseActive, idle: true, sound: service.soundAvailable, persistenceBlocked: service.persistenceBlocked, schedulerLastGapMs: service.lastObserveGapMs, schedulerMaximumGapMs: service.maximumObserveGapMs, schedulerLastDurationMs: service.lastObserveDurationMs, schedulerMaximumDurationMs: service.maximumObserveDurationMs }) }
+    function diagnostics(): string { return JSON.stringify({ fullscreen: service.fullscreenAvailable, dictation: service.dictationAvailable, mpris: true, pipewire: true, pipewireActiveStreams: service.activePipewireNodeIds.length, pipewireEvidenceRecords: service.pipewireEvidenceRecords.length, browserIntegration: service.browserIntegrationStatus, sundownIntegration: service.sundownIntegrationStatus, sundownSteamSensor: service.sundownSteamSensor, sundownGameSources: service.sundownGameSources, gameActive: service.sundownGameActive, steamGameActive: service.sundownGameActive, steamPauseActive: service.steamPauseActive, idle: true, sound: service.soundAvailable, persistenceBlocked: service.persistenceBlocked, schedulerLastGapMs: service.lastObserveGapMs, schedulerMaximumGapMs: service.maximumObserveGapMs, schedulerLastDurationMs: service.lastObserveDurationMs, schedulerMaximumDurationMs: service.maximumObserveDurationMs }) }
     function takeBreak(): string { service.takeBreak(); return service.phase }
     function postpone(minutes: int): string { service.postponeMinutes(minutes); return service.phase }
     function pause(minutes: int): string { service.pauseMinutes(minutes); return service.phase }

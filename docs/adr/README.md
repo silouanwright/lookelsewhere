@@ -25,4 +25,4 @@ ADRs use `Accepted`, `Proposed`, or `Superseded` status. Accepted decisions gove
 | [0019](0019-reviewable-source-packages.md) | Manage extracted source through reviewable packages | Accepted |
 | [0020](0020-one-countdown-presentation-clock.md) | Use one total-seconds countdown presentation clock | Accepted |
 | [0021](0021-native-planned-breaks.md) | Coordinate native planned breaks in the existing scheduler | Accepted |
-| [0022](0022-optional-sundown-steam-pause.md) | Use optional Sundown evidence to pause during Steam games | Accepted |
+| [0022](0022-optional-sundown-steam-pause.md) | Use optional Sundown evidence to pause during games | Accepted |

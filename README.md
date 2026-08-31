@@ -47,7 +47,7 @@ rebuilt with Omarchy and Linux flair.
 - Optional Chromium integration that distinguishes playing foreground video
   and Picture-in-Picture from ordinary browser audio
 - Optional Sundown integration that pauses the focus timer while an actual
-  Steam or Proton game is running
+  Steam, Proton, or Heroic-launched game is running
 - Progressive warnings, short breaks, periodic long breaks, snoozing, office
   hours, enforcement modes, and configurable sounds
 - Recurring planned breaks for lunch, prayer, walks, or shutdown routines, with
@@ -168,14 +168,14 @@ disconnects. See
 [Browser integration](docs/browser-integration.md) for the privacy contract and
 setup details.
 
-### Optional Steam integration
+### Optional game integration
 
 LookElsewhere's built-in window matching delays due breaks while a focused
 Steam window is identifiable. If [Sundown](https://github.com/silouanwright/sundown)
-is installed, LookElsewhere automatically uses its process-level Steam and
-Proton detection and pauses active-time accounting while a game is running.
-The integration is local, read-only, optional, and can be disabled under
-**Settings → Context**.
+is installed, LookElsewhere automatically uses its policy-independent game
+signal for Steam, Proton, and Heroic, then pauses active-time accounting while
+a game is running. The integration is local, read-only, optional, and can be
+disabled under **Settings → Context**.
 
 ## Limitations
 
@@ -187,10 +187,9 @@ The integration is local, read-only, optional, and can be disabled under
 - Wayland exposes coarse application and device state, not semantic intent.
   Screen sharing, recording, and every meeting state cannot yet be identified
   perfectly without upstream support.
-- Without Sundown, Steam handling depends on the focused window exposing
-  `steam` or `steam_app_<id>` as its application class. Some native games use
-  unrelated classes, so process-level game detection is unavailable in the
-  standalone plugin.
+- Without Sundown, game handling depends on the focused window matching a
+  protected application. Some Steam and Heroic games use unrelated classes,
+  so launcher/process-level detection is unavailable in the standalone plugin.
 - The `Active` state means recent keyboard or pointer activity. Ordinary
   Wayland clients cannot tell which kind occurred, so scrolling or moving the
   pointer can hold the final ten seconds just like typing. LookElsewhere never
