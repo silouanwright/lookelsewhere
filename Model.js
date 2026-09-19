@@ -62,6 +62,7 @@ function defaultConfig() {
     completionSoundEnabled: true,
     startSoundPath: "",
     completionSoundPath: "",
+    alertPresentation: "custom",
     outputMode: "all",
     panelPattern: "off",
     pauseDuringSteamGames: true,
@@ -102,6 +103,8 @@ function normalizeConfig(input) {
   base.completionSoundEnabled = value.completionSoundEnabled === undefined ? base.completionSoundEnabled : value.completionSoundEnabled === true
   base.startSoundPath = String(value.startSoundPath || "").trim()
   base.completionSoundPath = String(value.completionSoundPath || "").trim()
+  base.alertPresentation = ["custom", "native", "both"].indexOf(value.alertPresentation) >= 0
+    ? value.alertPresentation : base.alertPresentation
   base.outputMode = ["all", "focused"].indexOf(value.outputMode) >= 0 ? value.outputMode : base.outputMode
   base.panelPattern = ["off", "topography", "graph-paper", "wiggle", "bank-note", "diagonal-lines"].indexOf(value.panelPattern) >= 0
     ? value.panelPattern : base.panelPattern
@@ -453,6 +456,7 @@ function configFromSettings(settings) {
   if (incoming.completionSoundEnabled !== undefined) next.completionSoundEnabled = incoming.completionSoundEnabled === true
   if (incoming.startSoundPath !== undefined) next.startSoundPath = String(incoming.startSoundPath)
   if (incoming.completionSoundPath !== undefined) next.completionSoundPath = String(incoming.completionSoundPath)
+  if (incoming.alertPresentation !== undefined) next.alertPresentation = String(incoming.alertPresentation)
   if (incoming.outputMode !== undefined) next.outputMode = String(incoming.outputMode)
   if (incoming.panelPattern !== undefined) next.panelPattern = String(incoming.panelPattern)
   if (incoming.pauseDuringSteamGames !== undefined) next.pauseDuringSteamGames = incoming.pauseDuringSteamGames === true

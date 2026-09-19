@@ -12,6 +12,14 @@ TestCase {
     return Model.normalizeConfig(value)
   }
 
+  function test_alertPresentation() {
+    compare(Model.configFromSettings({}).alertPresentation, "custom")
+    for (var mode of ["custom", "native", "both"])
+      compare(Model.configFromSettings({ alertPresentation: mode }).alertPresentation, mode)
+    compare(Model.configFromSettings({ alertPresentation: "invalid" }).alertPresentation, "custom")
+    compare(Model.normalizeConfig({ alertPresentation: "native" }).alertPresentation, "native")
+  }
+
   function test_overnightOfficeHours() {
     var hours = { enabled: true, startMinute: 20 * 60, endMinute: 2 * 60 }
     verify(Model.inOfficeHours(new Date(2026, 7, 22, 23, 0), hours))

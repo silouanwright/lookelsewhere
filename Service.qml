@@ -965,6 +965,8 @@ Item {
     pipewireEvidenceRefresh.start()
   }
 
+  NativeAlerts { controller: service }
+
   IpcHandler {
     target: "look-elsewhere"
 
@@ -979,6 +981,12 @@ Item {
     function resume(): string { service.resume(); return service.phase }
     function skip(): string { service.skipBreak(); return service.phase }
     function resetHistory(): string { service.resetHistory(); return "ok" }
+    function undoNativeNotice(decidedAt: string): string {
+      var decision = service.snapshot.naturalBreakDecision
+      if (!decision || String(decision.decidedAtMs) !== decidedAt || !service.naturalBreakUndoAvailable) return "expired"
+      service.undoNaturalBreak()
+      return service.phase
+    }
     function undoNaturalBreak(): string { service.undoNaturalBreak(); return service.phase }
     function resetLocalData(): string { service.resetLocalData(); return "ok" }
     function demo(state: string): string { service.setDemo(state); return service.phase }

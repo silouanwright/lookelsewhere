@@ -43,7 +43,7 @@ ColumnLayout {
     || soundVolumeField.editorActive || plannedBreaksPage.editorActive
   readonly property bool dropdownOpen: enforcementDropdown.popupOpen
     || officeStartDropdown.popupOpen || officeEndDropdown.popupOpen
-    || outputModeDropdown.popupOpen || displayModeDropdown.popupOpen
+    || alertPresentationDropdown.popupOpen || outputModeDropdown.popupOpen || displayModeDropdown.popupOpen
     || panelPatternDropdown.popupOpen || plannedBreaksPage.dropdownOpen
   readonly property string activeAppId: service ? String(service.activeAppId || "").trim() : ""
   readonly property bool activeAppProtected: service
@@ -101,7 +101,7 @@ ColumnLayout {
   function targets() {
     var byTab = {
       general: [panelPatternDropdown, soundRow, soundVolumeField,
-        startSoundRow, completionSoundRow, outputModeDropdown, displayModeDropdown,
+        startSoundRow, completionSoundRow, alertPresentationDropdown, outputModeDropdown, displayModeDropdown,
         reduceMotionRow, reduceTransparencyRow, keyboardHintRow, editSettingsButton],
       context: [idleDetectionRow, recentInputDetectionRow, fullscreenDetectionRow, mediaDetectionRow,
         steamPauseRow, microphoneDetectionRow, screenSharingDetectionRow, dictationDetectionRow, protectedAppsRow],
@@ -830,6 +830,19 @@ ColumnLayout {
     label: qsTr("Displays")
     foreground: settingsPage.muted
     fontFamily: settingsPage.fontFamily
+  }
+
+  LookUi.DropdownSettingRow {
+    id: alertPresentationDropdown
+    Layout.fillWidth: true
+    label: qsTr("Brief alerts")
+    description: qsTr("Native notifications respect Do Not Disturb. Final countdowns and full-screen breaks stay visible.")
+    value: settingsPage.settings && settingsPage.settings.alertPresentation !== undefined ? String(settingsPage.settings.alertPresentation) : "custom"
+    options: [{ value: "custom", label: qsTr("Custom alerts") }, { value: "native", label: qsTr("Native notifications") }, { value: "both", label: qsTr("Both") }]
+    hasCursor: settingsPage.hasCursorFor(alertPresentationDropdown)
+    foreground: settingsPage.foreground; muted: settingsPage.muted; accent: settingsPage.accent; fontFamily: settingsPage.fontFamily
+    onHovered: function(on) { if (on) settingsPage.setCursorTarget(alertPresentationDropdown) }
+    onChanged: function(next) { settingsPage.persistSettings({ alertPresentation: next }) }
   }
 
   LookUi.DropdownSettingRow {

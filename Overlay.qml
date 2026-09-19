@@ -19,8 +19,10 @@ Item {
   property var shell: null
   property var manifest: null
 
+  readonly property bool customAlerts: !service || service.config.alertPresentation !== "native"
   readonly property bool visibleState: service && service.interrupting
-  readonly property bool naturalBreakToastVisible: service && service.naturalBreakToastVisible
+    && (customAlerts || breaking || finalCountdown)
+  readonly property bool naturalBreakToastVisible: customAlerts && service && service.naturalBreakToastVisible
   readonly property bool breaking: service && service.phase === "breaking"
   readonly property bool finalCountdown: service && service.phase === "final-countdown"
   readonly property bool plannedReady: service && service.plannedReady
