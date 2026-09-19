@@ -1,80 +1,84 @@
 # Marketplace Submission Record
 
-This document preserves the submission copy prepared on 2026-08-23. The plugin
-was submitted as
-[marketplace issue #1785](https://github.com/HANCORE-linux/omarchy-plugin-marketplace/issues/1785);
-the issue is the source of truth for its current review status.
+LookElsewhere is listed in the community Omarchy plugin marketplace.
 
-## Proposed listing
+- Plugin ID: `io.github.silouanwright.look-elsewhere`
+- Repository: <https://github.com/silouanwright/lookelsewhere>
+- Category: `Productivity`; tags: `bar`, `hyprland`, `quickshell`
+- Initial listing: [issue #1785](https://github.com/omacom/omarchy-plugin-marketplace/issues/1785)
+  (submitted 2026-08-23, listed 2026-08-24, closed 2026-08-24)
+- First verified snapshot: `1225de0632e6dff2874deeb3f4896fe026bdd8e4`
+  ("Polish keyboard hint placement", validated 2026-08-25)
+- 0.3.0 update request: opened 2026-09-19 against the release commit on `main`;
+  the issue URL and promotion result are recorded here after promotion.
 
-- Title: `[Plugin]: LookElsewhere`
-- Category: `Productivity`
-- Tags: `bar`, `hyprland`, `quickshell`
-- Suggested missing tag: `wellbeing`
+## Publishing a new version
 
-## Issue body
+The marketplace repository moved from `HANCORE-linux/omarchy-plugin-marketplace`
+to `omacom/omarchy-plugin-marketplace` (old links redirect), and version updates
+no longer use the `[Plugin]:` submission form. A released version is promoted
+through the **Plugin verification** issue form:
+
+<https://github.com/omacom/omarchy-plugin-marketplace/issues/new?template=verify-plugin.yml>
+
+1. Select **Verify and publish a newer upstream commit**.
+2. Enter the existing plugin ID, the repository root URL, and the full
+   40-character commit SHA of the release commit.
+3. The requested SHA must be the repository's default-branch HEAD when the
+   issue is validated (`update-upstream-changed` otherwise), and the configured
+   plugin ID set must not change (`update-plugin-set-changed`).
+4. Automated compatibility validation and the Automated Security Baseline run
+   against that exact commit. A write-authorized maintainer then applies
+   `approved-and-verified`; publication is atomic and the superseded snapshot is
+   retained in the registry's `listingValidationHistory`.
+5. Do not push to `main` between opening the issue and promotion, or the
+   requested commit stops matching the observed upstream HEAD.
+
+The version shown on the marketplace card comes from `manifest.json` at the
+submitted commit, so bump it before releasing.
+
+Site (canonical): <https://plugins.omarchy.org> — `omarchyplugins.com` redirects
+there, and `plugins.omarchy.com` does not exist.
+
+## Issue body contract
+
+The issue title must start with `[Verify]:`. The body must contain exactly these
+six `###` headings, in this order, with no additional headings:
 
 ```markdown
+### Verification action
+
+Verify and publish a newer upstream commit
+
+### Plugin ID
+
+io.github.silouanwright.look-elsewhere
+
 ### Repository URL
 
 https://github.com/silouanwright/lookelsewhere
 
-### Category
+### Target commit
 
-Productivity
+<full 40-character SHA of the release commit>
 
-### Tags
+### Verification acknowledgment
 
-bar, hyprland, quickshell
+- [x] I understand that only the exact target commit can become a verified marketplace snapshot and that verification is not a security audit.
 
-### Suggest a missing tag
+### Standard installation acknowledgment
 
-wellbeing
-
-### Maintainer notes
-
-LookElsewhere is a local-first active-use break coach. It uses coarse Omarchy
-and Wayland context signals to avoid interrupting meetings, media, fullscreen
-work, and dictation. It does not capture screen content, record audio, retain
-window or media titles, create accounts, or use the network.
-
-It has no installer or background service and never calls `sudo` or `pkexec`.
-Outside its own plugin directory, it writes only private scheduler state to
-`~/.local/state/look-elsewhere/state.json`; configuration is managed by
-Omarchy in `shell.json`. It invokes `hyprctl` and `jq` for a bounded,
-field-reduced active-window fallback,
-`omarchy-voxtype-status` for optional dictation state, and
-`canberra-gtk-play` for break cues. Missing optional integrations degrade
-gracefully. Bundled sounds can be disabled or replaced with user-provided
-files.
-
-Removal is
-`omarchy plugin remove io.github.silouanwright.look-elsewhere`.
-
-### Submission checklist
-
-- [x] The repository is public and contains installation and removal instructions.
-- [x] I have documented the plugin license and any external dependencies.
-- [x] I confirm that I own or have permission to submit this plugin and its preview assets.
-- [x] The plugin does not overwrite user configuration without explicit consent.
-- [x] I understand that approval is for listing and is not a security review.
+_No response_
 ```
 
-## Submission command
-
-After explicit approval:
-
-```bash
-gh issue create \
-  --repo HANCORE-linux/omarchy-plugin-marketplace \
-  --title "[Plugin]: LookElsewhere" \
-  --body-file /tmp/omarchy-plugin-submission.md
-```
+The install path stays the standard mutable-upstream command published on the
+listing (`omarchy plugin add https://github.com/silouanwright/lookelsewhere.git
+--enable`), so no manual-installation override applies and the standard
+installation acknowledgment stays unselected.
 
 Authoritative references:
 
+- <https://github.com/omacom/omarchy-plugin-marketplace/blob/main/SUBMISSION.md>
+- <https://github.com/omacom/omarchy-plugin-marketplace/blob/main/VERIFICATION.md>
 - <https://github.com/basecamp/omarchy/blob/quattro/manual/32-shell-plugins.md>
-- <https://github.com/HANCORE-linux/omarchy-plugin-marketplace/blob/main/SUBMISSION.md>
-
-All five statements describe the prepared repository. The completed title and
-body still require the owner's explicit approval before submission.
+- <https://plugins.omarchy.org/publish.html>

@@ -107,6 +107,7 @@ numbers: Sunday is `0`, Monday is `1`, through Saturday `6`.
 |---|---:|---|---|
 | `reducedMotion` | `false` | Boolean | Remove animated movement and soft-focus reveals. |
 | `reducedTransparency` | `false` | Boolean | Remove decorative patterns, soft-focus effects, and translucent break backdrops. |
+| `alertPresentation` | `"custom"` | `"custom"`, `"native"`, `"both"` | How warning and natural-break notices are delivered. `native` sends Omarchy notifications, which respect Do Not Disturb; the final countdown and the full-screen break stay on LookElsewhere surfaces. |
 | `outputMode` | `"all"` | `"all"`, `"focused"` | Show interruptions on every output or only the focused output. |
 | `displayMode` | `"icon-and-time"` | `"icon"`, `"time"`, `"icon-and-time"` | Bar-widget presentation. Vertical bars use the icon. |
 | `panelPattern` | `"off"` | `"off"`, `"topography"`, `"graph-paper"`, `"wiggle"`, `"bank-note"`, `"diagonal-lines"` | Optional patterned background for the plugin panel. |
@@ -193,6 +194,7 @@ the complete default value set in one copyable shape:
   // Presentation
   "reducedMotion": false,
   "reducedTransparency": false,
+  "alertPresentation": "custom",
   "outputMode": "all",
   "displayMode": "icon-and-time",
   "panelPattern": "off",
