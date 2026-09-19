@@ -223,10 +223,7 @@ Item {
       WlrLayershell.layer: WlrLayer.Overlay
       WlrLayershell.keyboardFocus: root.breaking && authoritative
         ? WlrKeyboardFocus.Exclusive
-        : authoritative && (root.naturalBreakToastVisible
-            || (root.visibleState && !root.finalCountdown))
-          ? WlrKeyboardFocus.OnDemand
-          : WlrKeyboardFocus.None
+        : WlrKeyboardFocus.None
 
       Item { id: emptyHitArea; width: 0; height: 0 }
 
@@ -308,8 +305,6 @@ Item {
         anchors.top: parent.top
         anchors.topMargin: Style.space(48)
         anchors.horizontalCenter: parent.horizontalCenter
-        onVisibleChanged: if (visible && window.authoritative)
-          Qt.callLater(function() { undoNaturalBreakButton.forceActiveFocus() })
         ProductUi.BedIcon {
           Layout.preferredWidth: Style.space(20)
           Layout.preferredHeight: Layout.preferredWidth
@@ -342,8 +337,6 @@ Item {
         radius: Style.cornerRadius
         color: Color.popups.background
         borderSpec: Border.surfaceSpec("popups", "border", Color.popups.border, Math.max(1, Style.space(2)))
-        onVisibleChanged: if (visible && window.authoritative)
-          Qt.callLater(function() { warningBreakNowButton.forceActiveFocus() })
 
         ColumnLayout {
           id: warningContent
