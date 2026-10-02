@@ -44,8 +44,25 @@ The content script reduces each frame to three values: video state, visual
 presence, and Picture-in-Picture state. The service worker combines those with
 whether Chromium is focused. A Python standard-library native host caps each
 message at 16 KiB, validates and allowlists the fields, and forwards one JSON
-line to a Quickshell-owned Unix socket. QML validates the same protocol again,
-rejects stale sequence numbers, and expires evidence after 12 seconds.
+line to a Unix socket owned by a separate Python receiver. The receiver reads
+at most 4 KiB at a time and rejects frames above 16 KiB before assembling a
+complete line. It allows eight same-user connections, closes incomplete frames
+after two seconds even if more bytes arrive, and closes idle connections after
+15 seconds. Invalid UTF-8, JSON, or protocol fields close that connection.
+
+Only allowlisted fields reach QML, in ASCII JSON records of at most 1 KiB,
+coalesced to at most four updates per second. QML validates the protocol again,
+rejects stale sequence numbers, and expires evidence after 12 seconds. The
+receiver is owned by the plugin's `Process` and stops on unload; it requires
+no service installation. Startup retries are limited to three for shell reload
+handover. If unavailable, standard MPRIS and PipeWire detection still work.
+
+The socket is `$XDG_RUNTIME_DIR/look-elsewhere-browser.sock` (or
+`/run/user/<uid>/look-elsewhere-browser.sock` when the environment variable is
+unset). The runtime directory must be private and owned by the current user.
+The receiver verifies peer credentials. This excludes other users; it does not
+authenticate the extension against other unsandboxed processes in your account.
+Coarse browser context is advisory and never authorizes commands or file writes.
 
 The extension requests access to HTTP and HTTPS pages because a content script
 cannot observe HTML video elements without page access. Its only extension API

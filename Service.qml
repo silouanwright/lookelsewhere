@@ -28,11 +28,6 @@ Item {
   readonly property string pipewireEvidencePath: decodeURIComponent(
     String(Qt.resolvedUrl("tools/pipewire-evidence")).replace(/^file:\/\//, ""))
   readonly property string sundownStatusPath: "/run/sundown/status.json"
-  readonly property string browserSocketPath: {
-    var runtime = Quickshell.env("XDG_RUNTIME_DIR")
-    if (!runtime) runtime = "/run/user/" + Quickshell.env("UID")
-    return runtime + "/look-elsewhere-browser.sock"
-  }
 
   property var config: Model.defaultConfig()
   property var snapshot: Model.defaultSnapshot(Date.now())
@@ -225,13 +220,15 @@ Item {
 
   function acceptBrowserContext(line) {
     try {
-      if (String(line).length > 16384) throw new Error("message exceeds 16 KiB")
+      if (String(line).length > 1024) throw new Error("context exceeds output limit")
       var value = JSON.parse(line)
-      var session = String(value.session_id || "")
-      var sequence = Number(value.sequence || 0)
+      if (!value || typeof value !== "object" || Array.isArray(value)) return
+      var session = value.session_id
+      var sequence = value.sequence
       if (value.version !== 1 || value.browser !== "chromium"
-          || session.length < 1 || session.length > 64
-          || !isFinite(sequence) || Math.floor(sequence) !== sequence || sequence < 1
+          || typeof session !== "string" || session.length < 1 || session.length > 64
+          || typeof sequence !== "number" || !isFinite(sequence)
+          || Math.floor(sequence) !== sequence || sequence < 1 || sequence > 9007199254740991
           || ["none", "paused", "buffering", "playing"].indexOf(value.video_state) < 0
           || typeof value.browser_focused !== "boolean"
           || typeof value.video_visible !== "boolean"
@@ -244,7 +241,7 @@ Item {
       browserContextSeen = true
       browserContextConnected = true
     } catch (error) {
-      console.warn("LookElsewhere rejected browser context: " + error)
+      console.warn("LookElsewhere rejected browser context")
     }
   }
 
@@ -627,13 +624,11 @@ Item {
     objects: service.pipewireLinkGroups
   }
 
-  SocketServer {
-    active: service.browserSocketPath.indexOf("/") === 0
-    path: service.browserSocketPath
-    handler: Socket {
-      parser: SplitParser {
-        onRead: function(line) { service.acceptBrowserContext(line) }
-      }
+  BrowserContext {
+    onContextReceived: function(line) { service.acceptBrowserContext(line) }
+    onUnavailable: {
+      service.browserContextConnected = false
+      service.browserContext = ({})
     }
   }
 

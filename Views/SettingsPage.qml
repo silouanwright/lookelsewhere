@@ -489,7 +489,7 @@ ColumnLayout {
       anchors.verticalCenter: parent.verticalCenter
       label: qsTr("Protected applications")
       description: settingsPage.service && settingsPage.service.config.protectedApps.length
-        ? settingsPage.service.config.protectedApps.join(", ") : qsTr("None configured")
+        ? Model.plainUiText(settingsPage.service.config.protectedApps.join(", ")) : qsTr("None configured")
       foreground: settingsPage.foreground
       muted: settingsPage.muted
       fontFamily: settingsPage.fontFamily
@@ -968,8 +968,8 @@ ColumnLayout {
       anchors.rightMargin: Style.space(12)
       anchors.verticalCenter: parent.verticalCenter
       spacing: Style.space(2)
-      Text { width: parent.width; text: qsTr("Omarchy configuration"); color: settingsPage.foreground; font.family: settingsPage.fontFamily; font.pixelSize: Style.font.body; font.weight: Font.DemiBold; elide: Text.ElideRight }
-      Text { width: parent.width; text: qsTr("Open the Omarchy Shell configuration file"); color: settingsPage.muted; font.family: settingsPage.fontFamily; font.pixelSize: Style.font.bodySmall; wrapMode: Text.WordWrap }
+      Text { textFormat: Text.PlainText; width: parent.width; text: qsTr("Omarchy configuration"); color: settingsPage.foreground; font.family: settingsPage.fontFamily; font.pixelSize: Style.font.body; font.weight: Font.DemiBold; elide: Text.ElideRight }
+      Text { textFormat: Text.PlainText; width: parent.width; text: qsTr("Open the Omarchy Shell configuration file"); color: settingsPage.muted; font.family: settingsPage.fontFamily; font.pixelSize: Style.font.bodySmall; wrapMode: Text.WordWrap }
     }
 
     LookUi.WeightedButton {

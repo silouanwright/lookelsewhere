@@ -121,6 +121,7 @@ BarWidget {
       }
 
       Text {
+        textFormat: Text.PlainText
         visible: root.showTime
         text: root.compactTime
         color: button.active && button.useActiveColor ? button.activeColor : button.foreground

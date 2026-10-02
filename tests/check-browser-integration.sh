@@ -5,6 +5,7 @@ root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
 host="$root/browser-extension/native-host/lookelsewhere-browser-host"
 
 python3 "$host" --self-test
+python3 -B "$root/tests/check-browser-receiver.py"
 node "$root/browser-extension/check.js"
 jq -e '
   .manifest_version == 3

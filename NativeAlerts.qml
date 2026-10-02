@@ -2,6 +2,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import Quickshell.Io
+import "Model.js" as Model
 
 Item {
   id: root
@@ -14,7 +15,8 @@ Item {
 
   function enqueue(title, body, action) {
     var command = ["/usr/bin/omarchy", "notification", "send", "--app-name", "LookElsewhere",
-      "--urgency", "normal", "--expire-time", "6000", title, body, "--exec", "/usr/bin/omarchy-shell"]
+      "--urgency", "normal", "--expire-time", "6000", Model.plainUiText(title),
+      Model.plainUiText(body), "--exec", "/usr/bin/omarchy-shell"]
     pending = pending.concat([command.concat(action)]).slice(-2)
     drain()
   }

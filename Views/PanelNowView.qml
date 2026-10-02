@@ -76,6 +76,7 @@ ColumnLayout {
     }
 
     Text {
+      textFormat: Text.PlainText
       Layout.fillWidth: true
       Layout.bottomMargin: -Style.space(10)
       text: root.manuallyPaused ? qsTr("Breaks paused")
@@ -125,6 +126,7 @@ ColumnLayout {
       }
 
       Text {
+        textFormat: Text.PlainText
         id: idleClock
         anchors.centerIn: parent
         text: root.gamePaused ? qsTr("Game") : root.manuallyPaused ? qsTr("Paused") : qsTr("Idle")
@@ -144,6 +146,7 @@ ColumnLayout {
   }
 
   Text {
+    textFormat: Text.PlainText
     Layout.fillWidth: true
     visible: root.recoveryWarning !== ""
     text: root.recoveryWarning
@@ -328,6 +331,7 @@ ColumnLayout {
   }
 
   Text {
+    textFormat: Text.PlainText
     Layout.fillWidth: true
     Layout.topMargin: Style.space(3)
     visible: root.delayActionsVisible

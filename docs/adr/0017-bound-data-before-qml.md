@@ -35,3 +35,18 @@ provide byte-limited file or collector APIs.
 This boundary is part of the privacy and reliability contract. Future inputs
 that can be influenced outside the plugin must use the same producer-side cap
 and shaping rule.
+
+## Browser socket extension (2026-10-02)
+
+Marketplace review #7717 found that the browser integration's receiving
+`SocketServer` bypassed this rule: its default newline `SplitParser` could
+buffer an unlimited unterminated frame, independently of the native host's
+16 KiB limit. The regular-file `bounded-read` helper remains unchanged; a Unix
+socket needs its own bounded receiver.
+
+The browser receiver now runs outside Quickshell, with 4 KiB reads, 16 KiB
+frames, eight clients, a two-second incomplete-frame deadline, and a
+15-second idle timeout. Only normalized ASCII records of at most 1 KiB reach
+QML, at most four times per second. QML consumes raw chunks with its own
+bounded accumulator. The receiver has no detached descendants and is owned
+by a Quickshell `Process`, including destruction on plugin unload.

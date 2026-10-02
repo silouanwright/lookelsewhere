@@ -42,6 +42,7 @@ ColumnLayout {
   }
 
   Text {
+    textFormat: Text.PlainText
     Layout.fillWidth: true
     Layout.topMargin: -Style.space(4)
     text: root.title
@@ -56,6 +57,7 @@ ColumnLayout {
   }
 
   Text {
+    textFormat: Text.PlainText
     Layout.fillWidth: true
     Layout.topMargin: -Style.space(12)
     horizontalAlignment: Text.AlignHCenter
@@ -79,6 +81,7 @@ ColumnLayout {
     radius: height / 2
 
     Text {
+      textFormat: Text.PlainText
       id: longBreakLabel
       anchors.centerIn: parent
       text: qsTr("Long break")

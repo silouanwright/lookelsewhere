@@ -239,6 +239,21 @@ Linux. If this reaches DHH or the Omarchy team, I'd love to talk about a role
 doing more of this work. If you know them and think LookElsewhere makes the
 case, an introduction would mean a lot.
 
+## Removing LookElsewhere
+
+Run `omarchy plugin remove io.github.silouanwright.look-elsewhere`. Unloading
+the plugin stops its browser-context receiver. Saved break state remains at
+`${XDG_STATE_HOME:-$HOME/.local/state}/look-elsewhere/state.json`; Omarchy's
+plugin settings may remain in `~/.config/omarchy/shell.json`. A socket left by
+an abrupt shell shutdown is reclaimed on the next receiver start or removed
+when the login runtime directory is cleared.
+
+If you installed the optional Chromium integration, remove its extension
+directory from the `--load-extension` line in `~/.config/chromium-flags.conf`,
+move `~/.config/chromium/NativeMessagingHosts/io.github.silouanwright.look_elsewhere.json`
+to Trash, and restart Chromium. The plugin removal command does not undo those
+optional setup changes or remove a global keybinding you added yourself.
+
 ## Development
 
 Architecture decisions, research, verification evidence, deterministic demo

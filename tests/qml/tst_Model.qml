@@ -6,6 +6,13 @@ import "../../vendor/qmlpack/oma-command-layer/Ui/CommandModel.js" as CommandMod
 TestCase {
   name: "LookElsewhereModel"
 
+  function test_hostLabelsCannotCarryMarkup() {
+    compare(Model.plainUiText("<img src='https://invalid.example/pixel'>&#60;\u202e\n"),
+      "img src='https://invalid.example/pixel'#60;")
+    compare(Model.plainUiText("A".repeat(600)).length, 512)
+    compare(Model.plainUiText("Lunch break"), "Lunch break")
+  }
+
   function config(overrides) {
     var value = { focusMs: 60000, breakMs: 5000, dueSoonMs: 2000, warningMs: 4000, finalMs: 1000, cooldownMs: 2000, maximumDelayMs: 10000 }
     for (var key in (overrides || {})) value[key] = overrides[key]

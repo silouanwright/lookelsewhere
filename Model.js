@@ -1,5 +1,12 @@
 .pragma library
 
+// Host-owned labels and notifications do not expose Text.PlainText. Keep
+// their dynamic copy bounded and unable to select Qt's rich-text renderer.
+function plainUiText(value) {
+  return String(value || "").slice(0, 512)
+    .replace(/[<>&\u0000-\u001f\u007f-\u009f\u202a-\u202e\u2066-\u2069]/g, "")
+}
+
 var State = {
   Disabled: "disabled",
   Paused: "paused",

@@ -106,7 +106,7 @@ ColumnLayout {
   function routineOptions() {
     let values = []
     for (let i = 0; i < routines.length; i++)
-      values.push({ value: String(i), label: routines[i].name })
+      values.push({ value: String(i), label: Model.plainUiText(routines[i].name) })
     return values
   }
 
@@ -118,6 +118,7 @@ ColumnLayout {
   }
 
   Text {
+    textFormat: Text.PlainText
     Layout.fillWidth: true
     visible: !root.selectedRoutine
     text: qsTr("Add a routine for lunch, prayer, a walk, or any break that belongs at a particular time.")

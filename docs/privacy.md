@@ -42,9 +42,11 @@ Persist user configuration only through Omarchy's `shell.json`. The plugin state
   QML. Active node reads stop at 64 KiB and the complete request stops at 1.5
   seconds, then retain only allowlisted roles, one capture boolean, and bounded
   application identifiers.
-- Browser native messages stop at 16 KiB before parsing. The native host and
-  QML each accept only the documented coarse fields and reject stale sequence
-  numbers; browser evidence expires after 12 seconds without a heartbeat.
+- Browser native messages and socket frames stop at 16 KiB before parsing.
+  A separate receiver caps socket reads, connections, incomplete-frame time,
+  and output rate before input enters QML. The native host and receiver share
+  one coarse-field schema; QML validates again and rejects stale sequence
+  numbers. Browser evidence expires after 12 seconds without a heartbeat.
 - Sundown status is read from its root-owned, atomically replaced public file,
   rejected above 64 KiB, reduced to one game-active boolean and a bounded
   detector name, and expires after five seconds without an update.

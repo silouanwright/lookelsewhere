@@ -313,6 +313,7 @@ Item {
           color: Color.accent
         }
         Text {
+          textFormat: Text.PlainText
           text: root.service ? root.service.naturalBreakMessage : ""
           color: Color.popups.text
           font.family: Style.font.family
@@ -373,6 +374,7 @@ Item {
                 Accessible.name: root.accessibleCountdown(root.remainingSeconds, qsTr("until break"))
               }
               Text {
+                textFormat: Text.PlainText
                 Layout.fillWidth: true
                 Layout.topMargin: -Style.space(3)
                 text: root.service && root.service.plannedActive
@@ -444,6 +446,7 @@ Item {
           color: Color.accent
         }
         Text {
+          textFormat: Text.PlainText
           Layout.fillWidth: true
           text: root.service && root.service.plannedActive
             ? qsTr("%1 starts in").arg(root.service.plannedName)
@@ -455,6 +458,7 @@ Item {
           elide: Text.ElideRight
         }
         Text {
+          textFormat: Text.PlainText
           text: root.service ? root.service.remainingText : ""
           color: Color.popups.text
           font.family: Style.font.family

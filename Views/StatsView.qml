@@ -117,6 +117,7 @@ ColumnLayout {
       }
     }
     Text {
+      textFormat: Text.PlainText
       text: qsTr("Current session")
       color: root.muted
       font.family: root.fontFamily
@@ -124,6 +125,7 @@ ColumnLayout {
       Accessible.ignored: true
     }
     Text {
+      textFormat: Text.PlainText
       text: "·"
       color: root.muted
       font.family: root.fontFamily
@@ -131,6 +133,7 @@ ColumnLayout {
       Accessible.ignored: true
     }
     Text {
+      textFormat: Text.PlainText
       text: Model.formatDuration(root.statistics.currentSessionActiveMs)
       color: root.foreground
       font.family: root.fontFamily
@@ -141,6 +144,7 @@ ColumnLayout {
   }
 
   Text {
+    textFormat: Text.PlainText
     Layout.fillWidth: true
     Layout.leftMargin: Style.space(4)
     text: qsTr("%1 short · %2 long · %3 planned · %4 snoozed · %5 skipped")
@@ -163,6 +167,7 @@ ColumnLayout {
   }
 
   Text {
+    textFormat: Text.PlainText
     Layout.fillWidth: true
     text: qsTr("Longest %1  ·  Median %2")
       .arg(Model.formatDuration(root.today.longestSessionMs))
@@ -174,6 +179,7 @@ ColumnLayout {
   }
 
   Text {
+    textFormat: Text.PlainText
     Layout.fillWidth: true
     visible: root.sessions.length === 0
     text: qsTr("Your completed focus sessions will appear here.")
@@ -201,6 +207,7 @@ ColumnLayout {
         Layout.fillWidth: true
         spacing: Style.space(8)
         Text {
+          textFormat: Text.PlainText
           Layout.fillWidth: true
           Layout.alignment: Qt.AlignBaseline
           text: root.outcomeLabel(modelData.outcome)
@@ -212,6 +219,7 @@ ColumnLayout {
           Accessible.ignored: true
         }
         Text {
+          textFormat: Text.PlainText
           Layout.alignment: Qt.AlignBaseline
           text: Model.formatDuration(modelData.durationMs)
           color: root.foreground
@@ -220,6 +228,7 @@ ColumnLayout {
           Accessible.ignored: true
         }
         Text {
+          textFormat: Text.PlainText
           Layout.alignment: Qt.AlignBaseline
           text: root.timeLabel(modelData.endedAtMs)
           color: root.muted
@@ -263,6 +272,7 @@ ColumnLayout {
         Layout.fillWidth: true
         spacing: Style.space(8)
         Text {
+          textFormat: Text.PlainText
           Layout.fillWidth: true
           text: root.dayLabel(modelData.dateKey)
           color: root.foreground
@@ -272,6 +282,7 @@ ColumnLayout {
           Accessible.ignored: true
         }
         Text {
+          textFormat: Text.PlainText
           text: Model.formatDuration(modelData.activeMs)
           color: root.muted
           font.family: root.fontFamily
@@ -279,6 +290,7 @@ ColumnLayout {
           Accessible.ignored: true
         }
         Text {
+          textFormat: Text.PlainText
           text: qsTr("%1 breaks").arg(Number(modelData.completed || 0))
           color: root.muted
           font.family: root.fontFamily
@@ -304,6 +316,7 @@ ColumnLayout {
     Accessible.role: Accessible.StaticText
     Accessible.name: qsTr("%1, %2").arg(label).arg(value)
     Text {
+      textFormat: Text.PlainText
       Layout.fillWidth: true
       text: parent.value
       color: root.foreground
@@ -315,6 +328,7 @@ ColumnLayout {
       Accessible.ignored: true
     }
     Text {
+      textFormat: Text.PlainText
       Layout.fillWidth: true
       text: parent.label
       color: root.muted

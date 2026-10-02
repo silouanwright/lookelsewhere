@@ -9,8 +9,10 @@ LookElsewhere is listed in the community Omarchy plugin marketplace.
   (submitted 2026-08-23, listed 2026-08-24, closed 2026-08-24)
 - First verified snapshot: `1225de0632e6dff2874deeb3f4896fe026bdd8e4`
   ("Polish keyboard hint placement", validated 2026-08-25)
-- 0.3.0 update request: opened 2026-09-19 against the release commit on `main`;
-  the issue URL and promotion result are recorded here after promotion.
+- Current update request: [issue #7717](https://github.com/omacom/omarchy-plugin-marketplace/issues/7717),
+  opened for 0.3.0 on 2026-09-19. Version 0.3.1 fixes the receiving-socket
+  byte-limit finding from 2026-09-30 and is submitted through the same issue.
+  Marketplace promotion remains subject to exact-commit validation and maintainer approval.
 
 ## Publishing a new version
 

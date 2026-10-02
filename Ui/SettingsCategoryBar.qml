@@ -121,6 +121,7 @@ Row {
           }
 
           Text {
+            textFormat: Text.PlainText
             text: String(modelData.label)
             color: tabButton.selected
               ? Style.selectedStateColor(root.foreground, root.accent)
