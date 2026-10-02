@@ -546,6 +546,7 @@ Item {
   }
 
   function clearDemo() {
+    if (!demoMode) return
     demoMode = false
     demoIdle = false
     demoNaturalPause = true

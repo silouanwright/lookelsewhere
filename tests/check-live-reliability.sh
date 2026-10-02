@@ -41,15 +41,16 @@ test "$(jq -r '.remainingMs' <<<"$game_before")" = "$(jq -r '.remainingMs' <<<"$
 
 call demo flow >/dev/null
 states=""
-for _ in $(seq 1 22); do
+for _ in $(seq 1 110); do
   current=$(status)
+  jq -e '.demo == true' <<<"$current" >/dev/null
   state=$(jq -r .state <<<"$current")
   case " $states " in *" $state "*) ;; *) states="$states $state" ;; esac
   if [[ " $states " == *" warning "* && " $states " == *" final-countdown "* \
     && " $states " == *" breaking "* && " $states " == *" working "* ]]; then
     break
   fi
-  sleep 1
+  sleep 0.2
 done
 for required in warning final-countdown breaking working; do
   case " $states " in
@@ -61,6 +62,12 @@ done
 call demoOff >/dev/null
 jq -e '.demo == false' <<<"$(status)" >/dev/null
 test "$(call configuration)" = "$original_config"
+
+# Cleanup runs again in the EXIT trap. Repeating it must preserve the real
+# snapshot, including a user's paused state and accumulated statistics.
+restored_state=$(status | jq -r .state)
+call demoOff >/dev/null
+test "$(status | jq -r .state)" = "$restored_state"
 
 diagnostics=$(call diagnostics)
 jq -e '
